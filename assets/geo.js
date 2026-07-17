@@ -140,10 +140,18 @@ async function idealPopulateBrazilCities(selectEl, ufSigla) {
   }
 }
 
+// Guarda o nome oficial em inglês de cada país assim que a API devolve
+// (nossa lista de países está em português, mas a busca de cidades
+// precisa do nome em inglês — por isso guardamos aqui na primeira consulta)
+const idealCountryEnglishNameCache = {};
+
 // Busca os estados/regiões de qualquer país do mundo (exceto Brasil, que usa o IBGE)
 // via API gratuita e sem chave (CountriesNow). Só busca o país escolhido, nunca a lista toda.
 async function idealPopulateCountryStates(selectEl, countryName) {
   if (countryName === "Brasil") return idealPopulateBrazilStates(selectEl);
+
+  const countryInfo = IDEAL_COUNTRIES.find((c) => c.name === countryName);
+  const iso2 = countryInfo ? countryInfo.code : null;
 
   selectEl.disabled = true;
   selectEl.innerHTML = `<option value="">Carregando estados…</option>`;
@@ -151,10 +159,13 @@ async function idealPopulateCountryStates(selectEl, countryName) {
     const res = await fetch("https://countriesnow.space/api/v0.1/countries/states", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ country: countryName }),
+      body: JSON.stringify(iso2 ? { iso2 } : { country: countryName }),
     });
     const json = await res.json();
     const states = json?.data?.states || [];
+
+    // Guarda o nome em inglês pra usar depois na busca de cidades
+    if (json?.data?.name) idealCountryEnglishNameCache[countryName] = json.data.name;
 
     if (!states.length) {
       selectEl.innerHTML = `<option value="">Este país não tem estados/regiões listados</option>`;
@@ -178,11 +189,12 @@ async function idealPopulateCountryStates(selectEl, countryName) {
 // Preenche um <datalist> (sugestão), mantendo o campo de cidade sempre digitável.
 async function idealPopulateCountryStateCities(datalistEl, countryName, stateName) {
   if (!countryName || !stateName) return;
+  const englishName = idealCountryEnglishNameCache[countryName] || countryName;
   try {
     const res = await fetch("https://countriesnow.space/api/v0.1/countries/state/cities", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ country: countryName, state: stateName }),
+      body: JSON.stringify({ country: englishName, state: stateName }),
     });
     const json = await res.json();
     const cities = json?.data || [];
