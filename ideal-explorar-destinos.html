@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explorar destinos — iDeal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7FA; --paper:#FFFFFF; --navy:#131B3A; --navy-2:#1E2A56;
+  --coral:#FF5A3C; --coral-dark:#E8432A; --gold:#F5A623; --mint:#1FAE8C;
+  --ink:#14213D; --ink-soft:#5B6478; --line:#E3E6EE; --radius:20px;
+  --shadow: 0 4px 24px rgba(19,27,58,0.06); --shadow-lg: 0 12px 40px rgba(19,27,58,0.12);
+  font-size:16px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; color:var(--navy); letter-spacing:-0.01em;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+a{color:inherit; text-decoration:none;}
+button,select,input{font-family:inherit; cursor:pointer; border:none;}
+.wrap{max-width:1240px; margin:0 auto; padding:0 24px;}
+:focus-visible{outline:2px solid var(--coral); outline-offset:2px;}
+
+header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1240px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; gap:24px;}
+.logo{display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; color:var(--navy);}
+.logo .dot{width:10px; height:10px; border-radius:50%; background:var(--coral); display:inline-block;}
+.nav-links{display:flex; align-items:center; gap:28px; font-size:14.5px; font-weight:500; color:var(--ink-soft);}
+.nav-links a.active{color:var(--navy); font-weight:700;}
+.nav-links a:hover{color:var(--navy);}
+.btn{padding:11px 22px; border-radius:999px; font-weight:600; font-size:14.5px; display:inline-flex; align-items:center; gap:8px; transition:transform .15s;}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:var(--coral); color:#fff; box-shadow:0 6px 16px rgba(255,90,60,0.3);}
+.btn-ghost{background:transparent; color:var(--navy); border:1.5px solid var(--line);}
+.hamburger{display:none; flex-direction:column; gap:5px; background:none; padding:6px;}
+.hamburger span{width:22px; height:2px; background:var(--navy); border-radius:2px;}
+.mobile-menu{display:none; flex-direction:column; gap:2px; padding:8px 24px 20px; border-top:1px solid var(--line);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{padding:12px 0; font-weight:500; border-bottom:1px solid var(--line); color:var(--ink-soft);}
+
+/* PAGE HEAD + SEARCH */
+.page-head{padding:44px 0 30px; background:var(--paper); border-bottom:1px solid var(--line);}
+.page-head .kicker{font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; color:var(--coral); text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; display:block;}
+.page-head h1{font-size:clamp(26px,3.6vw,38px);}
+.page-head p{color:var(--ink-soft); margin-top:8px; max-width:520px;}
+.dest-search{
+  margin-top:24px; max-width:520px; position:relative;
+}
+.dest-search input{width:100%; padding:15px 18px 15px 46px; border-radius:14px; border:1.5px solid var(--line); background:var(--bg); font-size:15px;}
+.dest-search input:focus{outline:none; border-color:var(--coral); background:var(--paper);}
+.dest-search .ic{position:absolute; left:17px; top:50%; transform:translateY(-50%); font-size:16px; color:var(--ink-soft);}
+
+/* FILTER TABS */
+.filter-tabs{display:flex; gap:10px; padding:20px 0; overflow-x:auto;}
+.f-tab{padding:10px 20px; border-radius:999px; background:var(--paper); border:1.5px solid var(--line); font-size:13.5px; font-weight:600; color:var(--ink-soft); white-space:nowrap;}
+.f-tab.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+
+section{padding:36px 0;}
+.section-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; flex-wrap:wrap; gap:10px;}
+.section-head h2{font-size:21px;}
+.section-head span.count{font-size:13.5px; color:var(--ink-soft); font-weight:600;}
+
+.scroller{display:flex; gap:20px; overflow-x:auto; padding-bottom:10px; margin:0 -24px; padding-left:24px; padding-right:24px;}
+.grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+@media (max-width:1000px){.grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:640px){.grid{grid-template-columns:1fr;}}
+
+/* DESTINATION CARD (reused style) */
+.dest-card{
+  min-width:290px; background:var(--paper); border-radius:var(--radius); border:1px solid var(--line); overflow:hidden;
+  box-shadow:var(--shadow); transition:box-shadow .2s, transform .2s; display:flex; flex-direction:column;
+}
+.dest-card:hover{box-shadow:var(--shadow-lg); transform:translateY(-3px);}
+.dest-top{padding:22px 22px 0;}
+.dest-flag-row{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+.dest-flag{font-size:28px;}
+.dest-flag-row h3{font-size:19px;}
+.dest-badge{margin-left:auto; font-size:10.5px; font-weight:700; padding:4px 10px; border-radius:999px; background:#FFEBE6; color:var(--coral-dark); text-transform:uppercase;}
+.dest-stats{display:flex; gap:16px; margin:14px 0 12px;}
+.dest-stat b{font-family:'Space Grotesk',sans-serif; font-size:20px; display:block;}
+.dest-stat span{font-size:11px; color:var(--ink-soft); font-weight:600;}
+.dest-arrival{font-size:13px; color:var(--mint); font-weight:600; background:#E7F7F2; padding:8px 12px; border-radius:10px; display:flex; gap:6px; margin-bottom:14px;}
+.dest-dest-list{font-size:13px; color:var(--ink-soft); margin-bottom:14px; line-height:1.5;}
+.dest-dest-list b{color:var(--ink); font-weight:600;}
+.tag-row{display:flex; flex-wrap:wrap; gap:6px; padding:0 22px; margin-bottom:18px;}
+.tag{background:var(--bg); border:1px solid var(--line); font-size:12px; font-weight:600; padding:5px 11px; border-radius:999px; color:var(--ink-soft);}
+.dest-card .btn{margin:0 22px 22px;}
+.dest-card .btn-ghost{border-color:var(--navy);}
+
+/* BRAZIL CITY LIST */
+.city-list{display:flex; flex-wrap:wrap; gap:12px;}
+.city-chip{
+  display:flex; align-items:center; gap:10px; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:12px 18px;
+  font-weight:600; font-size:14px; box-shadow:var(--shadow); transition:transform .15s;
+}
+.city-chip:hover{transform:translateY(-2px); border-color:var(--coral);}
+.city-chip .count{font-size:11.5px; color:var(--ink-soft); font-weight:600;}
+
+footer{padding:56px 0 32px; border-top:1px solid var(--line); margin-top:20px; background:var(--paper);}
+.footer-bottom{display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--ink-soft); flex-wrap:wrap; gap:12px; max-width:1240px; margin:0 auto; padding:0 24px;}
+.footer-bottom a{color:var(--ink-soft);}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="ideal-homepage.html">Início</a>
+      <a href="#" class="active">Explorar destinos</a>
+      <a href="ideal-buscar-viagens.html">Encontrar viagens</a>
+      <a href="ideal-anunciar-viagem.html">Anunciar viagem</a>
+    </nav>
+    <div class="nav-actions" style="display:flex; align-items:center; gap:12px;">
+      <a href="#" class="btn btn-ghost" style="display:inline-flex">Entrar</a>
+      <a href="#" class="btn btn-primary" style="display:inline-flex">Criar conta</a>
+      <button class="hamburger" id="hamburger" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="ideal-homepage.html">Início</a>
+    <a href="#">Explorar destinos</a>
+    <a href="ideal-buscar-viagens.html">Encontrar viagens</a>
+    <a href="ideal-anunciar-viagem.html">Anunciar viagem</a>
+  </div>
+</header>
+
+<div class="page-head">
+  <div class="wrap">
+    <span class="kicker">Origens de compra</span>
+    <h1>Explorar destinos</h1>
+    <p>Navegue por países e cidades com viajantes ativos, sem precisar saber a rota exata ainda.</p>
+    <div class="dest-search">
+      <span class="ic">🔍</span>
+      <input type="text" placeholder="Buscar por país ou cidade">
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="filter-tabs">
+    <span class="f-tab active">Todos</span>
+    <span class="f-tab">Internacionais</span>
+    <span class="f-tab">Cidades brasileiras</span>
+    <span class="f-tab">Em alta</span>
+    <span class="f-tab">Mais viajantes</span>
+    
+  </div>
+</div>
+
+<!-- MAIS VIAJANTES ATIVOS -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Com mais viajantes ativos</h2>
+      <span class="count" id="allDestCount">…</span>
+    </div>
+    <div class="grid" id="allDestinationsGrid">
+      <p style="color:var(--ink-soft); font-size:14px;">Carregando destinos…</p>
+    </div>
+  </div>
+</section>
+
+<!-- CIDADES BRASILEIRAS -->
+<section style="background:var(--paper); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Cidades brasileiras com viajantes ativos</h2>
+      <span class="count" id="cityCount">…</span>
+    </div>
+    <div class="city-list" id="brazilCityList">
+      <p style="color:var(--ink-soft); font-size:14px;">Carregando cidades…</p>
+    </div>
+  </div>
+</section>
+
+
+
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 iDeal. Todos os direitos reservados.</span>
+    <div style="display:flex; gap:20px;">
+      <a href="#">Termos de uso</a>
+      <a href="#">Privacidade</a>
+      <a href="#">Central de ajuda</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('hamburger').addEventListener('click', ()=>{
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+function checkNav(){
+  const navLinks = document.getElementById('navLinks');
+  const hamburger = document.getElementById('hamburger');
+  if(window.innerWidth < 900){ navLinks.style.display='none'; hamburger.style.display='flex'; }
+  else { navLinks.style.display='flex'; hamburger.style.display='none'; document.getElementById('mobileMenu').classList.remove('open'); }
+}
+window.addEventListener('resize', checkNav); checkNav();
+
+document.querySelectorAll('.f-tab').forEach(t=>t.addEventListener('click', ()=>{
+  document.querySelectorAll('.f-tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+}));
+</script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/data.js"></script>
+<script>
+const FLAGS = { "Brasil":"🇧🇷", "Estados Unidos":"🇺🇸", "Portugal":"🇵🇹", "Japão":"🇯🇵", "China":"🇨🇳", "França":"🇫🇷", "Itália":"🇮🇹", "Paraguai":"🇵🇾", "Argentina":"🇦🇷" };
+function flagFor(country){ return FLAGS[country] || "🌍"; }
+
+async function renderAllDestinations() {
+  const grid = document.getElementById('allDestinationsGrid');
+  const countEl = document.getElementById('allDestCount');
+  const origins = await idealFetchOriginSummary();
+
+  countEl.textContent = `${origins.length} destino${origins.length===1?'':'s'}`;
+
+  if (!origins.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px 20px; background:var(--paper); border:1px dashed var(--line); border-radius:16px;">
+      <p style="color:var(--ink-soft); font-size:15px; margin-bottom:16px;">Ainda não há destinos ativos. Assim que uma viagem for publicada, ela aparece aqui.</p>
+      <a href="ideal-anunciar-viagem.html" class="btn btn-primary" style="display:inline-flex;">Anunciar a primeira viagem</a>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = origins.map(o => `
+    <div class="dest-card">
+      <div class="dest-top">
+        <div class="dest-flag-row"><span class="dest-flag">${flagFor(o.country)}</span><h3>${o.country}</h3></div>
+        <div class="dest-stats">
+          <div class="dest-stat"><b>${o.travelerCount}</b><span>VIAJANTES</span></div>
+          <div class="dest-stat"><b>${o.tripCount}</b><span>VIAGENS</span></div>
+        </div>
+        ${o.nextArrival ? `<div class="dest-arrival">✓ Próxima chegada em ${idealFormatDateShort(o.nextArrival)}</div>` : ''}
+        ${o.destCities.length ? `<div class="dest-dest-list">Chegadas para <b>${o.destCities.join(', ')}</b></div>` : ''}
+      </div>
+      <div class="tag-row">${o.categories.map(c=>`<span class="tag">${c}</span>`).join('')}</div>
+      <a href="ideal-buscar-viagens.html" class="btn btn-ghost">Ver viagens de ${o.country}</a>
+    </div>
+  `).join('');
+}
+
+async function renderBrazilCities() {
+  const el = document.getElementById('brazilCityList');
+  const countEl = document.getElementById('cityCount');
+  const trips = await idealFetchActiveTrips(300);
+
+  const cities = {};
+  trips.filter(t => t.origin_country === 'Brasil').forEach(t => {
+    if (!t.origin_city) return;
+    if (!cities[t.origin_city]) cities[t.origin_city] = new Set();
+    if (t.traveler_id) cities[t.origin_city].add(t.traveler_id);
+  });
+
+  const list = Object.entries(cities).map(([city, ids]) => ({ city, count: ids.size }))
+    .sort((a,b) => b.count - a.count);
+
+  countEl.textContent = `${list.length} cidade${list.length===1?'':'s'}`;
+
+  if (!list.length) {
+    el.innerHTML = `<p style="color:var(--ink-soft); font-size:14px;">Nenhuma cidade brasileira com viagens ativas ainda.</p>`;
+    return;
+  }
+
+  el.innerHTML = list.map(c => `
+    <div class="city-chip">🏙️ ${c.city} <span class="count">· ${c.count} viajante${c.count===1?'':'s'}</span></div>
+  `).join('');
+}
+
+renderAllDestinations();
+renderBrazilCities();
+</script>
+</body>
+</html>

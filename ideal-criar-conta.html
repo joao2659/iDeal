@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criar conta — iDeal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#F6F7FA; --paper:#FFFFFF; --navy:#131B3A; --coral:#FF5A3C; --coral-dark:#E8432A;
+  --gold:#F5A623; --mint:#1FAE8C; --ink:#14213D; --ink-soft:#5B6478; --line:#E3E6EE;
+  --shadow-lg: 0 12px 40px rgba(19,27,58,0.12);
+  font-size:16px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;}
+h1{font-family:'Space Grotesk',sans-serif; color:var(--navy); font-size:24px; margin-bottom:6px;}
+a{color:var(--coral); font-weight:600; text-decoration:none;}
+.card{background:var(--paper); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow-lg); padding:36px; width:100%; max-width:420px;}
+.logo{display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:20px; color:var(--navy); margin-bottom:24px; justify-content:center;}
+.logo .dot{width:9px; height:9px; border-radius:50%; background:var(--coral);}
+p.sub{color:var(--ink-soft); font-size:14px; margin-bottom:24px;}
+.field{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+.field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px; min-width:0;}
+.field-row .field{min-width:0;}
+label{font-size:12.5px; font-weight:700; color:var(--navy);}
+input{width:100%; min-width:0; padding:12px 14px; border:1.5px solid var(--line); border-radius:12px; font-size:14.5px; background:var(--bg);}
+input:focus{outline:none; border-color:var(--coral); background:var(--paper);}
+button{width:100%; padding:13px; border-radius:999px; border:none; background:var(--coral); color:#fff; font-weight:700; font-size:14.5px; cursor:pointer; margin-top:8px;}
+button:hover{background:var(--coral-dark);}
+button:disabled{opacity:.6; cursor:not-allowed;}
+.msg{font-size:13px; padding:12px 14px; border-radius:10px; margin-bottom:14px; display:none;}
+.msg.error{background:#FDEBEB; color:#C43030; display:block;}
+.msg.success{background:#E7F7F2; color:#137A5F; display:block;}
+.footer-link{text-align:center; font-size:13.5px; color:var(--ink-soft); margin-top:20px;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo"><span class="dot"></span>iDeal</div>
+  <h1 style="text-align:center;">Criar sua conta</h1>
+  <p class="sub" style="text-align:center;">Compre de qualquer lugar ou transporte na sua próxima viagem.</p>
+
+  <div class="msg" id="msgBox"></div>
+
+  <form id="signupForm">
+    <div class="field-row">
+      <div class="field"><label>Nome</label><input type="text" id="firstName" required></div>
+      <div class="field"><label>Sobrenome</label><input type="text" id="lastName" required></div>
+    </div>
+    <div class="field"><label>E-mail</label><input type="email" id="email" required></div>
+    <div class="field"><label>Senha</label><input type="password" id="password" minlength="6" required></div>
+    <button type="submit" id="submitBtn">Criar conta</button>
+  </form>
+
+  <div class="footer-link">Já tem conta? <a href="ideal-entrar.html">Entrar</a></div>
+</div>
+
+<script src="assets/supabase-client.js"></script>
+<script>
+const form = document.getElementById('signupForm');
+const msgBox = document.getElementById('msgBox');
+const submitBtn = document.getElementById('submitBtn');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Criando conta...';
+  msgBox.className = 'msg';
+
+  try {
+    const result = await idealSignUp({
+      email: document.getElementById('email').value,
+      password: document.getElementById('password').value,
+      firstName: document.getElementById('firstName').value,
+      lastName: document.getElementById('lastName').value,
+    });
+
+    if (result.error) {
+      msgBox.className = 'msg error';
+      msgBox.textContent = 'Não foi possível criar a conta: ' + result.error.message;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Criar conta';
+      return;
+    }
+
+    if (result.needsEmailConfirmation) {
+      msgBox.className = 'msg success';
+      msgBox.textContent = 'Conta criada! Enviamos um e-mail de confirmação — verifique sua caixa de entrada antes de entrar.';
+      submitBtn.textContent = 'Conta criada';
+      return;
+    }
+
+    msgBox.className = 'msg success';
+    msgBox.textContent = 'Conta criada! Redirecionando…';
+    setTimeout(() => { window.location.href = 'ideal-dashboard.html'; }, 1200);
+  } catch (err) {
+    console.error(err);
+    msgBox.className = 'msg error';
+    msgBox.textContent = 'Algo deu errado. Tente novamente em instantes.';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Criar conta';
+  }
+});
+</script>
+</body>
+</html>

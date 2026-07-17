@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontrar viagens — iDeal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7FA; --paper:#FFFFFF; --navy:#131B3A; --navy-2:#1E2A56;
+  --coral:#FF5A3C; --coral-dark:#E8432A; --gold:#F5A623; --mint:#1FAE8C;
+  --ink:#14213D; --ink-soft:#5B6478; --line:#E3E6EE; --radius:20px;
+  --shadow: 0 4px 24px rgba(19,27,58,0.06); --shadow-lg: 0 12px 40px rgba(19,27,58,0.12);
+  font-size:16px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; color:var(--navy); letter-spacing:-0.01em;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+a{color:inherit; text-decoration:none;}
+button,select,input{font-family:inherit;}
+button{cursor:pointer; border:none;}
+.wrap{max-width:1240px; margin:0 auto; padding:0 24px;}
+:focus-visible{outline:2px solid var(--coral); outline-offset:2px;}
+
+/* NAV (same system as homepage) */
+header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1240px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; gap:24px;}
+.logo{display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; color:var(--navy);}
+.logo .dot{width:10px; height:10px; border-radius:50%; background:var(--coral); display:inline-block;}
+.nav-links{display:flex; align-items:center; gap:28px; font-size:14.5px; font-weight:500; color:var(--ink-soft);}
+.nav-links a.active{color:var(--navy); font-weight:700;}
+.nav-links a:hover{color:var(--navy);}
+.nav-actions{display:flex; align-items:center; gap:12px;}
+.btn{padding:11px 22px; border-radius:999px; font-weight:600; font-size:14.5px; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:transform .15s ease; white-space:nowrap;}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:var(--coral); color:#fff; box-shadow:0 6px 16px rgba(255,90,60,0.3);}
+.btn-primary:hover{background:var(--coral-dark);}
+.btn-ghost{background:transparent; color:var(--navy); border:1.5px solid var(--line);}
+.btn-ghost:hover{border-color:var(--navy);}
+.btn-sm{padding:8px 16px; font-size:13px;}
+.hamburger{display:none; flex-direction:column; gap:5px; background:none; padding:6px;}
+.hamburger span{width:22px; height:2px; background:var(--navy); border-radius:2px;}
+.mobile-menu{display:none; flex-direction:column; gap:2px; padding:8px 24px 20px; border-top:1px solid var(--line);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{padding:12px 0; font-weight:500; border-bottom:1px solid var(--line); color:var(--ink-soft);}
+
+/* PAGE HEAD */
+.page-head{padding:40px 0 28px; border-bottom:1px solid var(--line); background:var(--paper);}
+.page-head .kicker{font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; color:var(--coral); text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; display:block;}
+.page-head h1{font-size:clamp(26px,3.4vw,36px);}
+.page-head p{color:var(--ink-soft); margin-top:8px;}
+
+/* LAYOUT */
+.layout{display:grid; grid-template-columns:290px 1fr; gap:32px; padding:36px 0 80px; align-items:start;}
+@media (max-width:960px){.layout{grid-template-columns:1fr;}}
+
+/* FILTERS */
+.filters{background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:24px; position:sticky; top:88px;}
+@media (max-width:960px){.filters{position:static;}}
+.filters h3{font-size:16px; margin-bottom:18px; display:flex; align-items:center; justify-content:space-between;}
+.filters h3 button{font-size:12.5px; font-weight:600; color:var(--coral); background:none;}
+.f-group{margin-bottom:20px;}
+.f-group label{display:block; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); margin-bottom:8px;}
+.f-group select, .f-group input[type=text], .f-group input[type=date]{
+  width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:14px; color:var(--ink); background:var(--bg);
+}
+.f-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.chip-group{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{padding:7px 13px; border-radius:999px; border:1px solid var(--line); font-size:12.5px; font-weight:600; color:var(--ink-soft); background:var(--bg);}
+.chip.selected{background:var(--navy); color:#fff; border-color:var(--navy);}
+.f-divider{border-top:1px solid var(--line); margin:20px 0;}
+.f-toggle{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+.f-toggle span{font-size:13.5px; font-weight:600;}
+.switch{width:38px; height:22px; border-radius:999px; background:var(--line); position:relative; flex-shrink:0;}
+.switch.on{background:var(--mint);}
+.switch::after{content:''; position:absolute; width:16px; height:16px; border-radius:50%; background:#fff; top:3px; left:3px; transition:transform .15s;}
+.switch.on::after{transform:translateX(16px);}
+.rating-row{display:flex; gap:6px;}
+.rating-chip{flex:1; text-align:center; padding:8px 0; border-radius:8px; border:1px solid var(--line); font-size:12.5px; font-weight:700; color:var(--ink-soft); background:var(--bg);}
+.rating-chip.selected{background:var(--gold); color:#fff; border-color:var(--gold);}
+
+/* RESULTS HEADER */
+.results-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:12px;}
+.results-count{font-size:14.5px; color:var(--ink-soft);}
+.results-count b{color:var(--navy);}
+.sort-row{display:flex; align-items:center; gap:10px; font-size:13.5px;}
+.sort-row select{padding:9px 14px; border-radius:10px; border:1px solid var(--line); background:var(--paper); font-weight:600; color:var(--navy);}
+
+.results-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:22px;}
+@media (max-width:1180px){.results-grid{grid-template-columns:1fr;}}
+
+/* TRIP RESULT CARD (luggage tag style, wide format) */
+.trip-card{
+  background:var(--paper); border-radius:18px; box-shadow:var(--shadow); border:1px solid var(--line); position:relative;
+  transition:transform .2s, box-shadow .2s; display:flex; flex-direction:column;
+}
+.trip-card:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg);}
+.trip-card::before{content:''; position:absolute; top:24px; left:-9px; width:18px; height:18px; border-radius:50%; background:var(--bg); border:1px solid var(--line);}
+.trip-top{display:flex; align-items:center; justify-content:space-between; padding:20px 22px 0;}
+.trip-user{display:flex; align-items:center; gap:12px;}
+.avatar{width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--coral)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-family:'Space Grotesk',sans-serif; flex-shrink:0;}
+.trip-name{font-weight:700; font-size:14.5px; display:flex; align-items:center; gap:6px;}
+.verif{color:var(--mint); font-size:13px;}
+.trip-rating{font-size:12px; color:var(--ink-soft); font-weight:600;}
+.trip-rating .star{color:var(--gold);}
+.badge-type{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:5px 10px; border-radius:999px;}
+.badge-type.regional{background:#E7F7F2; color:var(--mint);}
+.badge-type.nacional{background:#FFF3DC; color:#B27600;}
+.badge-type.internacional{background:#FFEBE6; color:var(--coral-dark);}
+
+.trip-route{display:flex; align-items:center; gap:14px; margin:20px 22px 0;}
+.route-code{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:24px; color:var(--navy);}
+.route-line{flex:1; height:1px; background:repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 11px); position:relative;}
+.route-line span{position:absolute; left:50%; top:-11px; transform:translateX(-50%); font-size:15px; background:var(--paper); padding:0 4px;}
+.trip-dates{display:flex; justify-content:space-between; margin:8px 22px 0; font-size:11.5px; color:var(--ink-soft); font-weight:600; text-transform:uppercase;}
+
+.perforation{margin:18px 0; border-top:1px dashed var(--line); position:relative;}
+.perforation::before, .perforation::after{content:''; position:absolute; top:-8px; width:16px; height:16px; border-radius:50%; background:var(--bg); border:1px solid var(--line);}
+.perforation::before{left:-9px;} .perforation::after{right:-9px;}
+
+.trip-body{padding:0 22px 22px; display:flex; flex-direction:column; flex:1;}
+.trip-meta-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; font-size:13px; color:var(--ink-soft); margin-bottom:14px;}
+.trip-meta-grid b{color:var(--ink); font-weight:600; display:block; font-size:13.5px;}
+.tag-cats{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;}
+.tagpill{background:var(--bg); border:1px solid var(--line); font-size:11.5px; font-weight:600; padding:5px 10px; border-radius:999px; color:var(--ink-soft);}
+.trip-footer{margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:12px;}
+.reward{display:flex; flex-direction:column;}
+.reward span{font-size:10.5px; color:var(--ink-soft); font-weight:700; text-transform:uppercase;}
+.reward b{font-family:'Space Grotesk',sans-serif; color:var(--coral); font-size:17px;}
+
+.load-more{display:flex; justify-content:center; margin-top:36px;}
+
+footer{padding:56px 0 32px; border-top:1px solid var(--line); margin-top:20px;}
+.footer-bottom{display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--ink-soft); flex-wrap:wrap; gap:12px;}
+.footer-bottom a{color:var(--ink-soft);}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="ideal-homepage.html">Início</a>
+      <a href="#">Explorar destinos</a>
+      <a href="#" class="active">Encontrar viagens</a>
+      <a href="#">Anunciar viagem</a>
+      <a href="ideal-homepage.html#como-funciona">Como funciona</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="#" class="btn btn-ghost" style="display:inline-flex">Entrar</a>
+      <a href="#" class="btn btn-primary" style="display:inline-flex">Criar conta</a>
+      <button class="hamburger" id="hamburger" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="ideal-homepage.html">Início</a>
+    <a href="#">Explorar destinos</a>
+    <a href="#">Encontrar viagens</a>
+    <a href="#">Anunciar viagem</a>
+    <a href="ideal-homepage.html#como-funciona">Como funciona</a>
+    <a href="#">Entrar</a>
+  </div>
+</header>
+
+<div class="page-head">
+  <div class="wrap">
+    <span class="kicker">Buscar</span>
+    <h1>Encontrar viagens</h1>
+    <p>Filtre por rota, data, transporte e categoria para achar o viajante ideal.</p>
+  </div>
+</div>
+
+<div class="wrap layout">
+  <!-- FILTERS -->
+  <aside class="filters">
+    <h3>Filtros <button id="clearFilters">Limpar tudo</button></h3>
+
+    <div class="f-group">
+      <label>Origem</label>
+      <div class="f-row">
+        <select id="origPais"></select>
+        <select id="origEstado"><option value="">Estado</option></select>
+      </div>
+      <input type="text" id="origCidade" placeholder="Cidade de origem" style="margin-top:10px">
+    </div>
+
+    <div class="f-group">
+      <label>Destino</label>
+      <div class="f-row">
+        <select id="destPais"></select>
+        <select id="destEstado"><option value="">Estado</option></select>
+      </div>
+      <input type="text" id="destCidade" placeholder="Cidade de destino" style="margin-top:10px">
+    </div>
+    <p style="font-size:12px; color:var(--ink-soft); margin-top:-8px; margin-bottom:20px;">Estados do Brasil carregados pela base oficial do IBGE.</p>
+
+    <div class="f-divider"></div>
+
+    <div class="f-group">
+      <label>Data de embarque</label>
+      <div class="f-row">
+        <input type="date">
+        <input type="date">
+      </div>
+    </div>
+
+    <div class="f-divider"></div>
+
+    <div class="f-group">
+      <label>Tipo de viagem</label>
+      <div class="chip-group">
+        <span class="chip selected">Regional</span>
+        <span class="chip selected">Nacional</span>
+        <span class="chip selected">Internacional</span>
+      </div>
+    </div>
+
+    <div class="f-group">
+      <label>Transporte</label>
+      <div class="chip-group">
+        <span class="chip selected">✈️ Avião</span>
+        <span class="chip">🚗 Carro</span>
+        <span class="chip">🚌 Ônibus</span>
+        <span class="chip">🚆 Trem</span>
+        <span class="chip">🚢 Navio</span>
+        <span class="chip">📦 Outro</span>
+      </div>
+    </div>
+
+    <div class="f-group">
+      <label>Categoria do produto</label>
+      <select>
+        <option>Todas as categorias</option>
+        <option>Eletrônicos</option>
+        <option>Tênis</option>
+        <option>Cosméticos</option>
+        <option>Games</option>
+        <option>Documentos</option>
+      </select>
+    </div>
+
+    <div class="f-group">
+      <label>Peso mínimo disponível</label>
+      <select>
+        <option>Qualquer peso</option>
+        <option>Acima de 3 kg</option>
+        <option>Acima de 5 kg</option>
+        <option>Acima de 10 kg</option>
+        <option>Acima de 20 kg</option>
+      </select>
+    </div>
+
+    <div class="f-divider"></div>
+
+    <div class="f-toggle">
+      <span>Apenas viajantes verificados</span>
+      <div class="switch on"></div>
+    </div>
+
+    <div class="f-group">
+      <label>Avaliação mínima</label>
+      <div class="rating-row">
+        <div class="rating-chip">3★</div>
+        <div class="rating-chip selected">4★</div>
+        <div class="rating-chip">4.5★</div>
+        <div class="rating-chip">5★</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%; margin-top:6px;">Aplicar filtros</button>
+  </aside>
+
+  <!-- RESULTS -->
+  <main>
+    <div class="results-head">
+      <div class="results-count" id="resultsCount">Carregando…</div>
+      <div class="sort-row">
+        Ordenar por:
+        <select>
+          <option>Próximas viagens</option>
+          <option>Melhor avaliação</option>
+          <option>Mais espaço disponível</option>
+          <option>Publicadas recentemente</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="results-grid" id="resultsGrid">
+      <p style="color:var(--ink-soft); font-size:14px;">Carregando viagens…</p>
+    </div>
+
+    <div class="load-more">
+      <button class="btn btn-ghost">Carregar mais viagens</button>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap footer-bottom">
+    <span>© 2026 iDeal. Todos os direitos reservados.</span>
+    <div style="display:flex; gap:20px;">
+      <a href="#">Termos de uso</a>
+      <a href="#">Privacidade</a>
+      <a href="#">Central de ajuda</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/geo.js"></script>
+<script>
+idealSetupLocationGroup({
+  countrySelect: document.getElementById('origPais'),
+  stateSelect: document.getElementById('origEstado'),
+  citySelect: document.getElementById('origCidade'),
+});
+idealSetupLocationGroup({
+  countrySelect: document.getElementById('destPais'),
+  stateSelect: document.getElementById('destEstado'),
+  citySelect: document.getElementById('destCidade'),
+});
+
+document.getElementById('hamburger').addEventListener('click', ()=>{
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+function checkNav(){
+  const navLinks = document.getElementById('navLinks');
+  const hamburger = document.getElementById('hamburger');
+  if(window.innerWidth < 900){ navLinks.style.display='none'; hamburger.style.display='flex'; }
+  else { navLinks.style.display='flex'; hamburger.style.display='none'; document.getElementById('mobileMenu').classList.remove('open'); }
+}
+window.addEventListener('resize', checkNav); checkNav();
+
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click', ()=>c.classList.toggle('selected')));
+document.querySelectorAll('.rating-chip').forEach(c=>c.addEventListener('click', ()=>{
+  document.querySelectorAll('.rating-chip').forEach(x=>x.classList.remove('selected'));
+  c.classList.add('selected');
+}));
+document.querySelector('.switch').addEventListener('click', function(){ this.classList.toggle('on'); });
+document.getElementById('clearFilters').addEventListener('click', ()=>{
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('input').forEach(i=>i.value='');
+});
+</script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/data.js"></script>
+<script>
+function tripTypeClass(type){
+  if (type === 'Nacional') return 'nacional';
+  if (type === 'Internacional') return 'internacional';
+  return 'regional';
+}
+
+async function renderResults() {
+  const grid = document.getElementById('resultsGrid');
+  const countEl = document.getElementById('resultsCount');
+  const trips = await idealFetchActiveTrips(50);
+
+  countEl.innerHTML = `<b>${trips.length}</b> viagem${trips.length===1?'':'ns'} encontrada${trips.length===1?'':'s'}`;
+
+  if (!trips.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px 20px; background:var(--paper); border:1px dashed var(--line); border-radius:16px;">
+      <p style="color:var(--ink-soft); font-size:15px; margin-bottom:16px;">Nenhuma viagem publicada ainda. Assim que alguém anunciar uma viagem, ela aparece aqui.</p>
+      <a href="ideal-anunciar-viagem.html" class="btn btn-primary" style="display:inline-flex;">Anunciar a primeira viagem</a>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = trips.map(t => {
+    const name = t.traveler?.first_name || 'Viajante';
+    const rating = t.traveler?.average_rating ? t.traveler.average_rating.toFixed(1) : '—';
+    const tripsCount = t.traveler?.completed_trips_count ?? 0;
+    const verif = t.traveler?.identity_verified ? '<span class="verif">✓</span>' : '';
+    const reward = !t.expected_reward ? 'A combinar' : `R$ ${t.expected_reward}${t.reward_type === 'por_kg' ? ' / kg' : ''}`;
+    return `
+      <div class="trip-card">
+        <div class="trip-top">
+          <div class="trip-user">
+            <div class="avatar">${idealInitial(name)}</div>
+            <div>
+              <div class="trip-name">${name} ${verif}</div>
+              <div class="trip-rating"><span class="star">★</span> ${rating} · ${tripsCount} viagens concluídas</div>
+            </div>
+          </div>
+          <span class="badge-type ${tripTypeClass(t.trip_type)}">${t.trip_type || 'Regional'}</span>
+        </div>
+        <div class="trip-route">
+          <span class="route-code">${(t.origin_city||'').slice(0,3).toUpperCase()}</span>
+          <span class="route-line"><span>✈</span></span>
+          <span class="route-code">${(t.destination_city||'').slice(0,3).toUpperCase()}</span>
+        </div>
+        <div class="trip-dates"><span>Embarque ${idealFormatDateShort(t.departure_date)}</span><span>Chegada ${idealFormatDateShort(t.arrival_date)}</span></div>
+        <div class="perforation"></div>
+        <div class="trip-body">
+          <div class="trip-meta-grid">
+            <div><b>${t.transport_type || '—'}</b>Transporte</div>
+            <div><b>${t.available_weight || 0} kg</b>Espaço disponível</div>
+          </div>
+          <div class="tag-cats">${(t.accepted_categories||[]).map(c=>`<span class="tagpill">${c}</span>`).join('')}</div>
+          <div class="trip-footer">
+            <div class="reward"><span>Recompensa</span><b>${reward}</b></div>
+            <a href="ideal-detalhe-viagem.html?id=${t.id}" class="btn btn-primary btn-sm">Ver viagem</a>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+renderResults();
+</script>
+</body>
+</html>

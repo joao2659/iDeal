@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel administrativo — iDeal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7FA; --paper:#FFFFFF; --navy:#131B3A; --navy-2:#1E2A56;
+  --coral:#FF5A3C; --coral-dark:#E8432A; --gold:#F5A623; --mint:#1FAE8C; --red:#E14848;
+  --ink:#14213D; --ink-soft:#5B6478; --line:#E3E6EE; --radius:16px;
+  --shadow: 0 4px 24px rgba(19,27,58,0.06);
+  font-size:15.5px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; color:var(--navy); letter-spacing:-0.01em;}
+a{color:inherit; text-decoration:none;}
+button,select,input{font-family:inherit; cursor:pointer; border:none;}
+:focus-visible{outline:2px solid var(--coral); outline-offset:2px;}
+
+.app-shell{display:grid; grid-template-columns:240px 1fr; min-height:100vh;}
+@media (max-width:900px){.app-shell{grid-template-columns:1fr;}}
+
+/* SIDEBAR */
+.side{background:var(--navy); color:#fff; padding:24px 16px; display:flex; flex-direction:column;}
+@media (max-width:900px){.side{display:none;}}
+.side-logo{display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; padding:0 8px 24px; color:#fff;}
+.side-logo .dot{width:9px; height:9px; border-radius:50%; background:var(--coral);}
+.side-tag{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,0.4); padding:0 8px 10px;}
+.side-nav{display:flex; flex-direction:column; gap:2px;}
+.side-link{display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:10px; font-size:13.5px; font-weight:600; color:rgba(255,255,255,0.65);}
+.side-link:hover{background:rgba(255,255,255,0.06); color:#fff;}
+.side-link.active{background:var(--coral); color:#fff;}
+.side-link .count{margin-left:auto; font-size:10.5px; background:rgba(255,255,255,0.15); padding:2px 7px; border-radius:999px; font-weight:700;}
+.side-link.active .count{background:rgba(255,255,255,0.25);}
+.side-divider{height:1px; background:rgba(255,255,255,0.1); margin:14px 8px;}
+.side-admin{margin-top:auto; display:flex; align-items:center; gap:10px; padding:12px 8px; border-top:1px solid rgba(255,255,255,0.1);}
+.avatar-admin{width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--coral)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:13px; font-family:'Space Grotesk',sans-serif;}
+.side-admin b{font-size:12.5px; display:block; color:#fff;}
+.side-admin span{font-size:11px; color:rgba(255,255,255,0.5);}
+
+/* MAIN */
+.main{padding:28px 32px 60px;}
+.main-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;}
+.main-head h1{font-size:23px;}
+.main-head p{color:var(--ink-soft); font-size:13.5px; margin-top:3px;}
+.btn{padding:10px 18px; border-radius:10px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px;}
+.btn-primary{background:var(--coral); color:#fff;}
+.btn-ghost{background:var(--paper); color:var(--navy); border:1px solid var(--line);}
+.btn-success{background:#E7F7F2; color:var(--mint);}
+.btn-danger{background:#FDEBEB; color:var(--red);}
+.btn-sm{padding:7px 13px; font-size:12px;}
+
+/* METRICS */
+.metrics-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:28px;}
+@media (max-width:1100px){.metrics-grid{grid-template-columns:repeat(3,1fr);}}
+@media (max-width:640px){.metrics-grid{grid-template-columns:repeat(2,1fr);}}
+.metric-card{background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow);}
+.metric-card span.label{font-size:11.5px; color:var(--ink-soft); font-weight:600; text-transform:uppercase; letter-spacing:.02em;}
+.metric-card b{font-family:'Space Grotesk',sans-serif; font-size:24px; display:block; margin:6px 0 4px;}
+.metric-card .delta{font-size:11.5px; font-weight:700;}
+.metric-card .delta.up{color:var(--mint);}
+.metric-card .delta.down{color:var(--red);}
+
+.section{margin-bottom:30px;}
+.section-title{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+.section-title h3{font-size:16px;}
+.section-title a{font-size:12.5px; font-weight:700; color:var(--coral);}
+
+/* TABLE */
+.table-card{background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;}
+.table-wrap{overflow-x:auto;}
+table{width:100%; border-collapse:collapse; min-width:640px;}
+thead th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-soft); font-weight:700; padding:14px 18px; border-bottom:1px solid var(--line); background:var(--bg);}
+tbody td{padding:14px 18px; border-bottom:1px solid var(--line); font-size:13.5px; vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:#FAFAFC;}
+.cell-user{display:flex; align-items:center; gap:10px;}
+.avatar-sm{width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--coral)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:11.5px; font-family:'Space Grotesk',sans-serif; flex-shrink:0;}
+.cell-user b{display:block; font-size:13.5px;}
+.cell-user span{font-size:11.5px; color:var(--ink-soft);}
+.route-mono{font-family:'IBM Plex Mono',monospace; font-weight:600;}
+.status-chip{font-size:10.5px; font-weight:700; padding:5px 11px; border-radius:999px; text-transform:uppercase; display:inline-block;}
+.status-chip.pending{background:#FFF3DC; color:#B27600;}
+.status-chip.active{background:#E7F7F2; color:var(--mint);}
+.status-chip.rejected{background:#FDEBEB; color:var(--red);}
+.status-chip.suspended{background:#FDEBEB; color:var(--red);}
+.status-chip.verified{background:#E9EDFB; color:#3D57C4;}
+.row-actions{display:flex; gap:8px;}
+
+/* TABS */
+.admin-tabs{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap;}
+.a-tab{padding:9px 16px; border-radius:10px; background:var(--paper); border:1px solid var(--line); font-size:13px; font-weight:600; color:var(--ink-soft);}
+.a-tab.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="side">
+    <div class="side-logo"><span class="dot"></span>iDeal <span style="font-size:11px; font-weight:600; color:rgba(255,255,255,0.4); margin-left:2px;">admin</span></div>
+
+    <div class="side-tag">Moderação</div>
+    <nav class="side-nav">
+      <a href="#" class="side-link active">📊 Visão geral</a>
+      <a href="#" class="side-link">✈️ Viagens aguardando <span class="count">4</span></a>
+      <a href="#" class="side-link">🧳 Viagens ativas</a>
+      <a href="#" class="side-link">🪪 Verificações <span class="count">6</span></a>
+      <a href="#" class="side-link">🚩 Denúncias <span class="count">3</span></a>
+    </nav>
+
+    <div class="side-divider"></div>
+    <div class="side-tag">Plataforma</div>
+    <nav class="side-nav">
+      <a href="#" class="side-link">👥 Usuários</a>
+      <a href="#" class="side-link">📦 Solicitações</a>
+      <a href="#" class="side-link">⭐ Avaliações</a>
+      <a href="#" class="side-link">🏷️ Categorias</a>
+      <a href="#" class="side-link">🌎 Destinos</a>
+    </nav>
+
+    <div class="side-admin">
+      <div class="avatar-admin">A</div>
+      <div><b>Equipe iDeal</b><span>Administrador</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-head">
+      <div>
+        <h1>Visão geral</h1>
+        <p>Atividade da plataforma nos últimos 30 dias.</p>
+      </div>
+      <a href="ideal-homepage.html" class="btn btn-ghost">← Ver plataforma</a>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card"><span class="label">Usuários ativos</span><b>2.480</b><span class="delta up">↑ 12% no mês</span></div>
+      <div class="metric-card"><span class="label">Viagens ativas</span><b>184</b><span class="delta up">↑ 8% no mês</span></div>
+      <div class="metric-card"><span class="label">Solicitações abertas</span><b>96</b><span class="delta up">↑ 5% no mês</span></div>
+      <div class="metric-card"><span class="label">Entregas concluídas</span><b>1.312</b><span class="delta up">↑ 19% no mês</span></div>
+      <div class="metric-card"><span class="label">Denúncias abertas</span><b>3</b><span class="delta down">↓ 2 desde ontem</span></div>
+    </div>
+
+    <!-- VIAGENS AGUARDANDO APROVAÇÃO -->
+    <div class="section">
+      <div class="section-title"><h3>Viagens aguardando aprovação</h3></div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Viajante</th><th>Rota</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="pendingTripsBody">
+              <tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DENÚNCIAS -->
+    <div class="section">
+      <div class="section-title"><h3>Denúncias recentes</h3><a href="#">Ver todas</a></div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Denunciante</th><th>Denunciado</th><th>Motivo</th><th>Contexto</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="cell-user"><div class="avatar-sm">C</div><div><b>Camila R.</b></div></td>
+                <td class="cell-user"><div class="avatar-sm">X</div><div><b>Usuário #4471</b></div></td>
+                <td>Comunicação suspeita</td>
+                <td class="route-mono">GIG → CGH</td>
+                <td><span class="status-chip pending">Em análise</span></td>
+                <td class="row-actions"><button class="btn btn-ghost btn-sm">Revisar</button></td>
+              </tr>
+              <tr>
+                <td class="cell-user"><div class="avatar-sm">R</div><div><b>Rodrigo M.</b></div></td>
+                <td class="cell-user"><div class="avatar-sm">Y</div><div><b>Usuário #3892</b></div></td>
+                <td>Produto não permitido</td>
+                <td class="route-mono">LIS → GRU</td>
+                <td><span class="status-chip pending">Em análise</span></td>
+                <td class="row-actions"><button class="btn btn-ghost btn-sm">Revisar</button></td>
+              </tr>
+              <tr>
+                <td class="cell-user"><div class="avatar-sm">S</div><div><b>Sofia T.</b></div></td>
+                <td class="cell-user"><div class="avatar-sm">Z</div><div><b>Usuário #2214</b></div></td>
+                <td>Não compareceu à entrega</td>
+                <td class="route-mono">GIG → MIA</td>
+                <td><span class="status-chip pending">Em análise</span></td>
+                <td class="row-actions"><button class="btn btn-ghost btn-sm">Revisar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VERIFICAÇÕES -->
+    <div class="section">
+      <div class="section-title"><h3>Verificações pendentes</h3><a href="#">Ver todas</a></div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Usuário</th><th>Tipo</th><th>Enviado em</th><th>Documento</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="cell-user"><div class="avatar-sm">T</div><div><b>Thiago Lins</b><span>thiago@email.com</span></div></td>
+                <td>Identidade</td>
+                <td>Hoje</td>
+                <td><a href="#" style="color:var(--coral); font-weight:600;">Ver documento</a></td>
+                <td class="row-actions">
+                  <button class="btn btn-success btn-sm">Verificar</button>
+                  <button class="btn btn-danger btn-sm">Rejeitar</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="cell-user"><div class="avatar-sm">V</div><div><b>Vanessa Reis</b><span>vanessa@email.com</span></div></td>
+                <td>Identidade</td>
+                <td>Ontem</td>
+                <td><a href="#" style="color:var(--coral); font-weight:600;">Ver documento</a></td>
+                <td class="row-actions">
+                  <button class="btn btn-success btn-sm">Verificar</button>
+                  <button class="btn btn-danger btn-sm">Rejeitar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- USUÁRIOS -->
+    <div class="section">
+      <div class="section-title"><h3>Usuários recentes</h3><a href="#">Ver todos</a></div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Usuário</th><th>Tipo</th><th>Avaliação</th><th>Viagens</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="cell-user"><div class="avatar-sm">M</div><div><b>Mariana Souza</b><span>mariana@email.com</span></div></td>
+                <td>Viajante e comprador</td>
+                <td>4.9 ★</td>
+                <td>32</td>
+                <td><span class="status-chip verified">Verificado</span></td>
+                <td class="row-actions"><button class="btn btn-ghost btn-sm">Ver perfil</button></td>
+              </tr>
+              <tr>
+                <td class="cell-user"><div class="avatar-sm">R</div><div><b>Rafael Lima</b><span>rafael@email.com</span></div></td>
+                <td>Viajante</td>
+                <td>4.8 ★</td>
+                <td>19</td>
+                <td><span class="status-chip verified">Verificado</span></td>
+                <td class="row-actions"><button class="btn btn-ghost btn-sm">Ver perfil</button></td>
+              </tr>
+              <tr>
+                <td class="cell-user"><div class="avatar-sm">X</div><div><b>Usuário #4471</b><span>—</span></div></td>
+                <td>Comprador</td>
+                <td>3.2 ★</td>
+                <td>2</td>
+                <td><span class="status-chip suspended">Suspenso</span></td>
+                <td class="row-actions"><button class="btn btn-ghost btn-sm">Ver perfil</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="assets/supabase-client.js"></script>
+<script src="assets/data.js"></script>
+<script>
+async function loadPendingTrips() {
+  const tbody = document.getElementById('pendingTripsBody');
+
+  const user = await idealGetCurrentUser();
+  if (!user) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Você precisa estar logado como administrador.</td></tr>';
+    return;
+  }
+
+  const { data: trips, error } = await idealSupabase
+    .from('trips')
+    .select('*, traveler:traveler_id(first_name, last_name)')
+    .eq('approval_status', 'pendente')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Sem permissão de administrador ou erro ao carregar (${error.message}).</td></tr>`;
+    return;
+  }
+
+  if (!trips.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Nenhuma viagem aguardando aprovação.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = trips.map(t => `
+    <tr id="trip-row-${t.id}">
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(t.traveler?.first_name)}</div><div><b>${t.traveler?.first_name||'—'} ${t.traveler?.last_name||''}</b></div></td>
+      <td class="route-mono">${(t.origin_city||'').slice(0,3).toUpperCase()} → ${(t.destination_city||'').slice(0,3).toUpperCase()}</td>
+      <td>${idealFormatDateShort(t.departure_date)}</td>
+      <td><span class="status-chip pending">Pendente</span></td>
+      <td class="row-actions">
+        <button class="btn btn-success btn-sm" onclick="approveTrip('${t.id}')">Aprovar</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectTrip('${t.id}')">Rejeitar</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function approveTrip(id) {
+  const { error } = await idealSupabase.from('trips').update({ approval_status: 'aprovada' }).eq('id', id);
+  if (error) { alert('Erro ao aprovar: ' + error.message); return; }
+  document.getElementById(`trip-row-${id}`).remove();
+}
+
+async function rejectTrip(id) {
+  const { error } = await idealSupabase.from('trips').update({ approval_status: 'rejeitada', trip_status: 'inativa' }).eq('id', id);
+  if (error) { alert('Erro ao rejeitar: ' + error.message); return; }
+  document.getElementById(`trip-row-${id}`).remove();
+}
+
+loadPendingTrips();
+</script>
+</body>
+</html>

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iDeal — Compre de qualquer lugar com quem já está viajando</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7FA;
+  --paper:#FFFFFF;
+  --navy:#131B3A;
+  --navy-2:#1E2A56;
+  --coral:#FF5A3C;
+  --coral-dark:#E8432A;
+  --gold:#F5A623;
+  --mint:#1FAE8C;
+  --ink:#14213D;
+  --ink-soft:#5B6478;
+  --line:#E3E6EE;
+  --radius:20px;
+  --shadow: 0 4px 24px rgba(19,27,58,0.06);
+  --shadow-lg: 0 12px 40px rgba(19,27,58,0.12);
+  font-size:16px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; color:var(--navy); letter-spacing:-0.01em;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+a{color:inherit; text-decoration:none;}
+img{max-width:100%; display:block;}
+button{font-family:inherit; cursor:pointer; border:none;}
+.wrap{max-width:1240px; margin:0 auto; padding:0 24px;}
+:focus-visible{outline:2px solid var(--coral); outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important;}}
+
+/* ===== NAV ===== */
+header.nav{
+  position:sticky; top:0; z-index:100;
+  background:rgba(246,247,250,0.88);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  max-width:1240px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between; gap:24px;
+}
+.logo{
+  display:flex; align-items:center; gap:8px;
+  font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; color:var(--navy);
+}
+.logo .dot{width:10px; height:10px; border-radius:50%; background:var(--coral); display:inline-block;}
+.nav-links{display:flex; align-items:center; gap:28px; font-size:14.5px; font-weight:500; color:var(--ink-soft);}
+.nav-links a:hover{color:var(--navy);}
+.nav-actions{display:flex; align-items:center; gap:12px;}
+.btn{
+  padding:11px 22px; border-radius:999px; font-weight:600; font-size:14.5px;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  transition:transform .15s ease, box-shadow .15s ease;
+  white-space:nowrap;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:var(--coral); color:#fff; box-shadow:0 6px 16px rgba(255,90,60,0.3);}
+.btn-primary:hover{background:var(--coral-dark);}
+.btn-ghost{background:transparent; color:var(--navy); border:1.5px solid var(--line);}
+.btn-ghost:hover{border-color:var(--navy);}
+.btn-dark{background:var(--navy); color:#fff;}
+.btn-dark:hover{background:var(--navy-2);}
+.hamburger{display:none; flex-direction:column; gap:5px; background:none; padding:6px;}
+.hamburger span{width:22px; height:2px; background:var(--navy); border-radius:2px;}
+.mobile-menu{display:none; flex-direction:column; gap:2px; padding:8px 24px 20px; border-top:1px solid var(--line);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{padding:12px 0; font-weight:500; border-bottom:1px solid var(--line); color:var(--ink-soft);}
+
+/* ===== HERO ===== */
+.hero{position:relative; padding:64px 0 40px; overflow:hidden;}
+.hero-bg{
+  position:absolute; inset:0; z-index:0;
+  background:
+    radial-gradient(560px 320px at 85% -10%, rgba(245,166,35,0.18), transparent 60%),
+    radial-gradient(500px 300px at -5% 20%, rgba(31,174,140,0.12), transparent 60%);
+}
+.route-line-deco{position:absolute; top:110px; left:0; width:100%; height:200px; z-index:0; opacity:.5; pointer-events:none;}
+.hero-inner{position:relative; z-index:1; text-align:center; max-width:820px; margin:0 auto;}
+.eyebrow-badge{
+  display:inline-flex; align-items:center; gap:8px; background:var(--paper); border:1px solid var(--line);
+  padding:7px 16px; border-radius:999px; font-size:13px; font-weight:600; color:var(--navy-2); margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.eyebrow-badge .pulse{width:7px; height:7px; border-radius:50%; background:var(--mint); animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.3;}}
+.hero h1{font-size:clamp(32px,5.2vw,58px); line-height:1.06; font-weight:700; letter-spacing:-0.02em;}
+.hero h1 .hl{color:var(--coral);}
+.hero p.sub{margin:22px auto 0; max-width:560px; font-size:18px; color:var(--ink-soft); line-height:1.55;}
+.hero-ctas{display:flex; gap:14px; justify-content:center; margin-top:32px; flex-wrap:wrap;}
+.hero-ctas .btn{padding:15px 28px; font-size:15.5px;}
+
+/* Search ticket */
+.ticket{
+  max-width:920px; margin:48px auto 0; background:var(--paper); border-radius:24px;
+  box-shadow:var(--shadow-lg); border:1px solid var(--line); position:relative;
+  display:flex; align-items:stretch; overflow:visible;
+}
+.ticket-main{flex:1; padding:26px 8px 26px 30px; display:grid; grid-template-columns:1.2fr 1.2fr 1fr 1fr; gap:0;}
+.ticket-field{padding:0 18px; border-right:1px dashed var(--line); text-align:left;}
+.ticket-field:last-child{border-right:none;}
+.ticket-field label{display:block; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px;}
+.ticket-field input, .ticket-field select{
+  border:none; background:transparent; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16px;
+  color:var(--navy); width:100%; padding:0;
+}
+.ticket-field input:focus, .ticket-field select:focus{outline:none;}
+.ticket-field input::placeholder{color:#B7BCCB; font-weight:500;}
+.ticket-stub{
+  width:150px; background:var(--navy); border-radius:0 24px 24px 0; color:#fff;
+  display:flex; align-items:center; justify-content:center; padding:12px;
+  position:relative;
+}
+.ticket-stub::before{
+  content:''; position:absolute; left:-11px; top:50%; transform:translateY(-50%);
+  width:22px; height:22px; border-radius:50%; background:var(--bg); border:1px solid var(--line);
+}
+.ticket-stub .btn{width:100%; padding:13px 10px; font-size:14px;}
+.punch-row{position:absolute; left:0; top:0; bottom:0; width:0;}
+@media (max-width:860px){
+  .ticket{flex-direction:column; border-radius:20px;}
+  .ticket-main{grid-template-columns:1fr 1fr; padding:22px 22px 6px; gap:16px 0;}
+  .ticket-field{border-right:none; border-bottom:1px dashed var(--line); padding:0 0 14px;}
+  .ticket-stub{width:100%; border-radius:0 0 20px 20px; padding:18px 22px;}
+  .ticket-stub::before{display:none;}
+}
+
+.hero-split{display:flex; gap:16px; justify-content:center; margin-top:28px; flex-wrap:wrap;}
+.split-card{
+  display:flex; align-items:center; gap:12px; background:var(--paper); border:1px solid var(--line);
+  padding:14px 20px; border-radius:16px; font-weight:600; font-size:14.5px; box-shadow:var(--shadow);
+  transition:transform .15s;
+}
+.split-card:hover{transform:translateY(-2px); border-color:var(--coral);}
+.split-card .ic{width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
+.split-card.a .ic{background:#FFF0EB; color:var(--coral);}
+.split-card.b .ic{background:#E7F7F2; color:var(--mint);}
+
+/* ===== SECTION GENERIC ===== */
+section{padding:76px 0;}
+.section-head{margin-bottom:40px; max-width:640px;}
+.section-head .kicker{font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; color:var(--coral); text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; display:block;}
+.section-head h2{font-size:clamp(26px,3.4vw,38px); font-weight:700;}
+.section-head p{color:var(--ink-soft); font-size:16px; margin-top:12px; line-height:1.6;}
+.section-head.center{margin-left:auto; margin-right:auto; text-align:center;}
+.scroller{display:flex; gap:20px; overflow-x:auto; padding-bottom:12px; scroll-snap-type:x proximity; margin:0 -24px; padding-left:24px; padding-right:24px;}
+.scroller::-webkit-scrollbar{height:6px;}
+.scroller::-webkit-scrollbar-thumb{background:var(--line); border-radius:3px;}
+.grid{display:grid; gap:20px;}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-2{grid-template-columns:repeat(2,1fr);}
+@media (max-width:1000px){.grid-4{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:640px){.grid-4,.grid-3,.grid-2{grid-template-columns:1fr;}}
+
+/* ===== DESTINATION CARDS (De onde você quer comprar) ===== */
+.dest-card{
+  min-width:300px; scroll-snap-align:start; background:var(--paper); border-radius:var(--radius);
+  border:1px solid var(--line); overflow:hidden; box-shadow:var(--shadow); transition:box-shadow .2s, transform .2s;
+  display:flex; flex-direction:column;
+}
+.dest-card:hover{box-shadow:var(--shadow-lg); transform:translateY(-3px);}
+.dest-top{padding:22px 22px 0;}
+.dest-flag-row{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+.dest-flag{font-size:28px; line-height:1;}
+.dest-flag-row h3{font-size:19px; font-weight:700;}
+.dest-stats{display:flex; gap:16px; margin:14px 0 12px;}
+.dest-stat{display:flex; flex-direction:column;}
+.dest-stat b{font-family:'Space Grotesk',sans-serif; font-size:20px; color:var(--navy);}
+.dest-stat span{font-size:11.5px; color:var(--ink-soft); font-weight:600;}
+.dest-arrival{
+  font-size:13px; color:var(--mint); font-weight:600; background:#E7F7F2; padding:8px 12px; border-radius:10px;
+  display:flex; align-items:center; gap:6px; margin-bottom:14px;
+}
+.dest-dest-list{font-size:13px; color:var(--ink-soft); margin-bottom:14px; line-height:1.5;}
+.dest-dest-list b{color:var(--ink); font-weight:600;}
+.tag-row{display:flex; flex-wrap:wrap; gap:6px; padding:0 22px; margin-bottom:18px;}
+.tag{background:var(--bg); border:1px solid var(--line); font-size:12px; font-weight:600; padding:5px 11px; border-radius:999px; color:var(--ink-soft);}
+.dest-card .btn{margin:0 22px 22px; }
+.dest-card .btn-ghost{border-color:var(--navy); }
+
+/* ===== ROUTE CARDS ===== */
+.route-card{
+  background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:22px;
+  box-shadow:var(--shadow); transition:transform .2s, box-shadow .2s;
+}
+.route-card:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg);}
+.route-path{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+.route-city{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px;}
+.route-arrow{flex:1; height:1px; background:repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 11px); position:relative;}
+.route-arrow::after{content:'✈'; position:absolute; right:-2px; top:-9px; font-size:14px; color:var(--coral);}
+.route-meta{display:flex; flex-wrap:wrap; gap:10px 18px; font-size:13px; color:var(--ink-soft); margin-bottom:18px;}
+.route-meta b{color:var(--ink); font-weight:600;}
+.route-meta .sep{color:var(--line);}
+
+/* ===== TRIP / LUGGAGE TAG CARDS ===== */
+.tag-card{
+  background:var(--paper); border-radius:18px; box-shadow:var(--shadow); position:relative;
+  border:1px solid var(--line); min-width:320px; scroll-snap-align:start;
+  transition:transform .2s, box-shadow .2s;
+}
+.tag-card:hover{transform:translateY(-3px) rotate(-0.4deg); box-shadow:var(--shadow-lg);}
+.tag-card::before{ /* punch hole */
+  content:''; position:absolute; top:22px; left:-9px; width:18px; height:18px; border-radius:50%;
+  background:var(--bg); border:1px solid var(--line); z-index:2;
+}
+.tag-head{display:flex; align-items:center; gap:12px; padding:20px 20px 0;}
+.avatar{width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--coral)); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-family:'Space Grotesk',sans-serif;}
+.tag-name{font-weight:700; font-size:15px; display:flex; align-items:center; gap:6px;}
+.verif{color:var(--mint); font-size:14px;}
+.tag-rating{font-size:12.5px; color:var(--ink-soft); font-weight:600;}
+.tag-rating .star{color:var(--gold);}
+.tag-route{
+  display:flex; align-items:center; justify-content:space-between; margin:18px 20px 0;
+  font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:22px; color:var(--navy);
+}
+.tag-route .code{letter-spacing:.02em;}
+.tag-route .arr{color:var(--coral); font-size:16px;}
+.tag-dates{display:flex; justify-content:space-between; margin:6px 20px 0; font-size:11.5px; color:var(--ink-soft); font-weight:600; text-transform:uppercase; letter-spacing:.03em;}
+.perforation{
+  margin:18px 0; border-top:1px dashed var(--line); position:relative;
+}
+.perforation::before, .perforation::after{
+  content:''; position:absolute; top:-8px; width:16px; height:16px; border-radius:50%; background:var(--bg); border:1px solid var(--line);
+}
+.perforation::before{left:-9px;} .perforation::after{right:-9px;}
+.tag-body{padding:0 20px 20px;}
+.tag-info-row{display:flex; justify-content:space-between; font-size:13px; margin-bottom:10px; color:var(--ink-soft);}
+.tag-info-row b{color:var(--ink); font-weight:600;}
+.tag-cats{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 16px;}
+.tag-reward{
+  display:flex; align-items:center; justify-content:space-between; background:var(--bg); border-radius:12px; padding:12px 14px; margin-bottom:14px;
+}
+.tag-reward b{font-family:'Space Grotesk',sans-serif; color:var(--coral); font-size:16px;}
+.tag-reward span{font-size:11.5px; color:var(--ink-soft); font-weight:600; text-transform:uppercase;}
+.tag-body .btn{width:100%;}
+
+/* ===== TRENDING ===== */
+.trend-card{
+  background:var(--navy); color:#fff; border-radius:var(--radius); padding:26px; position:relative; overflow:hidden;
+  min-height:260px; display:flex; flex-direction:column; justify-content:space-between;
+}
+.trend-card::after{
+  content:''; position:absolute; inset:0; background:radial-gradient(300px 200px at 90% 0%, rgba(255,90,60,0.35), transparent 70%);
+}
+.trend-top{position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between;}
+.trend-flag{font-size:34px;}
+.trend-count{font-family:'IBM Plex Mono',monospace; font-size:12.5px; background:rgba(255,255,255,0.12); padding:6px 12px; border-radius:999px;}
+.trend-title{position:relative; z-index:1; font-size:23px; font-weight:700; margin-top:20px; font-family:'Space Grotesk',sans-serif;}
+.trend-cats{position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:7px; margin-top:14px;}
+.trend-cats span{background:rgba(255,255,255,0.1); font-size:12px; padding:5px 11px; border-radius:999px; font-weight:600;}
+.trend-cta{position:relative; z-index:1; margin-top:20px; display:flex; align-items:center; gap:8px; font-weight:600; font-size:14px; color:var(--gold);}
+
+/* ===== CATEGORIES ===== */
+.cat-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:14px;}
+@media (max-width:900px){.cat-grid{grid-template-columns:repeat(3,1fr);}}
+@media (max-width:520px){.cat-grid{grid-template-columns:repeat(2,1fr);}}
+.cat-card{
+  background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:22px 14px; text-align:center;
+  transition:transform .15s, border-color .15s;
+}
+.cat-card:hover{transform:translateY(-3px); border-color:var(--coral);}
+.cat-card .ic{font-size:26px; margin-bottom:10px;}
+.cat-card span{font-size:13.5px; font-weight:600;}
+
+/* ===== HOW IT WORKS ===== */
+.tabs{display:flex; gap:10px; margin-bottom:36px; justify-content:center;}
+.tab-btn{
+  padding:11px 22px; border-radius:999px; font-weight:600; font-size:14.5px; background:var(--paper); border:1.5px solid var(--line); color:var(--ink-soft);
+}
+.tab-btn.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+.steps{display:grid; grid-template-columns:repeat(5,1fr); gap:16px;}
+@media (max-width:1000px){.steps{grid-template-columns:repeat(3,1fr);}}
+@media (max-width:640px){.steps{grid-template-columns:1fr;}}
+.step-card{background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:22px 18px; position:relative;}
+.step-num{font-family:'IBM Plex Mono',monospace; color:var(--coral); font-weight:700; font-size:13px; margin-bottom:10px;}
+.step-card h4{font-size:15px; margin-bottom:6px;}
+.step-card p{font-size:13px; color:var(--ink-soft); line-height:1.5;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ===== TRUST ===== */
+.trust-section{background:var(--navy); color:#fff; border-radius:32px; margin:0 24px; padding:64px 40px;}
+.trust-section .section-head h2{color:#fff;}
+.trust-section .section-head p{color:rgba(255,255,255,0.65);}
+.trust-section .kicker{color:var(--gold);}
+.trust-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:8px;}
+@media (max-width:800px){.trust-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:520px){.trust-grid{grid-template-columns:1fr;}}
+.trust-item{background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px;}
+.trust-item .ic{font-size:22px; margin-bottom:10px;}
+.trust-item h4{color:#fff; font-size:15px; margin-bottom:6px;}
+.trust-item p{font-size:13px; color:rgba(255,255,255,0.6); line-height:1.5;}
+.warning-box{
+  margin-top:28px; background:rgba(245,166,35,0.12); border:1px solid rgba(245,166,35,0.35); border-radius:14px;
+  padding:16px 18px; display:flex; gap:12px; align-items:flex-start; font-size:13.5px; color:#FFE1B0; line-height:1.5;
+}
+
+/* ===== FOOTER ===== */
+footer{padding:64px 0 32px;}
+.footer-grid{display:grid; grid-template-columns:1.4fr repeat(4,1fr); gap:32px; padding-bottom:40px; border-bottom:1px solid var(--line);}
+@media (max-width:800px){.footer-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:520px){.footer-grid{grid-template-columns:1fr;}}
+.footer-grid h5{font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-bottom:16px; font-weight:700;}
+.footer-grid ul{list-style:none;}
+.footer-grid li{margin-bottom:11px;}
+.footer-grid a{font-size:14px; color:var(--ink-soft);}
+.footer-grid a:hover{color:var(--navy);}
+.footer-brand p{color:var(--ink-soft); font-size:14px; margin-top:12px; max-width:280px; line-height:1.6;}
+.footer-bottom{display:flex; justify-content:space-between; align-items:center; padding-top:24px; font-size:13px; color:var(--ink-soft); flex-wrap:wrap; gap:12px;}
+.social{display:flex; gap:12px;}
+.social a{width:36px; height:36px; border-radius:50%; background:var(--paper); border:1px solid var(--line); display:flex; align-items:center; justify-content:center;}
+
+.reveal{opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.show{opacity:1; transform:translateY(0);}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#" class="logo"><span class="dot"></span>iDeal</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#inicio">Início</a>
+      <a href="ideal-explorar-destinos.html">Explorar destinos</a>
+      <a href="ideal-buscar-viagens.html">Encontrar viagens</a>
+      <a href="ideal-anunciar-viagem.html">Anunciar viagem</a>
+      <a href="#como-funciona">Como funciona</a>
+    </nav>
+    <div class="nav-actions">
+      <span id="navAuthArea" style="display:flex; align-items:center; gap:12px;">
+        <a href="ideal-entrar.html" class="btn btn-ghost" style="display:inline-flex">Entrar</a>
+        <a href="ideal-criar-conta.html" class="btn btn-primary" style="display:inline-flex">Criar conta</a>
+      </span>
+      <button class="hamburger" id="hamburger" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#inicio">Início</a>
+    <a href="ideal-explorar-destinos.html">Explorar destinos</a>
+    <a href="ideal-buscar-viagens.html">Encontrar viagens</a>
+    <a href="ideal-anunciar-viagem.html">Anunciar viagem</a>
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#">Entrar</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="wrap hero-inner">
+    <span class="eyebrow-badge"><span class="pulse"></span> <span id="heroStatsText">Carregando…</span></span>
+    <h1>Compre de qualquer lugar<br>com quem já está <span class="hl">viajando</span>.</h1>
+    <p class="sub">Encontre viajantes com espaço disponível na bagagem ou aproveite sua próxima viagem para ganhar uma renda extra.</p>
+    <div class="hero-ctas">
+      <a href="ideal-buscar-viagens.html" class="btn btn-primary">Encontrar viajantes</a>
+      <a href="ideal-anunciar-viagem.html" class="btn btn-dark">Anunciar minha viagem</a>
+    </div>
+
+    <div class="ticket">
+      <div class="ticket-main">
+        <div class="ticket-field">
+          <label>De onde?</label>
+          <input type="text" placeholder="Cidade ou país de origem">
+        </div>
+        <div class="ticket-field">
+          <label>Para onde?</label>
+          <input type="text" placeholder="Cidade de destino">
+        </div>
+        <div class="ticket-field">
+          <label>Data aproximada</label>
+          <input type="text" placeholder="Qualquer data">
+        </div>
+        <div class="ticket-field">
+          <label>Categoria</label>
+          <select>
+            <option>Todas</option>
+            <option>Eletrônicos</option>
+            <option>Tênis</option>
+            <option>Cosméticos</option>
+          </select>
+        </div>
+      </div>
+      <div class="ticket-stub">
+        <button class="btn btn-primary">Buscar viagens</button>
+      </div>
+    </div>
+
+    <div class="hero-split">
+      <a href="ideal-buscar-viagens.html" class="split-card a"><span class="ic">🛍️</span> Preciso transportar ou comprar algo</a>
+      <a href="ideal-anunciar-viagem.html" class="split-card b"><span class="ic">🧳</span> Tenho espaço disponível</a>
+    </div>
+  </div>
+</section>
+
+<!-- DE ONDE VOCÊ QUER COMPRAR -->
+<section id="destinos">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Origens ativas agora</span>
+      <h2>De onde você quer comprar?</h2>
+      <p>Explore países e cidades com viajantes vindo para a sua região.</p>
+    </div>
+    <div class="scroller reveal" id="originScroller">
+      <p style="color:var(--ink-soft); font-size:14px;">Carregando destinos…</p>
+    </div>
+  </div>
+</section>
+
+<!-- ROTAS NACIONAIS -->
+<section style="background:var(--paper); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Dentro do Brasil</span>
+      <h2>Rotas nacionais em destaque</h2>
+    </div>
+    <div class="grid grid-3 reveal" id="routesGrid">
+      <p style="color:var(--ink-soft); font-size:14px;">Carregando rotas…</p>
+    </div>
+  </div>
+</section>
+
+<!-- DESTINOS EM ALTA -->
+<section>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Em alta esta semana</span>
+      <h2>Destinos em alta</h2>
+    </div>
+    <div class="grid grid-3 reveal" id="trendGrid">
+      <p style="color:var(--ink-soft); font-size:14px;">Carregando destinos em alta…</p>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIAS -->
+<section style="background:var(--paper); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Navegue por categoria</span>
+      <h2>O que você está procurando?</h2>
+    </div>
+    <div class="cat-grid reveal">
+      <div class="cat-card"><div class="ic">📱</div><span>Eletrônicos</span></div>
+      <div class="cat-card"><div class="ic">📷</div><span>Fotografia</span></div>
+      <div class="cat-card"><div class="ic">💻</div><span>Informática</span></div>
+      <div class="cat-card"><div class="ic">🎮</div><span>Games</span></div>
+      <div class="cat-card"><div class="ic">👕</div><span>Roupas</span></div>
+      <div class="cat-card"><div class="ic">👟</div><span>Tênis</span></div>
+      <div class="cat-card"><div class="ic">💄</div><span>Cosméticos</span></div>
+      <div class="cat-card"><div class="ic">🧸</div><span>Brinquedos</span></div>
+      <div class="cat-card"><div class="ic">🎒</div><span>Acessórios</span></div>
+      <div class="cat-card"><div class="ic">📄</div><span>Documentos</span></div>
+      <div class="cat-card"><div class="ic">📦</div><span>Outros</span></div>
+      <div class="cat-card"><div class="ic">✨</div><span>Ver todas</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROXIMAS VIAGENS -->
+<section id="viagens">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Embarque em breve</span>
+      <h2>Próximas viagens</h2>
+      <p>Cards no formato de etiqueta de mala — a rota, o espaço e a recompensa esperada, tudo em um lugar.</p>
+    </div>
+    <div class="scroller reveal" id="upcomingTripsScroller">
+      <p style="color:var(--ink-soft); font-size:14px;">Carregando viagens…</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section id="como-funciona" style="background:var(--paper); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head center reveal" style="margin-left:auto;margin-right:auto;">
+      <span class="kicker">Passo a passo</span>
+      <h2>Como funciona</h2>
+    </div>
+    <div class="tabs reveal">
+      <button class="tab-btn active" data-tab="buyer">Para compradores</button>
+      <button class="tab-btn" data-tab="traveler">Para viajantes</button>
+    </div>
+
+    <div class="tab-panel active" id="buyer">
+      <div class="steps">
+        <div class="step-card"><div class="step-num">01</div><h4>Explore</h4><p>Busque destinos ou uma rota específica.</p></div>
+        <div class="step-card"><div class="step-num">02</div><h4>Encontre</h4><p>Escolha um viajante compatível com o que você precisa.</p></div>
+        <div class="step-card"><div class="step-num">03</div><h4>Solicite</h4><p>Envie os detalhes do produto que deseja transportar.</p></div>
+        <div class="step-card"><div class="step-num">04</div><h4>Combine</h4><p>Negocie a recompensa e os detalhes da entrega.</p></div>
+        <div class="step-card"><div class="step-num">05</div><h4>Receba</h4><p>Receba o produto e avalie o viajante.</p></div>
+      </div>
+    </div>
+    <div class="tab-panel" id="traveler">
+      <div class="steps">
+        <div class="step-card"><div class="step-num">01</div><h4>Publique</h4><p>Anuncie sua próxima viagem em poucos passos.</p></div>
+        <div class="step-card"><div class="step-num">02</div><h4>Indique</h4><p>Informe o espaço disponível na bagagem ou veículo.</p></div>
+        <div class="step-card"><div class="step-num">03</div><h4>Receba pedidos</h4><p>Compradores vão te enviar solicitações.</p></div>
+        <div class="step-card"><div class="step-num">04</div><h4>Aceite</h4><p>Escolha os pedidos compatíveis com sua viagem.</p></div>
+        <div class="step-card"><div class="step-num">05</div><h4>Entregue</h4><p>Complete a entrega e construa sua reputação.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section>
+  <div class="trust-section reveal">
+    <div class="section-head">
+      <span class="kicker">Segurança em primeiro lugar</span>
+      <h2>Uma comunidade construída sobre confiança</h2>
+      <p>Cada viajante e comprador passa por camadas de verificação antes de fechar negócio.</p>
+    </div>
+    <div class="trust-grid">
+      <div class="trust-item"><div class="ic">🪪</div><h4>Perfis verificados</h4><p>Identidade e comprovante de viagem checados pela equipe.</p></div>
+      <div class="trust-item"><div class="ic">⭐</div><h4>Avaliações da comunidade</h4><p>Notas reais de quem já viajou e comprou na plataforma.</p></div>
+      <div class="trust-item"><div class="ic">🧭</div><h4>Histórico de viagens</h4><p>Veja todas as entregas já concluídas por cada viajante.</p></div>
+      <div class="trust-item"><div class="ic">📋</div><h4>Regras para produtos</h4><p>Categorias permitidas e proibidas claras para todos.</p></div>
+      <div class="trust-item"><div class="ic">🚩</div><h4>Sistema de denúncias</h4><p>Qualquer usuário pode reportar comportamento suspeito.</p></div>
+      <div class="trust-item"><div class="ic">💬</div><h4>Comunicação segura</h4><p>Conversas vinculadas sempre a uma viagem ou solicitação.</p></div>
+    </div>
+    <div class="warning-box">
+      ⚠️ O viajante deve conhecer e cumprir as regras fiscais, alfandegárias e de transporte aplicáveis à sua viagem.
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="logo"><span class="dot"></span>iDeal</a>
+        <p>Conectamos viajantes com espaço disponível a pessoas que querem comprar de qualquer lugar do mundo.</p>
+      </div>
+      <div>
+        <h5>Plataforma</h5>
+        <ul>
+          <li><a href="#">Sobre a iDeal</a></li>
+          <li><a href="#">Como funciona</a></li>
+          <li><a href="#">Central de ajuda</a></li>
+          <li><a href="#">Contato</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Confiança</h5>
+        <ul>
+          <li><a href="#">Segurança</a></li>
+          <li><a href="#">Produtos proibidos</a></li>
+          <li><a href="#">Sistema de denúncias</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">Termos de uso</a></li>
+          <li><a href="#">Política de privacidade</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Comunidade</h5>
+        <ul>
+          <li><a href="#">Explorar destinos</a></li>
+          <li><a href="#">Anunciar viagem</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 iDeal. Todos os direitos reservados.</span>
+      <div class="social"><a href="#" aria-label="Instagram">📷</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// mobile menu
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+
+// tabs
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// reveal on scroll
+const obs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); obs.unobserve(e.target);} });
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// responsive nav hamburger visibility handled by CSS media query below via inline style toggle
+function checkNav(){
+  if(window.innerWidth < 900){
+    document.getElementById('navLinks').style.display='none';
+    hamburger.style.display='flex';
+  } else {
+    document.getElementById('navLinks').style.display='flex';
+    hamburger.style.display='none';
+    mobileMenu.classList.remove('open');
+  }
+}
+window.addEventListener('resize', checkNav);
+checkNav();
+</script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/data.js"></script>
+<script>
+idealRenderNavAuth();
+
+const FLAGS = { "Brasil":"🇧🇷", "Estados Unidos":"🇺🇸", "Portugal":"🇵🇹", "Japão":"🇯🇵", "China":"🇨🇳", "França":"🇫🇷", "Itália":"🇮🇹", "Paraguai":"🇵🇾", "Argentina":"🇦🇷" };
+function flagFor(country){ return FLAGS[country] || "🌍"; }
+
+function emptyState(message, ctaText, ctaHref) {
+  return `<div style="width:100%; text-align:center; padding:40px 20px; background:var(--paper); border:1px dashed var(--line); border-radius:16px;">
+    <p style="color:var(--ink-soft); font-size:14.5px; margin-bottom:16px;">${message}</p>
+    <a href="${ctaHref}" class="btn btn-primary" style="display:inline-flex;">${ctaText}</a>
+  </div>`;
+}
+
+async function renderHeroStats() {
+  const stats = await idealFetchPlatformStats();
+  const el = document.getElementById('heroStatsText');
+  if (!el) return;
+  el.textContent = stats.tripCount > 0
+    ? `${stats.tripCount} viagem${stats.tripCount === 1 ? '' : 's'} ativa${stats.tripCount === 1 ? '' : 's'} agora`
+    : `Seja o primeiro a anunciar uma viagem`;
+}
+
+async function renderOrigins() {
+  const el = document.getElementById('originScroller');
+  const origins = await idealFetchOriginSummary();
+  if (!origins.length) {
+    el.innerHTML = emptyState('Ainda não há viagens publicadas na plataforma.', 'Anunciar a primeira viagem', 'ideal-anunciar-viagem.html');
+    return;
+  }
+  el.innerHTML = origins.map(o => `
+    <div class="dest-card">
+      <div class="dest-top">
+        <div class="dest-flag-row"><span class="dest-flag">${flagFor(o.country)}</span><h3>${o.country}</h3></div>
+        <div class="dest-stats">
+          <div class="dest-stat"><b>${o.travelerCount}</b><span>VIAJANTE${o.travelerCount===1?'':'S'}</span></div>
+          <div class="dest-stat"><b>${o.tripCount}</b><span>VIAGEM${o.tripCount===1?'':'ENS'}</span></div>
+        </div>
+        ${o.nextArrival ? `<div class="dest-arrival">✓ Próxima chegada em ${idealFormatDateShort(o.nextArrival)}</div>` : ''}
+        ${o.destCities.length ? `<div class="dest-dest-list">Chegadas para <b>${o.destCities.join(', ')}</b></div>` : ''}
+      </div>
+      <div class="tag-row">${o.categories.map(c=>`<span class="tag">${c}</span>`).join('')}</div>
+      <a href="ideal-buscar-viagens.html" class="btn btn-ghost">Ver viagens de ${o.country}</a>
+    </div>
+  `).join('');
+}
+
+async function renderRoutes() {
+  const el = document.getElementById('routesGrid');
+  const routes = await idealFetchNationalRoutes();
+  if (!routes.length) {
+    el.innerHTML = emptyState('Nenhuma rota nacional publicada ainda.', 'Anunciar uma viagem', 'ideal-anunciar-viagem.html');
+    return;
+  }
+  el.innerHTML = routes.map(r => `
+    <div class="route-card">
+      <div class="route-path"><span class="route-city">${r.originCity}</span><span class="route-arrow"></span><span class="route-city">${r.destCity}</span></div>
+      <div class="route-meta">
+        <span>${r.transport || '—'}</span><span class="sep">·</span><span><b>${r.count}</b> dispon${r.count===1?'ível':'íveis'}</span><span class="sep">·</span><span>até <b>${r.maxWeight}kg</b></span>
+      </div>
+      <a href="ideal-buscar-viagens.html" class="btn btn-ghost" style="width:100%">Explorar rota</a>
+    </div>
+  `).join('');
+}
+
+async function renderTrending() {
+  const el = document.getElementById('trendGrid');
+  const origins = await idealFetchOriginSummary();
+  const top = origins.filter(o => o.country !== 'Brasil').slice(0, 3);
+  if (!top.length) {
+    el.innerHTML = emptyState('Ainda não há destinos em alta — os primeiros aparecem aqui assim que houver viagens.', 'Anunciar uma viagem', 'ideal-anunciar-viagem.html');
+    return;
+  }
+  el.innerHTML = top.map(o => `
+    <div class="trend-card">
+      <div class="trend-top"><span class="trend-flag">${flagFor(o.country)}</span><span class="trend-count">${o.travelerCount} viajante${o.travelerCount===1?'':'s'}</span></div>
+      <div>
+        <div class="trend-title">${o.country}</div>
+        <div class="trend-cats">${o.categories.map(c=>`<span>${c}</span>`).join('')}</div>
+      </div>
+      <a href="ideal-buscar-viagens.html" class="trend-cta">Explorar destino →</a>
+    </div>
+  `).join('');
+}
+
+async function renderUpcomingTrips() {
+  const el = document.getElementById('upcomingTripsScroller');
+  const trips = await idealFetchActiveTrips(10);
+  if (!trips.length) {
+    el.innerHTML = emptyState('Nenhuma viagem publicada ainda. Que tal ser o primeiro viajante da comunidade?', 'Anunciar minha viagem', 'ideal-anunciar-viagem.html');
+    return;
+  }
+  el.innerHTML = trips.map(t => {
+    const name = t.traveler?.first_name || 'Viajante';
+    const rating = t.traveler?.average_rating ? t.traveler.average_rating.toFixed(1) : '—';
+    const tripsCount = t.traveler?.completed_trips_count ?? 0;
+    const verif = t.traveler?.identity_verified ? '<span class="verif">✓</span>' : '';
+    const reward = t.reward_type === 'a_combinar' || !t.expected_reward
+      ? 'Valor a combinar'
+      : `R$ ${t.expected_reward}${t.reward_type === 'por_kg' ? ' / kg' : ''}`;
+    return `
+      <div class="tag-card">
+        <div class="tag-head">
+          <div class="avatar">${idealInitial(name)}</div>
+          <div>
+            <div class="tag-name">${name} ${verif}</div>
+            <div class="tag-rating"><span class="star">★</span> ${rating} · ${tripsCount} viagens</div>
+          </div>
+        </div>
+        <div class="tag-route"><span class="code">${(t.origin_city||'').slice(0,3).toUpperCase()}</span><span class="arr">✈</span><span class="code">${(t.destination_city||'').slice(0,3).toUpperCase()}</span></div>
+        <div class="tag-dates"><span>Embarque ${idealFormatDateShort(t.departure_date)}</span><span>Chegada ${idealFormatDateShort(t.arrival_date)}</span></div>
+        <div class="perforation"></div>
+        <div class="tag-body">
+          <div class="tag-info-row"><span>Transporte</span><b>${t.transport_type || '—'}</b></div>
+          <div class="tag-info-row"><span>Espaço disponível</span><b>${t.available_weight || 0} kg</b></div>
+          <div class="tag-cats">${(t.accepted_categories||[]).map(c=>`<span class="tag">${c}</span>`).join('')}</div>
+          <div class="tag-reward"><span>RECOMPENSA</span><b>${reward}</b></div>
+          <a href="ideal-detalhe-viagem.html?id=${t.id}" class="btn btn-primary">Ver viagem</a>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+renderHeroStats();
+renderOrigins();
+renderRoutes();
+renderTrending();
+renderUpcomingTrips();
+</script>
+</body>
+</html>
