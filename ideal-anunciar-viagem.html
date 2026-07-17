@@ -343,8 +343,8 @@ function setupRouteFields(prefix) {
   paisEl.addEventListener('change', () => {
     cidadeEl.value = '';
     datalistEl.innerHTML = '';
-    if (paisEl.value === 'Brasil') {
-      idealPopulateBrazilStates(estadoEl);
+    if (paisEl.value) {
+      idealPopulateCountryStates(estadoEl, paisEl.value);
     } else {
       estadoEl.innerHTML = '<option value="">Estado / região</option>';
     }
@@ -352,12 +352,15 @@ function setupRouteFields(prefix) {
   });
 
   estadoEl.addEventListener('change', async () => {
-    if (paisEl.value === 'Brasil' && estadoEl.value) {
+    if (!estadoEl.value) return;
+    if (paisEl.value === 'Brasil') {
       try {
         const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estadoEl.value}/municipios`);
         const cidades = await res.json();
         datalistEl.innerHTML = cidades.map(c => `<option value="${c.nome}">`).join('');
       } catch (e) { /* segue sem sugestões se a API falhar */ }
+    } else {
+      await idealPopulateCountryStateCities(datalistEl, paisEl.value, estadoEl.value);
     }
   });
 
