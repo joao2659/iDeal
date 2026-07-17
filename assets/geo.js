@@ -140,6 +140,58 @@ async function idealPopulateBrazilCities(selectEl, ufSigla) {
   }
 }
 
+// Busca os estados/regiões de qualquer país do mundo (exceto Brasil, que usa o IBGE)
+// via API gratuita e sem chave (CountriesNow). Só busca o país escolhido, nunca a lista toda.
+async function idealPopulateCountryStates(selectEl, countryName) {
+  if (countryName === "Brasil") return idealPopulateBrazilStates(selectEl);
+
+  selectEl.disabled = true;
+  selectEl.innerHTML = `<option value="">Carregando estados…</option>`;
+  try {
+    const res = await fetch("https://countriesnow.space/api/v0.1/countries/states", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ country: countryName }),
+    });
+    const json = await res.json();
+    const states = json?.data?.states || [];
+
+    if (!states.length) {
+      selectEl.innerHTML = `<option value="">Este país não tem estados/regiões listados</option>`;
+      return;
+    }
+    selectEl.innerHTML = `<option value="">Estado / região</option>`;
+    states.forEach((s) => {
+      const opt = document.createElement("option");
+      opt.value = s.name;
+      opt.textContent = s.name;
+      selectEl.appendChild(opt);
+    });
+  } catch (err) {
+    selectEl.innerHTML = `<option value="">Não foi possível carregar os estados</option>`;
+  } finally {
+    selectEl.disabled = false;
+  }
+}
+
+// Busca as cidades de um estado/região de qualquer país (fora do Brasil), sob demanda.
+// Preenche um <datalist> (sugestão), mantendo o campo de cidade sempre digitável.
+async function idealPopulateCountryStateCities(datalistEl, countryName, stateName) {
+  if (!countryName || !stateName) return;
+  try {
+    const res = await fetch("https://countriesnow.space/api/v0.1/countries/state/cities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ country: countryName, state: stateName }),
+    });
+    const json = await res.json();
+    const cities = json?.data || [];
+    datalistEl.innerHTML = cities.map((c) => `<option value="${c}">`).join("");
+  } catch (err) {
+    // silencioso — o campo continua digitável normalmente
+  }
+}
+
 /* =========================================================================
    Helper de alto nível: transforma um grupo país/estado/cidade em um
    conjunto dinâmico. Uso:
@@ -160,25 +212,19 @@ function idealSetupLocationGroup({ countrySelect, stateSelect, citySelect }) {
 
     if (isBrasil) {
       idealPopulateBrazilStates(stateSelect);
-      if (isCitySelect) {
-        citySelect.innerHTML = `<option value="">Selecione um estado primeiro</option>`;
-        citySelect.disabled = true;
-      } else if (citySelect) {
-        citySelect.disabled = false;
-        citySelect.placeholder = "Cidade";
-      }
+    } else if (countrySelect.value) {
+      idealPopulateCountryStates(stateSelect, countrySelect.value);
     } else {
-      // Fora do Brasil: mantemos estado/região como campo livre
-      // (cobrir todos os países do mundo exigiria uma base como a
-      // biblioteca "country-state-city" ou uma API paga de endereços)
       stateSelect.innerHTML = `<option value="">Estado / região</option>`;
-      if (isCitySelect) {
-        citySelect.innerHTML = `<option value="">Digite a cidade</option>`;
-        citySelect.disabled = true;
-      } else if (citySelect) {
-        citySelect.disabled = false;
-        citySelect.placeholder = "Cidade";
-      }
+    }
+
+    if (isCitySelect) {
+      citySelect.innerHTML = `<option value="">Selecione um estado primeiro</option>`;
+      citySelect.disabled = true;
+    } else if (citySelect) {
+      citySelect.value = "";
+      citySelect.disabled = false;
+      citySelect.placeholder = "Cidade";
     }
   });
 
@@ -187,6 +233,9 @@ function idealSetupLocationGroup({ countrySelect, stateSelect, citySelect }) {
       if (countrySelect.value === "Brasil") {
         idealPopulateBrazilCities(citySelect, stateSelect.value);
       }
+      // Para outros países, o campo de cidade (quando for <select>) permanece
+      // simples; use o padrão com <input> + <datalist> (ver anunciar-viagem)
+      // se quiser sugestões de cidade também fora do Brasil.
     });
   }
 }
