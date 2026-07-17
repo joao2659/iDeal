@@ -200,9 +200,10 @@ async function idealPopulateCountryStateCities(datalistEl, countryName, stateNam
      countrySelect: document.querySelector('#origemPais'),
      stateSelect:   document.querySelector('#origemEstado'),
      citySelect:    document.querySelector('#origemCidade'), // select OU input
+     cityDatalist:  document.querySelector('#origemCidadeList'), // opcional — só se citySelect for <input>
    });
    ========================================================================= */
-function idealSetupLocationGroup({ countrySelect, stateSelect, citySelect }) {
+function idealSetupLocationGroup({ countrySelect, stateSelect, citySelect, cityDatalist }) {
   idealPopulateCountrySelect(countrySelect);
 
   const isCitySelect = citySelect && citySelect.tagName === "SELECT";
@@ -225,17 +226,33 @@ function idealSetupLocationGroup({ countrySelect, stateSelect, citySelect }) {
       citySelect.value = "";
       citySelect.disabled = false;
       citySelect.placeholder = "Cidade";
+      if (cityDatalist) cityDatalist.innerHTML = "";
     }
   });
 
-  if (isCitySelect) {
-    stateSelect.addEventListener("change", () => {
+  stateSelect.addEventListener("change", async () => {
+    if (!stateSelect.value) return;
+
+    if (isCitySelect) {
       if (countrySelect.value === "Brasil") {
         idealPopulateBrazilCities(citySelect, stateSelect.value);
       }
-      // Para outros países, o campo de cidade (quando for <select>) permanece
-      // simples; use o padrão com <input> + <datalist> (ver anunciar-viagem)
-      // se quiser sugestões de cidade também fora do Brasil.
-    });
-  }
+      return;
+    }
+
+    if (!cityDatalist) return;
+    if (countrySelect.value === "Brasil") {
+      try {
+        const res = await fetch(
+          `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${stateSelect.value}/municipios`
+        );
+        const cidades = await res.json();
+        cityDatalist.innerHTML = cidades.map((c) => `<option value="${c.nome}">`).join("");
+      } catch (err) {
+        /* segue sem sugestões se a API falhar */
+      }
+    } else {
+      await idealPopulateCountryStateCities(cityDatalist, countrySelect.value, stateSelect.value);
+    }
+  });
 }
