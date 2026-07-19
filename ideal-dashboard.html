@@ -144,7 +144,7 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
       <a href="ideal-mensagens.html" class="side-link">💬 Mensagens</a>
       <a href="#" class="side-link">⭐ Avaliações</a>
       <div class="side-divider"></div>
-      <a href="#" class="side-link">🪪 Perfil e verificação</a>
+      <a href="#verificacaoSection" class="side-link">🪪 Perfil e verificação</a>
       <a href="#" class="side-link">⚙️ Configurações</a>
     </nav>
   </aside>
@@ -183,6 +183,13 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
     <div class="section">
       <div class="section-title"><h3>Avaliações recentes</h3></div>
       <div class="mini-cards" id="reviewsGrid">
+        <p style="color:var(--ink-soft); font-size:14px;">Carregando…</p>
+      </div>
+    </div>
+
+    <div class="section" id="verificacaoSection">
+      <div class="section-title"><h3>Verificação de identidade</h3></div>
+      <div class="card" id="verificationCard">
         <p style="color:var(--ink-soft); font-size:14px;">Carregando…</p>
       </div>
     </div>
@@ -292,7 +299,72 @@ async function loadDashboard() {
   }
 }
 
+async function loadVerificationStatus() {
+  const card = document.getElementById('verificationCard');
+  const user = await idealGetCurrentUser();
+  if (!user) return;
+  const { data: profile } = await idealSupabase.from('profiles').select('verification_status').eq('id', user.id).single();
+  const status = profile?.verification_status || 'nao_enviado';
+
+  if (status === 'em_analise') {
+    card.innerHTML = `<p style="color:var(--ink-soft); font-size:14px;">🕒 Seu documento está em análise. Avisaremos assim que for aprovado.</p>`;
+  } else if (status === 'aprovado') {
+    card.innerHTML = `<p style="color:var(--mint); font-size:14px; font-weight:600;">✓ Identidade verificada.</p>`;
+  } else {
+    const rejectedMsg = status === 'rejeitado' ? `<p style="color:var(--coral-dark); font-size:13.5px; margin-bottom:14px;">Seu envio anterior foi rejeitado. Envie novamente com fotos mais nítidas.</p>` : '';
+    card.innerHTML = `
+      ${rejectedMsg}
+      <p style="color:var(--ink-soft); font-size:13.5px; margin-bottom:16px;">Envie uma foto do seu documento (RG ou CNH) e uma selfie segurando o documento. Usamos isso só para conferência manual da nossa equipe.</p>
+      <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Foto do documento</label>
+      <input type="file" id="docFile" accept="image/*" style="margin-bottom:16px;">
+      <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Selfie segurando o documento</label>
+      <input type="file" id="selfieFile" accept="image/*" style="margin-bottom:16px;">
+      <button class="btn btn-primary" onclick="submitVerification()">Enviar para análise</button>
+      <p id="verifMsg" style="font-size:13px; margin-top:10px;"></p>
+    `;
+  }
+}
+
+async function submitVerification() {
+  const user = await idealGetCurrentUser();
+  const docFile = document.getElementById('docFile').files[0];
+  const selfieFile = document.getElementById('selfieFile').files[0];
+  const msg = document.getElementById('verifMsg');
+
+  if (!docFile || !selfieFile) {
+    msg.textContent = 'Selecione as duas fotos antes de enviar.';
+    msg.style.color = 'var(--coral-dark)';
+    return;
+  }
+
+  msg.textContent = 'Enviando…';
+  msg.style.color = 'var(--ink-soft)';
+
+  const docPath = `${user.id}/documento-${Date.now()}.jpg`;
+  const selfiePath = `${user.id}/selfie-${Date.now()}.jpg`;
+
+  const { error: err1 } = await idealSupabase.storage.from('verification-docs').upload(docPath, docFile);
+  if (err1) { msg.textContent = 'Erro ao enviar documento: ' + err1.message; msg.style.color = 'var(--coral-dark)'; return; }
+
+  const { error: err2 } = await idealSupabase.storage.from('verification-docs').upload(selfiePath, selfieFile);
+  if (err2) { msg.textContent = 'Erro ao enviar selfie: ' + err2.message; msg.style.color = 'var(--coral-dark)'; return; }
+
+  const { error: err3 } = await idealSupabase.from('profiles').update({
+    document_photo_url: docPath,
+    selfie_photo_url: selfiePath,
+    verification_status: 'em_analise',
+    verification_submitted_at: new Date().toISOString()
+  }).eq('id', user.id);
+
+  if (err3) { msg.textContent = 'Erro ao salvar: ' + err3.message; msg.style.color = 'var(--coral-dark)'; return; }
+
+  msg.textContent = 'Enviado com sucesso! Vamos analisar em breve.';
+  msg.style.color = 'var(--mint)';
+  loadVerificationStatus();
+}
+
 loadDashboard();
+loadVerificationStatus();
 </script>
 </body>
 </html>
