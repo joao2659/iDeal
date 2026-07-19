@@ -363,15 +363,16 @@ async function submitVerification() {
   loadVerificationStatus();
 }
 
-loadDashboard();
-loadVerificationStatus().then(() => {
+Promise.all([loadDashboard(), loadVerificationStatus()]).then(() => {
   if (window.location.hash === '#verificacaoSection') {
-    const section = document.getElementById('verificacaoSection');
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    section.style.transition = 'box-shadow 0.3s ease';
-    section.style.boxShadow = '0 0 0 3px var(--coral)';
-    section.style.borderRadius = '18px';
-    setTimeout(() => { section.style.boxShadow = 'none'; }, 2500);
+    setTimeout(() => {
+      const section = document.getElementById('verificacaoSection');
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      section.style.transition = 'box-shadow 0.3s ease';
+      section.style.boxShadow = '0 0 0 3px var(--coral)';
+      section.style.borderRadius = '18px';
+      setTimeout(() => { section.style.boxShadow = 'none'; }, 2500);
+    }, 150);
   }
 });
 </script>
