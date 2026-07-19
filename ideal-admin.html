@@ -334,7 +334,7 @@ async function loadVerifications() {
     <tr id="verif-row-${u.id}">
       <td class="cell-user"><div class="avatar-sm">${idealInitial(u.first_name)}</div><div><b>${u.first_name||'—'} ${u.last_name||''}</b></div></td>
       <td>Identidade</td>
-      <td>${idealFormatDateShort(u.verification_submitted_at)}</td>
+      <td>${u.verification_submitted_at ? new Date(u.verification_submitted_at).toLocaleDateString('pt-BR') : '—'}</td>
       <td>
         <a href="#" onclick="verDocumento('${u.document_photo_url}'); return false;" style="color:var(--coral); font-weight:600; display:block;">Ver documento</a>
         <a href="#" onclick="verDocumento('${u.selfie_photo_url}'); return false;" style="color:var(--coral); font-weight:600; display:block;">Ver selfie</a>
