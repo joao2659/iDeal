@@ -106,11 +106,12 @@ tbody tr:hover{background:#FAFAFC;}
 
     <div class="side-tag">Moderação</div>
     <nav class="side-nav">
-      <a href="#" class="side-link active">📊 Visão geral</a>
-      <a href="#" class="side-link">✈️ Viagens aguardando <span class="count">4</span></a>
+     <a href="#" class="side-link active">📊 Visão geral</a>
+      <a href="#pendingTripsSection" class="side-link">✈️ Viagens aguardando <span class="count">4</span></a>
       <a href="#" class="side-link">🧳 Viagens ativas</a>
-      <a href="#" class="side-link">🪪 Verificações <span class="count">6</span></a>
-      <a href="#" class="side-link">🚩 Denúncias <span class="count">3</span></a>
+      <a href="#verificationsSection" class="side-link">🪪 Verificações <span class="count">6</span></a>
+      <a href="#disputesSection" class="side-link">⚖️ Disputas <span class="count" id="disputesCount">0</span></a>
+      <a href="#reportsSection" class="side-link">🚩 Denúncias <span class="count">3</span></a>
     </nav>
 
     <div class="side-divider"></div>
@@ -147,7 +148,7 @@ tbody tr:hover{background:#FAFAFC;}
     </div>
 
     <!-- VIAGENS AGUARDANDO APROVAÇÃO -->
-    <div class="section">
+   <div class="section" id="pendingTripsSection">
       <div class="section-title"><h3>Viagens aguardando aprovação</h3></div>
       <div class="table-card">
         <div class="table-wrap">
@@ -162,7 +163,7 @@ tbody tr:hover{background:#FAFAFC;}
     </div>
 
     <!-- DENÚNCIAS -->
-    <div class="section">
+    <div class="section" id="reportsSection">
       <div class="section-title"><h3>Denúncias recentes</h3><a href="#">Ver todas</a></div>
       <div class="table-card">
         <div class="table-wrap">
@@ -200,13 +201,28 @@ tbody tr:hover{background:#FAFAFC;}
     </div>
 
     <!-- VERIFICAÇÕES -->
-    <div class="section">
+   <div class="section" id="verificationsSection">
       <div class="section-title"><h3>Verificações pendentes</h3></div>
       <div class="table-card">
         <div class="table-wrap">
           <table>
             <thead><tr><th>Usuário</th><th>Tipo</th><th>Enviado em</th><th>Documento</th><th>Ações</th></tr></thead>
             <tbody id="verificationsBody">
+              <tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISPUTAS -->
+    <div class="section" id="disputesSection">
+      <div class="section-title"><h3>Disputas abertas</h3></div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aberta por</th><th>Contra</th><th>Motivo</th><th>Descrição</th><th>Ações</th></tr></thead>
+            <tbody id="disputesBody">
               <tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Carregando…</td></tr>
             </tbody>
           </table>
@@ -374,6 +390,63 @@ async function rejectVerification(id) {
 }
 
 loadVerifications();
+
+const REASON_LABELS = {
+  produto_nao_entregue: 'Produto não entregue',
+  produto_diferente: 'Produto diferente',
+  pagamento_nao_recebido: 'Pagamento não recebido',
+  comunicacao: 'Problema de comunicação',
+  outro: 'Outro'
+};
+
+async function loadDisputes() {
+  const tbody = document.getElementById('disputesBody');
+
+  const { data: disputes, error } = await idealSupabase
+    .from('disputes')
+    .select('*, opener:opened_by(first_name), target:against_user_id(first_name)')
+    .eq('dispute_status', 'aberta')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Erro ao carregar (${error.message}).</td></tr>`;
+    return;
+  }
+
+  document.getElementById('disputesCount').textContent = disputes.length;
+
+  if (!disputes.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Nenhuma disputa aberta.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = disputes.map(d => `
+    <tr id="dispute-row-${d.id}">
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(d.opener?.first_name)}</div><div><b>${d.opener?.first_name||'—'}</b></div></td>
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(d.target?.first_name)}</div><div><b>${d.target?.first_name||'—'}</b></div></td>
+      <td>${REASON_LABELS[d.reason]||d.reason||'—'}</td>
+      <td style="max-width:220px; white-space:normal;">${d.description||'—'}</td>
+      <td class="row-actions">
+        <button class="btn btn-success btn-sm" onclick="resolveDispute('${d.id}','resolvida_comprador')">A favor comprador</button>
+        <button class="btn btn-success btn-sm" onclick="resolveDispute('${d.id}','resolvida_viajante')">A favor viajante</button>
+        <button class="btn btn-ghost btn-sm" onclick="resolveDispute('${d.id}','encerrada')">Encerrar</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function resolveDispute(id, status) {
+  const { error } = await idealSupabase.from('disputes').update({
+    dispute_status: status,
+    resolved_at: new Date().toISOString()
+  }).eq('id', id);
+  if (error) { alert('Erro ao resolver: ' + error.message); return; }
+  document.getElementById(`dispute-row-${id}`).remove();
+  const countEl = document.getElementById('disputesCount');
+  countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
+}
+
+loadDisputes();
 </script>
 </body>
 </html>
