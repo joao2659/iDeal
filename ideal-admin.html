@@ -201,32 +201,13 @@ tbody tr:hover{background:#FAFAFC;}
 
     <!-- VERIFICAÇÕES -->
     <div class="section">
-      <div class="section-title"><h3>Verificações pendentes</h3><a href="#">Ver todas</a></div>
+      <div class="section-title"><h3>Verificações pendentes</h3></div>
       <div class="table-card">
         <div class="table-wrap">
           <table>
             <thead><tr><th>Usuário</th><th>Tipo</th><th>Enviado em</th><th>Documento</th><th>Ações</th></tr></thead>
-            <tbody>
-              <tr>
-                <td class="cell-user"><div class="avatar-sm">T</div><div><b>Thiago Lins</b><span>thiago@email.com</span></div></td>
-                <td>Identidade</td>
-                <td>Hoje</td>
-                <td><a href="#" style="color:var(--coral); font-weight:600;">Ver documento</a></td>
-                <td class="row-actions">
-                  <button class="btn btn-success btn-sm">Verificar</button>
-                  <button class="btn btn-danger btn-sm">Rejeitar</button>
-                </td>
-              </tr>
-              <tr>
-                <td class="cell-user"><div class="avatar-sm">V</div><div><b>Vanessa Reis</b><span>vanessa@email.com</span></div></td>
-                <td>Identidade</td>
-                <td>Ontem</td>
-                <td><a href="#" style="color:var(--coral); font-weight:600;">Ver documento</a></td>
-                <td class="row-actions">
-                  <button class="btn btn-success btn-sm">Verificar</button>
-                  <button class="btn btn-danger btn-sm">Rejeitar</button>
-                </td>
-              </tr>
+            <tbody id="verificationsBody">
+              <tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Carregando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -329,6 +310,70 @@ async function rejectTrip(id) {
 }
 
 loadPendingTrips();
+
+async function loadVerifications() {
+  const tbody = document.getElementById('verificationsBody');
+
+  const { data: users, error } = await idealSupabase
+    .from('profiles')
+    .select('id, first_name, last_name, verification_status, verification_submitted_at, document_photo_url, selfie_photo_url')
+    .eq('verification_status', 'em_analise')
+    .order('verification_submitted_at', { ascending: true });
+
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Erro ao carregar (${error.message}).</td></tr>`;
+    return;
+  }
+
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Nenhuma verificação pendente.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = users.map(u => `
+    <tr id="verif-row-${u.id}">
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(u.first_name)}</div><div><b>${u.first_name||'—'} ${u.last_name||''}</b></div></td>
+      <td>Identidade</td>
+      <td>${idealFormatDateShort(u.verification_submitted_at)}</td>
+      <td>
+        <a href="#" onclick="verDocumento('${u.document_photo_url}'); return false;" style="color:var(--coral); font-weight:600; display:block;">Ver documento</a>
+        <a href="#" onclick="verDocumento('${u.selfie_photo_url}'); return false;" style="color:var(--coral); font-weight:600; display:block;">Ver selfie</a>
+      </td>
+      <td class="row-actions">
+        <button class="btn btn-success btn-sm" onclick="approveVerification('${u.id}')">Verificar</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectVerification('${u.id}')">Rejeitar</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function verDocumento(path) {
+  const { data, error } = await idealSupabase.storage.from('verification-docs').createSignedUrl(path, 60);
+  if (error) { alert('Erro ao abrir documento: ' + error.message); return; }
+  window.open(data.signedUrl, '_blank');
+}
+
+async function approveVerification(id) {
+  const { error } = await idealSupabase.from('profiles').update({
+    verification_status: 'aprovado',
+    identity_verified: true,
+    verification_reviewed_at: new Date().toISOString()
+  }).eq('id', id);
+  if (error) { alert('Erro ao aprovar: ' + error.message); return; }
+  document.getElementById(`verif-row-${id}`).remove();
+}
+
+async function rejectVerification(id) {
+  const { error } = await idealSupabase.from('profiles').update({
+    verification_status: 'rejeitado',
+    identity_verified: false,
+    verification_reviewed_at: new Date().toISOString()
+  }).eq('id', id);
+  if (error) { alert('Erro ao rejeitar: ' + error.message); return; }
+  document.getElementById(`verif-row-${id}`).remove();
+}
+
+loadVerifications();
 </script>
 </body>
 </html>
