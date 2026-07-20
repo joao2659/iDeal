@@ -122,8 +122,13 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
   <div class="nav-inner">
     <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
     <div class="nav-right">
-      <button class="icon-btn">💬</button>
-      <button class="icon-btn">🔔<span class="dot-badge"></span></button>
+     <a href="ideal-mensagens.html" class="icon-btn" style="text-decoration:none;">💬</a>
+      <div style="position:relative;">
+        <button class="icon-btn" id="notifBtn" onclick="toggleNotifDropdown()">🔔<span class="dot-badge" id="notifBadge" style="display:none;"></span></button>
+        <div id="notifDropdown" style="display:none; position:absolute; top:48px; right:0; width:320px; max-height:400px; overflow-y:auto; background:var(--paper); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow-lg); z-index:150;">
+          <div id="notifList" style="padding:8px;"></div>
+        </div>
+      </div>
       <div class="avatar-nav" id="topAvatar">…</div>
     </div>
   </div>
@@ -465,6 +470,7 @@ function closeRequestModal() {
 }
 
 async function respondToRequest(requestId, newStatus) {
+  const { data: reqRow } = await idealSupabase.from('requests').select('buyer_id, product_name').eq('id', requestId).single();
   const { error } = await idealSupabase.from('requests').update({ request_status: newStatus }).eq('id', requestId);
   if (error) { alert('Erro: ' + error.message); return; }
 
@@ -473,6 +479,17 @@ async function respondToRequest(requestId, newStatus) {
     if (!existingConv) {
       await idealSupabase.from('conversations').insert({ request_id: requestId });
     }
+  }
+
+  if (reqRow) {
+    await idealSupabase.from('notifications').insert({
+      user_id: reqRow.buyer_id,
+      type: newStatus === 'aceita' ? 'solicitacao_aceita' : 'solicitacao_recusada',
+      message: newStatus === 'aceita'
+        ? `Sua solicitação de "${reqRow.product_name}" foi aceita!`
+        : `Sua solicitação de "${reqRow.product_name}" foi recusada.`,
+      link: 'ideal-dashboard.html'
+    });
   }
 
   closeRequestModal();
@@ -494,6 +511,63 @@ function scrollToHashSection() {
 }
 
 Promise.all([loadDashboard(), loadVerificationStatus()]).then(scrollToHashSection);
+
+async function loadNotifications() {
+  if (!currentUser) return;
+  const { data: notifs } = await idealSupabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  const list = notifs || [];
+  const unread = list.filter(n => !n.is_read).length;
+
+  const badge = document.getElementById('notifBadge');
+  badge.style.display = unread > 0 ? 'block' : 'none';
+
+  const notifList = document.getElementById('notifList');
+  if (!list.length) {
+    notifList.innerHTML = `<p style="color:var(--ink-soft); font-size:13px; padding:16px; text-align:center;">Nenhuma notificação ainda.</p>`;
+    return;
+  }
+
+  notifList.innerHTML = list.map(n => `
+    <a href="${n.link || '#'}" style="display:block; padding:12px 14px; border-radius:10px; ${n.is_read ? '' : 'background:#FFF0EB;'} margin-bottom:4px;" onclick="markNotifRead('${n.id}')">
+      <div style="font-size:13px; color:var(--ink); font-weight:${n.is_read ? '500' : '700'};">${n.message}</div>
+      <div style="font-size:11px; color:var(--ink-soft); margin-top:3px;">${timeAgoShort(n.created_at)}</div>
+    </a>
+  `).join('');
+}
+
+function timeAgoShort(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const h = diff / 3600000;
+  if (h < 1) return 'agora';
+  if (h < 24) return `${Math.floor(h)}h atrás`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? '1 dia atrás' : `${d} dias atrás`;
+}
+
+async function markNotifRead(id) {
+  await idealSupabase.from('notifications').update({ is_read: true }).eq('id', id);
+}
+
+function toggleNotifDropdown() {
+  const dd = document.getElementById('notifDropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('notifDropdown');
+  const btn = document.getElementById('notifBtn');
+  if (dd.style.display === 'block' && !dd.contains(e.target) && e.target !== btn) {
+    dd.style.display = 'none';
+  }
+});
+
+loadDashboard().then(loadNotifications);
 </script>
 </body>
 </html>
