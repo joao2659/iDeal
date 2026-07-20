@@ -331,6 +331,15 @@ async function sendMessage() {
     message_text: text,
   });
 
+  if (activeOtherUserId) {
+    await idealSupabase.from('notifications').insert({
+      user_id: activeOtherUserId,
+      type: 'mensagem',
+      message: 'Você recebeu uma nova mensagem.',
+      link: 'ideal-mensagens.html'
+    });
+  }
+
   await loadMessages();
 }
 
