@@ -388,6 +388,19 @@ async function loadVerificationStatus() {
       <p id="verifMsg" style="font-size:13px; margin-top:10px;"></p>
     `;
   }
+
+  const { data: mpProfile } = await idealSupabase.from('profiles').select('mp_connected').eq('id', user.id).single();
+  const mpSection = document.createElement('div');
+  mpSection.style.cssText = 'margin-top:20px; padding-top:20px; border-top:1px solid var(--line);';
+  if (mpProfile?.mp_connected) {
+    mpSection.innerHTML = `<p style="color:var(--mint); font-size:14px; font-weight:600;">✓ Conta Mercado Pago conectada — você já pode receber pagamentos.</p>`;
+  } else {
+    mpSection.innerHTML = `
+      <p style="font-size:13.5px; color:var(--ink-soft); margin-bottom:12px;">Para receber pagamentos como viajante, conecte sua conta Mercado Pago.</p>
+      <a href="/api/mp-oauth-start?user_id=${user.id}" class="btn btn-primary">Conectar Mercado Pago</a>
+    `;
+  }
+  card.appendChild(mpSection);
 }
 
 async function submitVerification() {
