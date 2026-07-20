@@ -369,18 +369,73 @@ async function submitVerification() {
   loadVerificationStatus();
 }
 
-Promise.all([loadDashboard(), loadVerificationStatus()]).then(() => {
-  if (window.location.hash === '#verificacaoSection') {
-    setTimeout(() => {
-      const section = document.getElementById('verificacaoSection');
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      section.style.transition = 'box-shadow 0.3s ease';
-      section.style.boxShadow = '0 0 0 3px var(--coral)';
-      section.style.borderRadius = '18px';
-      setTimeout(() => { section.style.boxShadow = 'none'; }, 2500);
-    }, 150);
+async function openRequestModal(requestId) {
+  const { data: r, error } = await idealSupabase
+    .from('requests')
+    .select('*, buyer:buyer_id(first_name, last_name)')
+    .eq('id', requestId)
+    .single();
+
+  if (error || !r) { alert('Erro ao carregar solicitação.'); return; }
+
+  document.getElementById('requestModalBody').innerHTML = `
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Comprador</span><span style="font-weight:600;">${r.buyer?.first_name||'—'} ${r.buyer?.last_name||''}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Produto</span><span style="font-weight:600;">${r.product_name||'—'}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Categoria</span><span style="font-weight:600;">${r.product_category||'—'}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Link do produto</span><span style="font-weight:600;">${r.product_url ? `<a href="${r.product_url}" target="_blank" style="color:var(--coral);">Abrir</a>` : '—'}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Preço do produto</span><span style="font-weight:600;">R$ ${r.product_price||0}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Recompensa oferecida</span><span style="font-weight:600;">R$ ${r.offered_reward||0}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Cidade de entrega</span><span style="font-weight:600;">${r.delivery_city||'—'}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;"><span style="color:var(--ink-soft);">Mensagem</span><span style="font-weight:600; text-align:right; max-width:60%;">${r.message||'—'}</span></div>
+  `;
+
+  const actions = document.getElementById('requestModalActions');
+  if (r.request_status === 'enviada' || r.request_status === 'em_analise') {
+    actions.innerHTML = `
+      <button class="btn btn-ghost" style="flex:1;" onclick="respondToRequest('${r.id}', 'recusada')">Recusar</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="respondToRequest('${r.id}', 'aceita')">Aceitar</button>
+    `;
+  } else {
+    actions.innerHTML = `<p style="text-align:center; color:var(--ink-soft); font-size:13px; flex:1;">Esta solicitação já foi respondida.</p>`;
   }
-});
+
+  document.getElementById('requestModal').style.display = 'flex';
+}
+
+function closeRequestModal() {
+  document.getElementById('requestModal').style.display = 'none';
+}
+
+async function respondToRequest(requestId, newStatus) {
+  const { error } = await idealSupabase.from('requests').update({ request_status: newStatus }).eq('id', requestId);
+  if (error) { alert('Erro: ' + error.message); return; }
+
+  if (newStatus === 'aceita') {
+    const { data: existingConv } = await idealSupabase.from('conversations').select('id').eq('request_id', requestId).maybeSingle();
+    if (!existingConv) {
+      await idealSupabase.from('conversations').insert({ request_id: requestId });
+    }
+  }
+
+  closeRequestModal();
+  loadDashboard();
+}
+
+function scrollToHashSection() {
+  const hash = window.location.hash;
+  if (!hash) return;
+  const section = document.querySelector(hash);
+  if (!section) return;
+  setTimeout(() => {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    section.style.transition = 'box-shadow 0.3s ease';
+    section.style.boxShadow = '0 0 0 3px var(--coral)';
+    section.style.borderRadius = '18px';
+    setTimeout(() => { section.style.boxShadow = 'none'; }, 2500);
+  }, 150);
+}
+
+Promise.all([loadDashboard(), loadVerificationStatus()]).then(scrollToHashSection);
 </script>
 </body>
 </html>
