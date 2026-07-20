@@ -314,8 +314,19 @@ async function loadPendingTrips() {
 }
 
 async function approveTrip(id) {
+  const { data: trip } = await idealSupabase.from('trips').select('traveler_id').eq('id', id).single();
   const { error } = await idealSupabase.from('trips').update({ approval_status: 'aprovada' }).eq('id', id);
   if (error) { alert('Erro ao aprovar: ' + error.message); return; }
+
+  if (trip) {
+    await idealSupabase.from('notifications').insert({
+      user_id: trip.traveler_id,
+      type: 'viagem_aprovada',
+      message: 'Sua viagem foi aprovada e já está visível para compradores!',
+      link: 'ideal-dashboard.html'
+    });
+  }
+
   document.getElementById(`trip-row-${id}`).remove();
 }
 
@@ -336,6 +347,13 @@ async function rejectTrip(id, travelerId) {
       message_text: `Sua viagem não foi aprovada. Motivo: ${motivo}`
     });
   }
+
+  await idealSupabase.from('notifications').insert({
+    user_id: travelerId,
+    type: 'viagem_rejeitada',
+    message: 'Sua viagem não foi aprovada. Veja o motivo nas mensagens.',
+    link: 'ideal-mensagens.html'
+  });
 
   document.getElementById(`trip-row-${id}`).remove();
 }
