@@ -307,7 +307,7 @@ async function loadPendingTrips() {
       <td><span class="status-chip pending">Pendente</span></td>
       <td class="row-actions">
         <button class="btn btn-success btn-sm" onclick="approveTrip('${t.id}')">Aprovar</button>
-        <button class="btn btn-danger btn-sm" onclick="rejectTrip('${t.id}')">Rejeitar</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectTrip('${t.id}', '${t.traveler_id}')">Rejeitar</button>
       </td>
     </tr>
   `).join('');
@@ -319,9 +319,24 @@ async function approveTrip(id) {
   document.getElementById(`trip-row-${id}`).remove();
 }
 
-async function rejectTrip(id) {
+async function rejectTrip(id, travelerId) {
+  const motivo = prompt('Explique o motivo da rejeição (isso será enviado ao viajante):');
+  if (motivo === null) return; // admin cancelou
+  if (!motivo.trim()) { alert('Digite um motivo antes de rejeitar.'); return; }
+
   const { error } = await idealSupabase.from('trips').update({ approval_status: 'rejeitada', trip_status: 'inativa' }).eq('id', id);
   if (error) { alert('Erro ao rejeitar: ' + error.message); return; }
+
+  const admin = await idealGetCurrentUser();
+  const { data: conv } = await idealSupabase.from('conversations').insert({ trip_id: id }).select().single();
+  if (conv) {
+    await idealSupabase.from('messages').insert({
+      conversation_id: conv.id,
+      sender_id: admin.id,
+      message_text: `Sua viagem não foi aprovada. Motivo: ${motivo}`
+    });
+  }
+
   document.getElementById(`trip-row-${id}`).remove();
 }
 
