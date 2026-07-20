@@ -136,16 +136,13 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
       <div><b>Carregando…</b><span></span></div>
     </div>
     <nav class="side-nav">
-      <a href="#" class="side-link active">📊 Visão geral</a>
-      <a href="#" class="side-link">🧳 Minhas viagens</a>
+     <a href="#" class="side-link active">📊 Visão geral</a>
+      <a href="#minhasViagensSection" class="side-link">🧳 Minhas viagens</a>
       <a href="#" class="side-link">📦 Minhas solicitações</a>
-      <a href="#" class="side-link">📥 Solicitações recebidas</a>
+      <a href="#solicitacoesRecebidasSection" class="side-link">📥 Solicitações recebidas</a>
       <a href="#" class="side-link">🤍 Viagens salvas</a>
       <a href="ideal-mensagens.html" class="side-link">💬 Mensagens</a>
-      <a href="#" class="side-link">⭐ Avaliações</a>
-      <div class="side-divider"></div>
-      <a href="#verificacaoSection" class="side-link">🪪 Perfil e verificação</a>
-      <a href="#" class="side-link">⚙️ Configurações</a>
+      <a href="#avaliacoesSection" class="side-link">⭐ Avaliações</a>
     </nav>
   </aside>
 
@@ -166,21 +163,21 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
       <div class="summary-card"><div class="ic">⭐</div><b>—</b><span>Avaliação média</span></div>
     </div>
 
-    <div class="section">
+    <div class="section" id="minhasViagensSection">
       <div class="section-title"><h3>Minhas viagens</h3><a href="ideal-anunciar-viagem.html">+ Nova viagem</a></div>
       <div class="mini-cards" id="myTripsGrid">
         <p style="color:var(--ink-soft); font-size:14px;">Carregando…</p>
       </div>
     </div>
 
-    <div class="section">
+   <div class="section" id="solicitacoesRecebidasSection">
       <div class="section-title"><h3>Solicitações recebidas</h3></div>
       <div class="req-list" id="requestsList">
         <p style="color:var(--ink-soft); font-size:14px; padding:20px;">Carregando…</p>
       </div>
     </div>
 
-    <div class="section">
+   <div class="section" id="avaliacoesSection">
       <div class="section-title"><h3>Avaliações recentes</h3></div>
       <div class="mini-cards" id="reviewsGrid">
         <p style="color:var(--ink-soft); font-size:14px;">Carregando…</p>
@@ -195,6 +192,15 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
     </div>
 
   </main>
+</div>
+
+<div id="requestModal" style="display:none; position:fixed; inset:0; background:rgba(19,27,58,0.5); z-index:200; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:var(--paper); border-radius:18px; padding:28px; max-width:460px; width:100%; max-height:85vh; overflow-y:auto;">
+    <h3 style="margin-bottom:16px;">Detalhes da solicitação</h3>
+    <div id="requestModalBody"></div>
+    <div id="requestModalActions" style="display:flex; gap:10px; margin-top:20px;"></div>
+    <button onclick="closeRequestModal()" style="width:100%; margin-top:10px; padding:10px; background:none; color:var(--ink-soft); font-weight:600; font-size:13px;">Fechar</button>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -279,8 +285,8 @@ async function loadDashboard() {
         <div class="req-thumb">📦</div>
         <div><div class="req-name">${r.product_name||'Produto'}</div><div class="req-sub">${r.delivery_city||''}</div></div>
         <div class="req-sub">Recompensa: <b>R$ ${r.offered_reward||0}</b></div>
-        <span class="req-status enviada">${STATUS_LABELS[r.request_status]||r.request_status}</span>
-        <a href="#" class="btn btn-ghost" style="padding:8px 16px; font-size:13px;">Ver</a>
+        <span class="req-status ${r.request_status}">${STATUS_LABELS[r.request_status]||r.request_status}</span>
+        <a href="#" class="btn btn-ghost" style="padding:8px 16px; font-size:13px;" onclick="openRequestModal('${r.id}'); return false;">Ver</a>
       </div>
     `).join('');
   }
