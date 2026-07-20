@@ -138,9 +138,9 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
     <nav class="side-nav">
      <a href="#" class="side-link active">📊 Visão geral</a>
       <a href="#minhasViagensSection" class="side-link">🧳 Minhas viagens</a>
-      <a href="#" class="side-link">📦 Minhas solicitações</a>
+      <a href="#minhasSolicitacoesSection" class="side-link">📦 Minhas solicitações</a>
       <a href="#solicitacoesRecebidasSection" class="side-link">📥 Solicitações recebidas</a>
-      <a href="#" class="side-link">🤍 Viagens salvas</a>
+      <a href="#viagensSalvasSection" class="side-link">🤍 Viagens salvas</a>
       <a href="ideal-mensagens.html" class="side-link">💬 Mensagens</a>
       <a href="#avaliacoesSection" class="side-link">⭐ Avaliações</a>
     </nav>
@@ -170,10 +170,24 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
       </div>
     </div>
 
-   <div class="section" id="solicitacoesRecebidasSection">
+  <div class="section" id="minhasSolicitacoesSection">
+      <div class="section-title"><h3>Minhas solicitações</h3></div>
+      <div class="req-list" id="myRequestsList">
+        <p style="color:var(--ink-soft); font-size:14px; padding:20px;">Carregando…</p>
+      </div>
+    </div>
+
+    <div class="section" id="solicitacoesRecebidasSection">
       <div class="section-title"><h3>Solicitações recebidas</h3></div>
       <div class="req-list" id="requestsList">
         <p style="color:var(--ink-soft); font-size:14px; padding:20px;">Carregando…</p>
+      </div>
+    </div>
+
+    <div class="section" id="viagensSalvasSection">
+      <div class="section-title"><h3>Viagens salvas</h3></div>
+      <div class="mini-cards" id="savedTripsGrid">
+        <p style="color:var(--ink-soft); font-size:14px;">Carregando…</p>
       </div>
     </div>
 
@@ -239,6 +253,14 @@ async function loadDashboard() {
     .from('requests').select('*').eq('traveler_id', user.id).order('created_at', { ascending: false });
   const requests = received || [];
 
+  const { data: sent } = await idealSupabase
+    .from('requests').select('*, trip:trip_id(origin_city, destination_city)').eq('buyer_id', user.id).order('created_at', { ascending: false });
+  const myRequests = sent || [];
+
+  const { data: saved } = await idealSupabase
+    .from('saved_trips').select('*, trip:trip_id(*)').eq('user_id', user.id).order('created_at', { ascending: false });
+  const savedTrips = saved || [];
+
   const { data: myReviews } = await idealSupabase
     .from('reviews').select('*, author:author_id(first_name)').eq('reviewed_user_id', user.id)
     .order('created_at', { ascending: false }).limit(6);
@@ -287,6 +309,36 @@ async function loadDashboard() {
         <div class="req-sub">Recompensa: <b>R$ ${r.offered_reward||0}</b></div>
         <span class="req-status ${r.request_status}">${STATUS_LABELS[r.request_status]||r.request_status}</span>
         <a href="#" class="btn btn-ghost" style="padding:8px 16px; font-size:13px;" onclick="openRequestModal('${r.id}'); return false;">Ver</a>
+      </div>
+    `).join('');
+  }
+
+  // Minhas solicitações (como comprador)
+  const myReqList = document.getElementById('myRequestsList');
+  if (!myRequests.length) {
+    myReqList.innerHTML = `<p style="color:var(--ink-soft); font-size:14px; padding:24px; text-align:center;">Você ainda não fez nenhuma solicitação de compra.</p>`;
+  } else {
+    myReqList.innerHTML = myRequests.map(r => `
+      <div class="req-row">
+        <div class="req-thumb">📦</div>
+        <div><div class="req-name">${r.product_name||'Produto'}</div><div class="req-sub">${r.trip ? (r.trip.origin_city||'')+' → '+(r.trip.destination_city||'') : ''}</div></div>
+        <div class="req-sub">Oferecido: <b>R$ ${r.offered_reward||0}</b></div>
+        <span class="req-status ${r.request_status}">${STATUS_LABELS[r.request_status]||r.request_status}</span>
+        <a href="#" class="btn btn-ghost" style="padding:8px 16px; font-size:13px;" onclick="openRequestModal('${r.id}'); return false;">Ver</a>
+      </div>
+    `).join('');
+  }
+
+  // Viagens salvas
+  const savedGrid = document.getElementById('savedTripsGrid');
+  if (!savedTrips.length) {
+    savedGrid.innerHTML = `<p style="color:var(--ink-soft); font-size:14px;">Nenhuma viagem salva ainda.</p>`;
+  } else {
+    savedGrid.innerHTML = savedTrips.map(s => `
+      <div class="trip-mini">
+        <div class="trip-mini-top"><span class="trip-mini-route">${(s.trip?.origin_city||'').slice(0,3).toUpperCase()} → ${(s.trip?.destination_city||'').slice(0,3).toUpperCase()}</span></div>
+        <div class="trip-mini-date">Embarque ${idealFormatDateShort(s.trip?.departure_date)}</div>
+        <div class="trip-mini-foot"><a href="ideal-detalhe-viagem.html?id=${s.trip_id}" class="btn btn-ghost" style="padding:6px 14px; font-size:12px;">Ver viagem</a></div>
       </div>
     `).join('');
   }
@@ -375,6 +427,7 @@ async function openRequestModal(requestId) {
     .select('*, buyer:buyer_id(first_name, last_name)')
     .eq('id', requestId)
     .single();
+  const currentUserId = currentUser?.id;
 
   if (error || !r) { alert('Erro ao carregar solicitação.'); return; }
 
@@ -389,12 +442,15 @@ async function openRequestModal(requestId) {
     <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;"><span style="color:var(--ink-soft);">Mensagem</span><span style="font-weight:600; text-align:right; max-width:60%;">${r.message||'—'}</span></div>
   `;
 
-  const actions = document.getElementById('requestModalActions');
-  if (r.request_status === 'enviada' || r.request_status === 'em_analise') {
+ const actions = document.getElementById('requestModalActions');
+  const isTraveler = r.traveler_id === currentUserId;
+  if (isTraveler && (r.request_status === 'enviada' || r.request_status === 'em_analise')) {
     actions.innerHTML = `
       <button class="btn btn-ghost" style="flex:1;" onclick="respondToRequest('${r.id}', 'recusada')">Recusar</button>
       <button class="btn btn-primary" style="flex:1;" onclick="respondToRequest('${r.id}', 'aceita')">Aceitar</button>
     `;
+  } else if (!isTraveler) {
+    actions.innerHTML = `<p style="text-align:center; color:var(--ink-soft); font-size:13px; flex:1;">Aguardando resposta do viajante.</p>`;
   } else {
     actions.innerHTML = `<p style="text-align:center; color:var(--ink-soft); font-size:13px; flex:1;">Esta solicitação já foi respondida.</p>`;
   }
