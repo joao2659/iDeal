@@ -88,8 +88,10 @@ footer{padding:56px 0 32px; border-top:1px solid var(--line); margin-top:20px; b
       <a href="ideal-anunciar-viagem.html">Anunciar viagem</a>
     </nav>
     <div class="nav-actions" style="display:flex; align-items:center; gap:12px;">
-      <a href="ideal-entrar.html" class="btn btn-ghost" style="display:inline-flex">Entrar</a>
-      <a href="ideal-criar-conta.html" class="btn btn-primary" style="display:inline-flex">Criar conta</a>
+      <span id="navAuthArea" style="display:flex; align-items:center; gap:12px;">
+        <a href="ideal-entrar.html" class="btn btn-ghost" style="display:inline-flex">Entrar</a>
+        <a href="ideal-criar-conta.html" class="btn btn-primary" style="display:inline-flex">Criar conta</a>
+      </span>
       <button class="hamburger" id="hamburger" aria-label="Abrir menu"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -262,6 +264,7 @@ async function submitInterest() {
   setTimeout(closeInterestModal, 1800);
 }
 
+idealRenderNavAuth();
 renderOffers();
 </script>
 </body>
