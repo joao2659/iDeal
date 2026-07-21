@@ -146,6 +146,7 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
       <a href="#minhasSolicitacoesSection" class="side-link">📦 Minhas solicitações</a>
       <a href="#solicitacoesRecebidasSection" class="side-link">📥 Solicitações recebidas</a>
       <a href="#viagensSalvasSection" class="side-link">🤍 Viagens salvas</a>
+      <a href="#meusAnunciosSection" class="side-link">🏷️ Meus anúncios</a>
       <a href="ideal-mensagens.html" class="side-link">💬 Mensagens</a>
       <a href="#avaliacoesSection" class="side-link">⭐ Avaliações</a>
     </nav>
@@ -189,9 +190,16 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
       </div>
     </div>
 
-    <div class="section" id="viagensSalvasSection">
+   <div class="section" id="viagensSalvasSection">
       <div class="section-title"><h3>Viagens salvas</h3></div>
       <div class="mini-cards" id="savedTripsGrid">
+        <p style="color:var(--ink-soft); font-size:14px;">Carregando…</p>
+      </div>
+    </div>
+
+    <div class="section" id="meusAnunciosSection">
+      <div class="section-title"><h3>Meus anúncios</h3><a href="#" onclick="openOfferModal(); return false;">+ Novo anúncio</a></div>
+      <div class="mini-cards" id="myOffersGrid">
         <p style="color:var(--ink-soft); font-size:14px;">Carregando…</p>
       </div>
     </div>
@@ -219,6 +227,34 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
     <div id="requestModalBody"></div>
     <div id="requestModalActions" style="display:flex; gap:10px; margin-top:20px;"></div>
     <button onclick="closeRequestModal()" style="width:100%; margin-top:10px; padding:10px; background:none; color:var(--ink-soft); font-weight:600; font-size:13px;">Fechar</button>
+  </div>
+</div>
+
+<div id="offerModal" style="display:none; position:fixed; inset:0; background:rgba(19,27,58,0.5); z-index:200; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:var(--paper); border-radius:18px; padding:28px; max-width:440px; width:100%; max-height:85vh; overflow-y:auto;">
+    <h3 style="margin-bottom:16px;">Novo anúncio</h3>
+    <p style="font-size:13px; color:var(--ink-soft); margin-bottom:16px;">Anuncie um produto que você vai poder trazer nessa viagem, para quem tiver interesse.</p>
+
+    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Viagem</label>
+    <select id="offerTripSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--line); margin-bottom:14px;"></select>
+
+    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Nome do produto</label>
+    <input type="text" id="offerProductName" placeholder="Ex: Tênis Nike Air Max" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--line); margin-bottom:14px;">
+
+    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Descrição</label>
+    <textarea id="offerDescription" rows="3" placeholder="Ex: Achei em promoção, cabe mais um par na mala." style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--line); margin-bottom:14px; font-family:inherit;"></textarea>
+
+    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Preço estimado (R$)</label>
+    <input type="text" id="offerPrice" placeholder="Ex: 250" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--line); margin-bottom:14px;">
+
+    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Foto do produto <span style="font-weight:500; color:var(--ink-soft);">(opcional)</span></label>
+    <input type="file" id="offerPhoto" accept="image/*" style="margin-bottom:16px;">
+
+    <div style="display:flex; gap:10px;">
+      <button style="flex:1; padding:11px; border-radius:10px; background:var(--bg); border:1px solid var(--line); font-weight:600; cursor:pointer;" onclick="closeOfferModal()">Cancelar</button>
+      <button style="flex:1; padding:11px; border-radius:10px; background:var(--coral); color:#fff; font-weight:600; cursor:pointer; border:none;" onclick="submitOffer()">Publicar</button>
+    </div>
+    <p id="offerMsg" style="font-size:12.5px; margin-top:10px; text-align:center;"></p>
   </div>
 </div>
 
@@ -624,6 +660,103 @@ document.addEventListener('click', (e) => {
 });
 
 loadDashboard().then(loadNotifications);
+
+async function loadMyOffers() {
+  const grid = document.getElementById('myOffersGrid');
+  const { data: offers } = await idealSupabase
+    .from('traveler_offers')
+    .select('*, trip:trip_id(origin_city, destination_city, departure_date)')
+    .eq('traveler_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  const list = offers || [];
+  if (!list.length) {
+    grid.innerHTML = `<p style="color:var(--ink-soft); font-size:14px;">Você ainda não publicou nenhum anúncio.</p>`;
+    return;
+  }
+
+  const statusLabel = { disponivel: 'Disponível', reservado: 'Reservado', vendido: 'Vendido', expirado: 'Expirado' };
+  const statusClass = { disponivel: 'active', reservado: 'pending', vendido: 'done', expirado: 'pending' };
+
+  grid.innerHTML = list.map(o => `
+    <div class="trip-mini">
+      <div class="trip-mini-top"><span class="trip-mini-route" style="font-size:13.5px;">${o.product_name}</span><span class="status-chip ${statusClass[o.offer_status]||'pending'}">${statusLabel[o.offer_status]||o.offer_status}</span></div>
+      <div class="trip-mini-date">${o.trip ? (o.trip.origin_city||'')+' → '+(o.trip.destination_city||'') : ''} · R$ ${o.price||0}</div>
+      <div class="trip-mini-foot">
+        <span></span>
+        <a href="#" style="color:var(--coral-dark); font-weight:600;" onclick="deleteOffer('${o.id}'); return false;">Remover</a>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function openOfferModal() {
+  const { data: trips } = await idealSupabase.from('trips').select('id, origin_city, destination_city, departure_date').eq('traveler_id', currentUser.id).eq('trip_status', 'ativa');
+  const select = document.getElementById('offerTripSelect');
+
+  if (!trips || !trips.length) {
+    select.innerHTML = `<option value="">Nenhuma viagem ativa</option>`;
+  } else {
+    select.innerHTML = trips.map(t => `<option value="${t.id}">${t.origin_city} → ${t.destination_city} (${idealFormatDateShort(t.departure_date)})</option>`).join('');
+  }
+
+  document.getElementById('offerModal').style.display = 'flex';
+}
+
+function closeOfferModal() {
+  document.getElementById('offerModal').style.display = 'none';
+}
+
+async function submitOffer() {
+  const msg = document.getElementById('offerMsg');
+  const tripId = document.getElementById('offerTripSelect').value;
+  const productName = document.getElementById('offerProductName').value.trim();
+  const description = document.getElementById('offerDescription').value.trim();
+  const price = parseFloat(document.getElementById('offerPrice').value) || 0;
+  const photoFile = document.getElementById('offerPhoto').files[0];
+
+  if (!tripId) { msg.textContent = 'Você precisa ter uma viagem ativa para anunciar.'; msg.style.color = 'var(--coral-dark)'; return; }
+  if (!productName) { msg.textContent = 'Digite o nome do produto.'; msg.style.color = 'var(--coral-dark)'; return; }
+
+  msg.textContent = 'Publicando…';
+  msg.style.color = 'var(--ink-soft)';
+
+  let photoPath = null;
+  if (photoFile) {
+    photoPath = `${currentUser.id}/${Date.now()}-${photoFile.name}`;
+    const { error: uploadErr } = await idealSupabase.storage.from('offer-photos').upload(photoPath, photoFile);
+    if (uploadErr) { msg.textContent = 'Erro ao enviar foto: ' + uploadErr.message; msg.style.color = 'var(--coral-dark)'; return; }
+  }
+
+  const { error } = await idealSupabase.from('traveler_offers').insert({
+    trip_id: tripId,
+    traveler_id: currentUser.id,
+    product_name: productName,
+    description: description,
+    price: price,
+    currency: 'BRL',
+    photo_url: photoPath,
+    offer_status: 'disponivel'
+  });
+
+  if (error) { msg.textContent = 'Erro ao publicar: ' + error.message; msg.style.color = 'var(--coral-dark)'; return; }
+
+  document.getElementById('offerProductName').value = '';
+  document.getElementById('offerDescription').value = '';
+  document.getElementById('offerPrice').value = '';
+  document.getElementById('offerPhoto').value = '';
+  closeOfferModal();
+  loadMyOffers();
+}
+
+async function deleteOffer(id) {
+  if (!confirm('Remover este anúncio?')) return;
+  const { error } = await idealSupabase.from('traveler_offers').delete().eq('id', id);
+  if (error) { alert('Erro ao remover: ' + error.message); return; }
+  loadMyOffers();
+}
+
+loadMyOffers();
 </script>
 </body>
 </html>
