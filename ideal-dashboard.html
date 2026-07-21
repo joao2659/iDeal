@@ -469,6 +469,18 @@ async function openRequestModal(requestId) {
       <button class="btn btn-ghost" style="flex:1;" onclick="respondToRequest('${r.id}', 'recusada')">Recusar</button>
       <button class="btn btn-primary" style="flex:1;" onclick="respondToRequest('${r.id}', 'aceita')">Aceitar</button>
     `;
+  } else if (!isTraveler && r.request_status === 'aceita') {
+    const taxa = Math.round((r.offered_reward || 0) * 0.05 * 100) / 100;
+    const total = Math.round(((r.offered_reward || 0) + taxa) * 100) / 100;
+    actions.innerHTML = `
+      <div style="width:100%;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; padding:4px 0; color:var(--ink-soft);"><span>Valor combinado</span><span>R$ ${(r.offered_reward||0).toFixed(2)}</span></div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; padding:4px 0; color:var(--ink-soft);"><span>Taxa de serviço iDeal (5%)</span><span>R$ ${taxa.toFixed(2)}</span></div>
+        <div style="display:flex; justify-content:space-between; font-size:14px; padding:8px 0; font-weight:700; border-top:1px solid var(--line); margin-top:4px;"><span>Total a pagar</span><span>R$ ${total.toFixed(2)}</span></div>
+        <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="payRequest('${r.id}')" id="payBtn">Pagar com Mercado Pago</button>
+        <p id="payMsg" style="font-size:12.5px; margin-top:8px; text-align:center;"></p>
+      </div>
+    `;
   } else if (!isTraveler) {
     actions.innerHTML = `<p style="text-align:center; color:var(--ink-soft); font-size:13px; flex:1;">Aguardando resposta do viajante.</p>`;
   } else {
@@ -480,6 +492,37 @@ async function openRequestModal(requestId) {
 
 function closeRequestModal() {
   document.getElementById('requestModal').style.display = 'none';
+}
+
+async function payRequest(requestId) {
+  const btn = document.getElementById('payBtn');
+  const msg = document.getElementById('payMsg');
+  btn.disabled = true;
+  btn.textContent = 'Gerando pagamento…';
+
+  try {
+    const res = await fetch('/api/create-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ request_id: requestId })
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      msg.textContent = data.error || 'Erro ao gerar pagamento.';
+      msg.style.color = 'var(--coral-dark)';
+      btn.disabled = false;
+      btn.textContent = 'Pagar com Mercado Pago';
+      return;
+    }
+
+    window.location.href = data.checkout_url;
+  } catch (err) {
+    msg.textContent = 'Erro inesperado: ' + err.message;
+    msg.style.color = 'var(--coral-dark)';
+    btn.disabled = false;
+    btn.textContent = 'Pagar com Mercado Pago';
+  }
 }
 
 async function respondToRequest(requestId, newStatus) {
