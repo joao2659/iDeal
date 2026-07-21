@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produtos Proibidos — iDeal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7FA; --paper:#FFFFFF; --navy:#131B3A; --coral:#FF5A3C; --red:#E14848;
+  --ink:#14213D; --ink-soft:#5B6478; --line:#E3E6EE; --radius:16px;
+  --shadow: 0 4px 24px rgba(19,27,58,0.06); font-size:16px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif;}
+h1,h2{font-family:'Space Grotesk',sans-serif; color:var(--navy);}
+a{color:inherit; text-decoration:none;}
+.wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1240px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; justify-content:space-between;}
+.logo{display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; color:var(--navy);}
+.logo .dot{width:10px; height:10px; border-radius:50%; background:var(--coral); display:inline-block;}
+.btn{padding:11px 22px; border-radius:999px; font-weight:600; font-size:14.5px; background:var(--coral); color:#fff; display:inline-flex; align-items:center;}
+.page-head{padding:48px 0 10px;}
+.page-head .kicker{font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; color:var(--coral); text-transform:uppercase; letter-spacing:.08em;}
+.page-head h1{font-size:clamp(26px,3.6vw,36px); margin-top:8px;}
+.page-head p{color:var(--ink-soft); margin-top:10px; font-size:15px; max-width:560px; line-height:1.6;}
+.content{padding:20px 0 70px;}
+.cat-block{background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:22px 24px; margin-bottom:16px; box-shadow:var(--shadow);}
+.cat-block h3{font-size:16px; color:var(--navy); margin-bottom:10px; display:flex; align-items:center; gap:10px;}
+.cat-block ul{padding-left:20px; color:var(--ink-soft); font-size:14.5px; line-height:1.8;}
+.warn-box{background:#FDEBEB; border:1px solid rgba(225,72,72,0.3); border-radius:14px; padding:18px 20px; margin-top:24px; font-size:14px; color:var(--red); line-height:1.6; display:flex; gap:12px;}
+footer{padding:40px 0; border-top:1px solid var(--line); text-align:center; font-size:13px; color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
+    <a href="ideal-homepage.html" class="btn">Voltar ao início</a>
+  </div>
+</header>
+
+<div class="page-head">
+  <div class="wrap">
+    <span class="kicker">Confiança e segurança</span>
+    <h1>Produtos proibidos</h1>
+    <p>Para manter a plataforma segura para todos, alguns tipos de produtos não podem ser solicitados nem transportados através da iDeal.</p>
+  </div>
+</div>
+
+<div class="wrap content">
+  <div class="cat-block">
+    <h3>🚫 Itens ilegais</h3>
+    <ul>
+      <li>Drogas ilícitas e substâncias controladas sem prescrição válida</li>
+      <li>Armas de fogo, munições, réplicas de armas e explosivos</li>
+      <li>Produtos falsificados ou pirateados</li>
+      <li>Qualquer item cuja posse, venda ou transporte seja proibido por lei</li>
+    </ul>
+  </div>
+
+  <div class="cat-block">
+    <h3>⚠️ Itens perigosos</h3>
+    <ul>
+      <li>Materiais inflamáveis, corrosivos ou explosivos</li>
+      <li>Baterias de lítio soltas (fora de dispositivos) acima dos limites permitidos por companhias aéreas</li>
+      <li>Produtos químicos perigosos ou tóxicos</li>
+      <li>Aerossóis pressurizados não permitidos em bagagem</li>
+    </ul>
+  </div>
+
+  <div class="cat-block">
+    <h3>🐾 Animais e itens de origem animal</h3>
+    <ul>
+      <li>Animais vivos de qualquer espécie</li>
+      <li>Produtos derivados de espécies ameaçadas ou protegidas</li>
+    </ul>
+  </div>
+
+  <div class="cat-block">
+    <h3>💊 Medicamentos e itens sensíveis</h3>
+    <ul>
+      <li>Medicamentos controlados sem prescrição médica válida</li>
+      <li>Produtos que exijam registro sanitário específico para importação</li>
+    </ul>
+  </div>
+
+  <div class="cat-block">
+    <h3>📄 Documentos e valores</h3>
+    <ul>
+      <li>Documentos oficiais de terceiros sem autorização expressa</li>
+      <li>Grandes quantias em dinheiro em espécie</li>
+    </ul>
+  </div>
+
+  <div class="warn-box">
+    ⚠️ Esta lista é ilustrativa e não exaustiva. É responsabilidade de cada viajante conhecer e cumprir a legislação aplicável à sua rota, incluindo normas de transporte e regulamentações locais. Solicitações ou anúncios envolvendo produtos proibidos podem ser removidos e resultar em suspensão da conta.
+  </div>
+</div>
+
+<footer>
+  © 2026 iDeal. Todos os direitos reservados.
+</footer>
+
+</body>
+</html>
