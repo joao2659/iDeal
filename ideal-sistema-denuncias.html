@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Denúncias — iDeal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7FA; --paper:#FFFFFF; --navy:#131B3A; --coral:#FF5A3C; --mint:#1FAE8C;
+  --ink:#14213D; --ink-soft:#5B6478; --line:#E3E6EE; --radius:16px;
+  --shadow: 0 4px 24px rgba(19,27,58,0.06); font-size:16px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif;}
+h1,h2{font-family:'Space Grotesk',sans-serif; color:var(--navy);}
+a{color:inherit; text-decoration:none;}
+.wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1240px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; justify-content:space-between;}
+.logo{display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; color:var(--navy);}
+.logo .dot{width:10px; height:10px; border-radius:50%; background:var(--coral); display:inline-block;}
+.btn{padding:11px 22px; border-radius:999px; font-weight:600; font-size:14.5px; background:var(--coral); color:#fff; display:inline-flex; align-items:center;}
+.page-head{padding:48px 0 10px;}
+.page-head .kicker{font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; color:var(--coral); text-transform:uppercase; letter-spacing:.08em;}
+.page-head h1{font-size:clamp(26px,3.6vw,36px); margin-top:8px;}
+.page-head p{color:var(--ink-soft); margin-top:10px; font-size:15px; max-width:560px; line-height:1.6;}
+.content{padding:20px 0 70px;}
+.steps{display:flex; flex-direction:column; gap:14px; margin-bottom:30px;}
+.step{background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; box-shadow:var(--shadow); display:flex; gap:16px; align-items:flex-start;}
+.step .num{width:32px; height:32px; border-radius:50%; background:var(--navy); color:#fff; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.step h3{font-size:15.5px; margin-bottom:4px; color:var(--navy);}
+.step p{font-size:14px; color:var(--ink-soft); line-height:1.6;}
+.reason-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0 30px;}
+@media (max-width:600px){.reason-grid{grid-template-columns:1fr;}}
+.reason-chip{background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:12px 16px; font-size:13.5px; font-weight:600; color:var(--ink-soft);}
+.info-box{background:#E7F7F2; border:1px solid rgba(31,174,140,0.3); border-radius:14px; padding:18px 20px; font-size:14px; color:#0F7A62; line-height:1.6;}
+footer{padding:40px 0; border-top:1px solid var(--line); text-align:center; font-size:13px; color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
+    <a href="ideal-homepage.html" class="btn">Voltar ao início</a>
+  </div>
+</header>
+
+<div class="page-head">
+  <div class="wrap">
+    <span class="kicker">Confiança e segurança</span>
+    <h1>Sistema de denúncias</h1>
+    <p>Qualquer usuário pode denunciar comportamentos suspeitos ou negociações que deram errado. Nossa equipe analisa cada caso com atenção.</p>
+  </div>
+</div>
+
+<div class="wrap content">
+  <div class="steps">
+    <div class="step">
+      <div class="num">1</div>
+      <div><h3>Identifique o problema</h3><p>Pode ser uma mensagem suspeita, um produto que não chegou, um comportamento inadequado, ou qualquer violação dos nossos Termos de Uso.</p></div>
+    </div>
+    <div class="step">
+      <div class="num">2</div>
+      <div><h3>Abra uma disputa ou denúncia</h3><p>Dentro de uma conversa, use a opção "Abrir disputa" para questões relacionadas a uma negociação específica, ou o botão de denúncia no perfil do usuário para outras violações.</p></div>
+    </div>
+    <div class="step">
+      <div class="num">3</div>
+      <div><h3>Nossa equipe analisa</h3><p>Revisamos as informações fornecidas, o histórico da conversa e o contexto da negociação.</p></div>
+    </div>
+    <div class="step">
+      <div class="num">4</div>
+      <div><h3>Uma decisão é tomada</h3><p>Dependendo do caso, podemos mediar uma solução entre as partes, suspender contas, ou remover conteúdo da plataforma.</p></div>
+    </div>
+  </div>
+
+  <h2 style="font-size:18px; margin-bottom:14px;">Motivos comuns de denúncia</h2>
+  <div class="reason-grid">
+    <div class="reason-chip">📦 Produto não entregue</div>
+    <div class="reason-chip">🔄 Produto diferente do combinado</div>
+    <div class="reason-chip">💬 Comunicação suspeita ou abusiva</div>
+    <div class="reason-chip">🚫 Solicitação de produto proibido</div>
+    <div class="reason-chip">🎭 Perfil ou identidade falsa</div>
+    <div class="reason-chip">💰 Tentativa de pagamento fora da plataforma</div>
+  </div>
+
+  <div class="info-box">
+    ✓ Levamos toda denúncia a sério. Suas informações são tratadas com confidencialidade durante a análise.
+  </div>
+</div>
+
+<footer>
+  © 2026 iDeal. Todos os direitos reservados.
+</footer>
+
+</body>
+</html>
