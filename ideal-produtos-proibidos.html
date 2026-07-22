@@ -26,11 +26,13 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .page-head .kicker{font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; color:var(--coral); text-transform:uppercase; letter-spacing:.08em;}
 .page-head h1{font-size:clamp(26px,3.6vw,36px); margin-top:8px;}
 .page-head p{color:var(--ink-soft); margin-top:10px; font-size:15px; max-width:560px; line-height:1.6;}
-.content{padding:20px 0 70px;}
+.layout{max-width:980px; margin:0 auto; padding:0 24px 70px; display:grid; grid-template-columns:1fr 240px; gap:36px; align-items:start;}
+@media (max-width:800px){.layout{grid-template-columns:1fr;}}
 .cat-block{background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:22px 24px; margin-bottom:16px; box-shadow:var(--shadow);}
 .cat-block h3{font-size:16px; color:var(--navy); margin-bottom:10px; display:flex; align-items:center; gap:10px;}
 .cat-block ul{padding-left:20px; color:var(--ink-soft); font-size:14.5px; line-height:1.8;}
-.warn-box{background:#FDEBEB; border:1px solid rgba(225,72,72,0.3); border-radius:14px; padding:18px 20px; margin-top:24px; font-size:14px; color:var(--red); line-height:1.6; display:flex; gap:12px;}
+.warn-box{background:#FDEBEB; border:1px solid rgba(225,72,72,0.3); border-radius:14px; padding:18px 20px; font-size:13px; color:var(--red); line-height:1.55; position:sticky; top:88px; display:flex; gap:10px;}
+@media (max-width:800px){.warn-box{position:static;}}
 footer{padding:40px 0; border-top:1px solid var(--line); text-align:center; font-size:13px; color:var(--ink-soft);}
 </style>
 </head>
@@ -51,7 +53,8 @@ footer{padding:40px 0; border-top:1px solid var(--line); text-align:center; font
   </div>
 </div>
 
-<div class="wrap content">
+<div class="layout">
+  <div>
   <div class="cat-block">
     <h3>🚫 Itens ilegais</h3>
     <ul>
@@ -95,6 +98,8 @@ footer{padding:40px 0; border-top:1px solid var(--line); text-align:center; font
       <li>Grandes quantias em dinheiro em espécie</li>
     </ul>
   </div>
+
+ </div>
 
   <div class="warn-box">
     ⚠️ Esta lista é ilustrativa e não exaustiva. É responsabilidade de cada viajante conhecer e cumprir a legislação aplicável à sua rota, incluindo normas de transporte e regulamentações locais. Solicitações ou anúncios envolvendo produtos proibidos podem ser removidos e resultar em suspensão da conta.
