@@ -131,10 +131,10 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
       <a href="ideal-buscar-viagens.html">Encontrar viagens</a>
       <a href="ideal-anunciar-viagem.html">Anunciar viagem</a>
     </nav>
-    <div class="header-actions">
-      <a href="#" class="btn btn-ghost">Entrar</a>
-      <a href="#" class="btn btn-primary">Criar conta</a>
-    </div>
+    <span id="navAuthArea" class="header-actions">
+      <a href="ideal-entrar.html" class="btn btn-ghost">Entrar</a>
+      <a href="ideal-criar-conta.html" class="btn btn-primary">Criar conta</a>
+    </span>
   </div>
 </header>
 
@@ -344,6 +344,7 @@ async function loadTrip() {
 }
 
 loadTrip();
+idealRenderNavAuth();
 </script>
 </body>
 </html>
