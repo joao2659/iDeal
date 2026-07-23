@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script src="assets/analytics.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mariana Souza — iDeal</title>
+<title>Perfil — iDeal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -31,7 +31,6 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .btn-primary{background:var(--coral); color:#fff; box-shadow:0 6px 16px rgba(255,90,60,0.3);}
 .btn-ghost{background:transparent; color:var(--navy); border:1.5px solid var(--line);}
 
-/* PROFILE HEADER */
 .profile-hero{background:var(--navy); position:relative; overflow:hidden; padding:60px 0 90px;}
 .profile-hero::after{content:''; position:absolute; inset:0; background:radial-gradient(400px 260px at 85% 0%, rgba(255,90,60,0.28), transparent 70%);}
 .profile-hero-inner{position:relative; z-index:1; display:flex; align-items:flex-end; gap:24px; flex-wrap:wrap;}
@@ -44,12 +43,9 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .hero-actions{display:flex; gap:10px;}
 .btn-white{background:#fff; color:var(--navy);}
 .btn-outline-white{background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,0.35);}
-.report-link-hero{font-size:12.5px; color:rgba(255,255,255,0.55); text-align:center; margin-top:8px; display:block;}
+.report-link-hero{font-size:12.5px; color:rgba(255,255,255,0.55); text-align:center; margin-top:8px; display:block; background:none;}
 
-/* STATS BAR (overlapping) */
-.stats-bar{
-  max-width:1160px; margin:-56px auto 0; padding:0 24px; position:relative; z-index:2;
-}
+.stats-bar{max-width:1160px; margin:-56px auto 0; padding:0 24px; position:relative; z-index:2;}
 .stats-card{background:var(--paper); border-radius:var(--radius); box-shadow:var(--shadow-lg); border:1px solid var(--line); display:flex;}
 .stat-col{flex:1; text-align:center; padding:24px 12px; border-right:1px solid var(--line);}
 .stat-col:last-child{border-right:none;}
@@ -67,22 +63,11 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .badge-pill{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; background:var(--bg); padding:10px 15px; border-radius:12px; color:var(--ink);}
 .badge-pill .ic{color:var(--mint); font-size:15px;}
 
-/* UPCOMING TRIPS */
 .trip-mini{display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--bg); gap:12px;}
 .trip-mini:last-child{border-bottom:none;}
 .trip-mini-route{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px;}
 .trip-mini-date{font-size:12.5px; color:var(--ink-soft);}
 .trip-mini .btn-ghost{padding:8px 16px; font-size:12.5px;}
-
-/* REVIEWS */
-.review-summary{display:flex; align-items:center; gap:20px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--line);}
-.review-score{text-align:center;}
-.review-score b{font-family:'Space Grotesk',sans-serif; font-size:38px; display:block; color:var(--navy);}
-.review-score .stars{color:var(--gold); font-size:14px;}
-.review-bars{flex:1; display:flex; flex-direction:column; gap:5px;}
-.review-bar-row{display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--ink-soft);}
-.review-bar-row .bar{flex:1; height:6px; border-radius:3px; background:var(--bg); overflow:hidden;}
-.review-bar-row .fill{height:100%; background:var(--gold); border-radius:3px;}
 
 .review-item{padding:18px 0; border-bottom:1px solid var(--line);}
 .review-item:last-child{border-bottom:none; padding-bottom:0;}
@@ -92,16 +77,18 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .review-stars{color:var(--gold); font-size:13px;}
 .review-date{font-size:12px; color:var(--ink-soft); margin-left:auto;}
 .review-text{font-size:14px; color:var(--ink-soft); line-height:1.6;}
-.review-ratings{display:flex; gap:14px; margin-top:8px; flex-wrap:wrap;}
-.review-ratings span{font-size:11.5px; color:var(--ink-soft); background:var(--bg); padding:4px 10px; border-radius:8px;}
 
-/* SIDEBAR */
 .sidebar{position:sticky; top:88px;}
 .info-list{display:flex; flex-direction:column; gap:14px;}
 .info-row{display:flex; justify-content:space-between; font-size:13.5px; padding-bottom:12px; border-bottom:1px solid var(--bg);}
 .info-row:last-child{border-bottom:none; padding-bottom:0;}
 .info-row span:first-child{color:var(--ink-soft);}
-.info-row span:last-child{font-weight:600;}
+.info-row span:last-child{font-weight:600; text-align:right;}
+
+.modal-overlay{display:none; position:fixed; inset:0; background:rgba(19,27,58,0.5); z-index:200; align-items:center; justify-content:center; padding:20px;}
+.modal-box{background:var(--paper); border-radius:18px; padding:28px; max-width:420px; width:100%;}
+.modal-box label{display:block; font-size:13px; font-weight:600; margin-bottom:6px;}
+.modal-box select, .modal-box textarea{width:100%; padding:10px; border-radius:10px; border:1px solid var(--line); margin-bottom:14px; font-family:inherit;}
 </style>
 </head>
 <body>
@@ -109,128 +96,238 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 <header class="nav">
   <div class="nav-inner">
     <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
-   <span id="navAuthArea" style="display:flex; gap:12px;">
+    <span id="navAuthArea" style="display:flex; gap:12px;">
       <a href="ideal-entrar.html" class="btn btn-ghost">Entrar</a>
       <a href="ideal-criar-conta.html" class="btn btn-primary">Criar conta</a>
     </span>
   </div>
 </header>
 
-<div class="profile-hero">
-  <div class="wrap profile-hero-inner">
-    <div class="avatar-xl">M</div>
-    <div class="profile-hero-info">
-      <div class="profile-hero-name">Mariana Souza <span class="verif">✓</span></div>
-      <div class="profile-hero-loc">📍 Rio de Janeiro, Brasil</div>
-      <div class="profile-hero-member">Na iDeal desde março de 2025</div>
+<div id="profileContent" style="display:none;">
+  <div class="profile-hero">
+    <div class="wrap profile-hero-inner">
+      <div class="avatar-xl" id="heroAvatar">?</div>
+      <div class="profile-hero-info">
+        <div class="profile-hero-name" id="heroName">—</div>
+        <div class="profile-hero-loc" id="heroLoc"></div>
+        <div class="profile-hero-member" id="heroMember"></div>
+      </div>
+      <div>
+        <div class="hero-actions">
+          <a href="#" class="btn btn-white" id="messageBtn">💬 Enviar mensagem</a>
+          <a href="ideal-buscar-viagens.html" class="btn btn-outline-white">Ver viagens</a>
+        </div>
+        <button class="report-link-hero" onclick="openReportModal()">🚩 Denunciar usuário</button>
+      </div>
     </div>
-    <div>
-      <div class="hero-actions">
-        <a href="ideal-mensagens.html" class="btn btn-white">💬 Enviar mensagem</a>
-        <a href="ideal-buscar-viagens.html" class="btn btn-outline-white">Ver viagens</a>
-      </div>
-      <a href="#" class="report-link-hero">🚩 Denunciar usuário</a>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stats-card">
+      <div class="stat-col"><b id="statRating">—</b><span>AVALIAÇÃO MÉDIA</span></div>
+      <div class="stat-col"><b id="statTrips">—</b><span>VIAGENS CONCLUÍDAS</span></div>
+      <div class="stat-col"><b id="statReqs">—</b><span>SOLICITAÇÕES ATENDIDAS</span></div>
+      <div class="stat-col"><b id="statReviews">—</b><span>AVALIAÇÕES RECEBIDAS</span></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="layout">
+      <main>
+        <div class="card" id="bioCard" style="display:none;">
+          <h3>Sobre</h3>
+          <p class="bio-text" id="bioText"></p>
+        </div>
+
+        <div class="card">
+          <h3>Verificações</h3>
+          <div class="badge-row" id="verifBadges"></div>
+        </div>
+
+        <div class="card" id="tripsCard" style="display:none;">
+          <h3>Próximas viagens</h3>
+          <div id="tripsList"></div>
+        </div>
+
+        <div class="card">
+          <h3>Avaliações <span id="reviewsCount" style="font-weight:500; color:var(--ink-soft); font-size:14px;"></span></h3>
+          <div id="reviewsList">
+            <p style="color:var(--ink-soft); font-size:14px;">Nenhuma avaliação ainda.</p>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar">
+        <div class="card">
+          <h3>Informações</h3>
+          <div class="info-list" id="infoList"></div>
+        </div>
+      </aside>
     </div>
   </div>
 </div>
 
-<div class="stats-bar">
-  <div class="stats-card">
-    <div class="stat-col"><b>4.9</b><span>AVALIAÇÃO MÉDIA</span></div>
-    <div class="stat-col"><b>32</b><span>VIAGENS CONCLUÍDAS</span></div>
-    <div class="stat-col"><b>47</b><span>SOLICITAÇÕES ATENDIDAS</span></div>
-    <div class="stat-col"><b>96%</b><span>TAXA DE RESPOSTA</span></div>
+<div id="profileNotFound" style="display:none; text-align:center; padding:80px 20px;">
+  <h2 style="margin-bottom:10px;">Perfil não encontrado</h2>
+  <p style="color:var(--ink-soft); margin-bottom:20px;">O link pode estar incorreto ou o usuário não existe mais.</p>
+  <a href="ideal-homepage.html" class="btn btn-primary" style="display:inline-flex;">Voltar ao início</a>
+</div>
+
+<div class="modal-overlay" id="reportModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:6px;">Denunciar usuário</h3>
+    <p style="font-size:13px; color:var(--ink-soft); margin-bottom:16px;">Nossa equipe vai analisar essa denúncia.</p>
+    <label>Motivo</label>
+    <select id="reportReason">
+      <option value="comunicacao_suspeita">Comunicação suspeita</option>
+      <option value="produto_nao_permitido">Produto não permitido</option>
+      <option value="nao_compareceu">Não compareceu à entrega</option>
+      <option value="perfil_falso">Perfil falso</option>
+      <option value="outro">Outro</option>
+    </select>
+    <label>Descreva o que aconteceu</label>
+    <textarea id="reportDescription" rows="4"></textarea>
+    <div style="display:flex; gap:10px;">
+      <button style="flex:1; padding:11px; border-radius:10px; background:var(--bg); border:1px solid var(--line); font-weight:600;" onclick="closeReportModal()">Cancelar</button>
+      <button style="flex:1; padding:11px; border-radius:10px; background:var(--coral-dark); color:#fff; font-weight:600;" onclick="submitReport()">Enviar denúncia</button>
+    </div>
+    <p id="reportMsg" style="font-size:12.5px; margin-top:10px; text-align:center;"></p>
   </div>
 </div>
 
-<div class="wrap">
-  <div class="layout">
-    <main>
-      <div class="card">
-        <h3>Sobre Mariana</h3>
-        <p class="bio-text">Viajo com frequência entre Rio de Janeiro e São Paulo a trabalho, e também faço algumas viagens internacionais durante o ano. Gosto de ajudar quem precisa trazer produtos de fora — já entreguei de tudo, de eletrônicos a itens de cosmética. Sempre combino tudo com antecedência e prezo pela pontualidade.</p>
-      </div>
-
-      <div class="card">
-        <h3>Verificações</h3>
-        <div class="badge-row">
-          <span class="badge-pill"><span class="ic">✓</span> Identidade verificada</span>
-          <span class="badge-pill"><span class="ic">✓</span> E-mail verificado</span>
-          <span class="badge-pill"><span class="ic">✓</span> Telefone verificado</span>
-          <span class="badge-pill"><span class="ic">✓</span> Viagens comprovadas</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Próximas viagens</h3>
-        <div class="trip-mini">
-          <div><div class="trip-mini-route">GIG → CGH</div><div class="trip-mini-date">Embarque 18 jul · Avião · 6 kg disponíveis</div></div>
-          <a href="ideal-detalhe-viagem.html" class="btn btn-ghost">Ver viagem</a>
-        </div>
-        <div class="trip-mini">
-          <div><div class="trip-mini-route">GIG → MIA</div><div class="trip-mini-date">Embarque 2 ago · Avião · 10 kg disponíveis</div></div>
-          <a href="#" class="btn btn-ghost">Ver viagem</a>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Avaliações <span style="font-weight:500; color:var(--ink-soft); font-size:14px;">(32)</span></h3>
-
-        <div class="review-summary">
-          <div class="review-score"><b>4.9</b><div class="stars">★★★★★</div></div>
-          <div class="review-bars">
-            <div class="review-bar-row"><span>Comunicação</span><div class="bar"><div class="fill" style="width:96%"></div></div></div>
-            <div class="review-bar-row"><span>Confiabilidade</span><div class="bar"><div class="fill" style="width:98%"></div></div></div>
-            <div class="review-bar-row"><span>Pontualidade</span><div class="bar"><div class="fill" style="width:92%"></div></div></div>
-            <div class="review-bar-row"><span>Estado do item</span><div class="bar"><div class="fill" style="width:97%"></div></div></div>
-          </div>
-        </div>
-
-        <div class="review-item">
-          <div class="review-top">
-            <div class="avatar-sm">P</div>
-            <div><div class="review-name">Paulo H.</div><div class="review-stars">★★★★★</div></div>
-            <span class="review-date">Há 1 semana</span>
-          </div>
-          <p class="review-text">Entrega tranquila, produto chegou em perfeito estado e a comunicação foi ótima do início ao fim.</p>
-        </div>
-
-        <div class="review-item">
-          <div class="review-top">
-            <div class="avatar-sm">J</div>
-            <div><div class="review-name">Juliana C.</div><div class="review-stars">★★★★★</div></div>
-            <span class="review-date">Há 3 semanas</span>
-          </div>
-          <p class="review-text">Segunda vez que compro com a Mariana transportando. Super pontual e cuidadosa com o item.</p>
-        </div>
-
-        <div class="review-item">
-          <div class="review-top">
-            <div class="avatar-sm">D</div>
-            <div><div class="review-name">Diego A.</div><div class="review-stars">★★★★☆</div></div>
-            <span class="review-date">Há 1 mês</span>
-          </div>
-          <p class="review-text">Combinou tudo certinho, só demorou um pouco a responder no início da negociação.</p>
-        </div>
-      </div>
-    </main>
-
-    <aside class="sidebar">
-      <div class="card">
-        <h3>Informações</h3>
-        <div class="info-list">
-          <div class="info-row"><span>Localização</span><span>Rio de Janeiro, BR</span></div>
-          <div class="info-row"><span>Membro desde</span><span>Mar 2025</span></div>
-          <div class="info-row"><span>Idiomas</span><span>Português, Inglês</span></div>
-          <div class="info-row"><span>Categorias frequentes</span><span>Eletrônicos, Tênis</span></div>
-        </div>
-      </div>
-    </aside>
-  </div>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/supabase-client.js"></script>
 <script src="assets/data.js"></script>
-<script>idealRenderNavAuth();</script>
+<script>
+let profileUserId = null;
+
+async function loadProfile() {
+  const params = new URLSearchParams(window.location.search);
+  profileUserId = params.get('user');
+
+  if (!profileUserId) {
+    document.getElementById('profileNotFound').style.display = 'block';
+    return;
+  }
+
+  const { data: p, error } = await idealSupabase
+    .from('profiles')
+    .select('*')
+    .eq('id', profileUserId)
+    .single();
+
+  if (error || !p) {
+    document.getElementById('profileNotFound').style.display = 'block';
+    return;
+  }
+
+  const name = p.first_name || 'Usuário';
+  document.title = `${name} — iDeal`;
+  document.getElementById('heroAvatar').textContent = idealInitial(name);
+  document.getElementById('heroName').innerHTML = `${name} ${p.last_name || ''} ${p.identity_verified ? '<span class="verif">✓</span>' : ''}`;
+  document.getElementById('heroLoc').textContent = '📍 ' + [p.city, p.country].filter(Boolean).join(', ');
+  document.getElementById('heroMember').textContent = p.created_at ? `Na iDeal desde ${new Date(p.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}` : '';
+  document.getElementById('messageBtn').href = 'ideal-mensagens.html';
+
+  document.getElementById('statRating').textContent = p.average_rating ? p.average_rating.toFixed(1) : '—';
+  document.getElementById('statTrips').textContent = p.completed_trips_count || 0;
+
+  if (p.bio) {
+    document.getElementById('bioCard').style.display = 'block';
+    document.getElementById('bioText').textContent = p.bio;
+  }
+
+  const badges = [];
+  if (p.identity_verified) badges.push('<span class="badge-pill"><span class="ic">✓</span> Identidade verificada</span>');
+  if (p.travel_verified) badges.push('<span class="badge-pill"><span class="ic">✓</span> Viagem comprovada</span>');
+  document.getElementById('verifBadges').innerHTML = badges.join('') || '<span style="color:var(--ink-soft); font-size:13px;">Ainda sem verificações.</span>';
+
+  document.getElementById('infoList').innerHTML = `
+    <div class="info-row"><span>Localização</span><span>${[p.city, p.country].filter(Boolean).join(', ') || '—'}</span></div>
+    <div class="info-row"><span>Membro desde</span><span>${p.created_at ? new Date(p.created_at).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) : '—'}</span></div>
+  `;
+
+  // Solicitações atendidas (como viajante, concluídas)
+  const { count: reqCount } = await idealSupabase
+    .from('requests').select('*', { count: 'exact', head: true })
+    .eq('traveler_id', profileUserId).eq('request_status', 'concluida');
+  document.getElementById('statReqs').textContent = reqCount || 0;
+
+  // Próximas viagens
+  const { data: trips } = await idealSupabase
+    .from('trips').select('*')
+    .eq('traveler_id', profileUserId).eq('trip_status', 'ativa')
+    .order('departure_date', { ascending: true }).limit(5);
+
+  if (trips && trips.length) {
+    document.getElementById('tripsCard').style.display = 'block';
+    document.getElementById('tripsList').innerHTML = trips.map(t => `
+      <div class="trip-mini">
+        <div><div class="trip-mini-route">${(t.origin_city||'').slice(0,3).toUpperCase()} → ${(t.destination_city||'').slice(0,3).toUpperCase()}</div><div class="trip-mini-date">Embarque ${idealFormatDateShort(t.departure_date)} · ${t.transport_type||''} · ${t.available_weight||0} kg disponíveis</div></div>
+        <a href="ideal-detalhe-viagem.html?id=${t.id}" class="btn btn-ghost">Ver viagem</a>
+      </div>
+    `).join('');
+  }
+
+  // Avaliações
+  const { data: reviews } = await idealSupabase
+    .from('reviews').select('*, author:author_id(first_name)')
+    .eq('reviewed_user_id', profileUserId).order('created_at', { ascending: false }).limit(10);
+
+  document.getElementById('statReviews').textContent = reviews?.length || 0;
+  document.getElementById('reviewsCount').textContent = `(${reviews?.length || 0})`;
+  if (reviews && reviews.length) {
+    document.getElementById('reviewsList').innerHTML = reviews.map(rv => `
+      <div class="review-item">
+        <div class="review-top">
+          <div class="avatar-sm">${idealInitial(rv.author?.first_name)}</div>
+          <div><div class="review-name">${rv.author?.first_name || 'Usuário'}</div><div class="review-stars">${'★'.repeat(Math.round(rv.overall_rating||0))}</div></div>
+          <span class="review-date">${idealFormatDateShort(rv.created_at)}</span>
+        </div>
+        <p class="review-text">${rv.written_comment || ''}</p>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('profileContent').style.display = 'block';
+}
+
+function openReportModal() {
+  document.getElementById('reportModal').style.display = 'flex';
+}
+function closeReportModal() {
+  document.getElementById('reportModal').style.display = 'none';
+}
+
+async function submitReport() {
+  const user = await idealGetCurrentUser();
+  if (!user) {
+    window.location.href = 'ideal-entrar.html';
+    return;
+  }
+  const reason = document.getElementById('reportReason').value;
+  const description = document.getElementById('reportDescription').value.trim();
+  const msg = document.getElementById('reportMsg');
+
+  if (!description) { msg.textContent = 'Descreva o que aconteceu.'; msg.style.color = 'var(--coral-dark)'; return; }
+  if (user.id === profileUserId) { msg.textContent = 'Você não pode denunciar o próprio perfil.'; msg.style.color = 'var(--coral-dark)'; return; }
+
+  const { error } = await idealSupabase.from('reports').insert({
+    reporter_id: user.id,
+    reported_user_id: profileUserId,
+    reason: reason,
+    description: description
+  });
+
+  if (error) { msg.textContent = 'Erro ao enviar: ' + error.message; msg.style.color = 'var(--coral-dark)'; return; }
+
+  msg.textContent = 'Denúncia enviada. Nossa equipe vai analisar.';
+  msg.style.color = 'var(--mint)';
+  setTimeout(closeReportModal, 1800);
+}
+
+loadProfile();
+idealRenderNavAuth();
+</script>
 </body>
 </html>
