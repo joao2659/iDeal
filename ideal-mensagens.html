@@ -98,8 +98,8 @@ header.nav{background:var(--paper); border-bottom:1px solid var(--line);}
 
 <header class="nav">
   <div class="nav-inner">
-    <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
-    <div class="avatar-nav">M</div>
+  <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
+    <a href="ideal-dashboard.html" class="avatar-nav" id="navAvatar">…</a>
   </div>
 </header>
 
@@ -205,6 +205,8 @@ async function loadConversations() {
     window.location.href = 'ideal-entrar.html';
     return;
   }
+  const { data: myProfile } = await idealSupabase.from('profiles').select('first_name').eq('id', currentUser.id).single();
+  document.getElementById('navAvatar').textContent = idealInitial(myProfile?.first_name || '?');
 
   const { data: requests } = await idealSupabase
     .from('requests')
