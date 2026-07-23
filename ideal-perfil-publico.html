@@ -109,10 +109,10 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 <header class="nav">
   <div class="nav-inner">
     <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
-    <div style="display:flex; gap:12px;">
-      <a href="#" class="btn btn-ghost">Entrar</a>
-      <a href="#" class="btn btn-primary">Criar conta</a>
-    </div>
+   <span id="navAuthArea" style="display:flex; gap:12px;">
+      <a href="ideal-entrar.html" class="btn btn-ghost">Entrar</a>
+      <a href="ideal-criar-conta.html" class="btn btn-primary">Criar conta</a>
+    </span>
   </div>
 </header>
 
@@ -228,6 +228,9 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
     </aside>
   </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/data.js"></script>
+<script>idealRenderNavAuth();</script>
 </body>
 </html>
