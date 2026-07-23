@@ -151,9 +151,11 @@ footer{padding:56px 0 32px; border-top:1px solid var(--line); margin-top:20px;}
       <a href="#">Anunciar viagem</a>
       <a href="ideal-homepage.html#como-funciona">Como funciona</a>
     </nav>
-    <div class="nav-actions">
-      <a href="#" class="btn btn-ghost" style="display:inline-flex">Entrar</a>
-      <a href="#" class="btn btn-primary" style="display:inline-flex">Criar conta</a>
+   <div class="nav-actions">
+      <span id="navAuthArea" style="display:flex; align-items:center; gap:12px;">
+        <a href="ideal-entrar.html" class="btn btn-ghost" style="display:inline-flex">Entrar</a>
+        <a href="ideal-criar-conta.html" class="btn btn-primary" style="display:inline-flex">Criar conta</a>
+      </span>
       <button class="hamburger" id="hamburger" aria-label="Abrir menu"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -412,6 +414,7 @@ async function renderResults() {
 }
 
 renderResults();
+idealRenderNavAuth();
 </script>
 </body>
 </html>
