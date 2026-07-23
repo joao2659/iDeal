@@ -118,7 +118,7 @@ tbody tr:hover{background:#FAFAFC;}
     <div class="side-divider"></div>
     <div class="side-tag">Plataforma</div>
     <nav class="side-nav">
-      <a href="#" class="side-link">👥 Usuários</a>
+      <a href="#usersSection" class="side-link">👥 Usuários</a>
       <a href="#" class="side-link">📦 Solicitações</a>
       <a href="#" class="side-link">⭐ Avaliações</a>
       <a href="#" class="side-link">🏷️ Categorias</a>
@@ -141,11 +141,11 @@ tbody tr:hover{background:#FAFAFC;}
     </div>
 
     <div class="metrics-grid">
-      <div class="metric-card"><span class="label">Usuários ativos</span><b>2.480</b><span class="delta up">↑ 12% no mês</span></div>
-      <div class="metric-card"><span class="label">Viagens ativas</span><b>184</b><span class="delta up">↑ 8% no mês</span></div>
-      <div class="metric-card"><span class="label">Solicitações abertas</span><b>96</b><span class="delta up">↑ 5% no mês</span></div>
-      <div class="metric-card"><span class="label">Entregas concluídas</span><b>1.312</b><span class="delta up">↑ 19% no mês</span></div>
-      <div class="metric-card"><span class="label">Denúncias abertas</span><b>3</b><span class="delta down">↓ 2 desde ontem</span></div>
+      <div class="metric-card"><span class="label">Usuários cadastrados</span><b id="metricUsers">—</b></div>
+      <div class="metric-card"><span class="label">Viagens ativas</span><b id="metricTrips">—</b></div>
+      <div class="metric-card"><span class="label">Solicitações abertas</span><b id="metricRequests">—</b></div>
+      <div class="metric-card"><span class="label">Entregas concluídas</span><b id="metricCompleted">—</b></div>
+      <div class="metric-card"><span class="label">Denúncias abertas</span><b id="metricReports">—</b></div>
     </div>
 
     <!-- VIAGENS AGUARDANDO APROVAÇÃO -->
@@ -163,38 +163,15 @@ tbody tr:hover{background:#FAFAFC;}
       </div>
     </div>
 
-    <!-- DENÚNCIAS -->
+   <!-- DENÚNCIAS -->
     <div class="section" id="reportsSection">
-      <div class="section-title"><h3>Denúncias recentes</h3><a href="#">Ver todas</a></div>
+      <div class="section-title"><h3>Denúncias recentes</h3></div>
       <div class="table-card">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Denunciante</th><th>Denunciado</th><th>Motivo</th><th>Contexto</th><th>Status</th><th>Ações</th></tr></thead>
-            <tbody>
-              <tr>
-                <td class="cell-user"><div class="avatar-sm">C</div><div><b>Camila R.</b></div></td>
-                <td class="cell-user"><div class="avatar-sm">X</div><div><b>Usuário #4471</b></div></td>
-                <td>Comunicação suspeita</td>
-                <td class="route-mono">GIG → CGH</td>
-                <td><span class="status-chip pending">Em análise</span></td>
-                <td class="row-actions"><button class="btn btn-ghost btn-sm">Revisar</button></td>
-              </tr>
-              <tr>
-                <td class="cell-user"><div class="avatar-sm">R</div><div><b>Rodrigo M.</b></div></td>
-                <td class="cell-user"><div class="avatar-sm">Y</div><div><b>Usuário #3892</b></div></td>
-                <td>Produto não permitido</td>
-                <td class="route-mono">LIS → GRU</td>
-                <td><span class="status-chip pending">Em análise</span></td>
-                <td class="row-actions"><button class="btn btn-ghost btn-sm">Revisar</button></td>
-              </tr>
-              <tr>
-                <td class="cell-user"><div class="avatar-sm">S</div><div><b>Sofia T.</b></div></td>
-                <td class="cell-user"><div class="avatar-sm">Z</div><div><b>Usuário #2214</b></div></td>
-                <td>Não compareceu à entrega</td>
-                <td class="route-mono">GIG → MIA</td>
-                <td><span class="status-chip pending">Em análise</span></td>
-                <td class="row-actions"><button class="btn btn-ghost btn-sm">Revisar</button></td>
-              </tr>
+            <thead><tr><th>Denunciante</th><th>Denunciado</th><th>Motivo</th><th>Descrição</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="reportsBody">
+              <tr><td colspan="6" style="text-align:center; color:var(--ink-soft);">Carregando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -231,38 +208,15 @@ tbody tr:hover{background:#FAFAFC;}
       </div>
     </div>
 
-    <!-- USUÁRIOS -->
-    <div class="section">
-      <div class="section-title"><h3>Usuários recentes</h3><a href="#">Ver todos</a></div>
+   <!-- USUÁRIOS -->
+    <div class="section" id="usersSection">
+      <div class="section-title"><h3>Usuários</h3></div>
       <div class="table-card">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Usuário</th><th>Tipo</th><th>Avaliação</th><th>Viagens</th><th>Status</th><th>Ações</th></tr></thead>
-            <tbody>
-              <tr>
-                <td class="cell-user"><div class="avatar-sm">M</div><div><b>Mariana Souza</b><span>mariana@email.com</span></div></td>
-                <td>Viajante e comprador</td>
-                <td>4.9 ★</td>
-                <td>32</td>
-                <td><span class="status-chip verified">Verificado</span></td>
-                <td class="row-actions"><button class="btn btn-ghost btn-sm">Ver perfil</button></td>
-              </tr>
-              <tr>
-                <td class="cell-user"><div class="avatar-sm">R</div><div><b>Rafael Lima</b><span>rafael@email.com</span></div></td>
-                <td>Viajante</td>
-                <td>4.8 ★</td>
-                <td>19</td>
-                <td><span class="status-chip verified">Verificado</span></td>
-                <td class="row-actions"><button class="btn btn-ghost btn-sm">Ver perfil</button></td>
-              </tr>
-              <tr>
-                <td class="cell-user"><div class="avatar-sm">X</div><div><b>Usuário #4471</b><span>—</span></div></td>
-                <td>Comprador</td>
-                <td>3.2 ★</td>
-                <td>2</td>
-                <td><span class="status-chip suspended">Suspenso</span></td>
-                <td class="row-actions"><button class="btn btn-ghost btn-sm">Ver perfil</button></td>
-              </tr>
+            <thead><tr><th>Usuário</th><th>Avaliação</th><th>Viagens</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="usersBody">
+              <tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Carregando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -481,6 +435,127 @@ async function resolveDispute(id, status) {
 }
 
 loadDisputes();
+
+async function loadMetrics() {
+  const [{ count: usersCount }, { count: tripsCount }, { count: requestsCount }, { count: completedCount }, { count: reportsCount }] = await Promise.all([
+    idealSupabase.from('profiles').select('*', { count: 'exact', head: true }),
+    idealSupabase.from('trips').select('*', { count: 'exact', head: true }).eq('trip_status', 'ativa'),
+    idealSupabase.from('requests').select('*', { count: 'exact', head: true }).not('request_status', 'in', '(concluida,cancelada,recusada)'),
+    idealSupabase.from('requests').select('*', { count: 'exact', head: true }).eq('request_status', 'concluida'),
+    idealSupabase.from('reports').select('*', { count: 'exact', head: true }).eq('report_status', 'pendente')
+  ]);
+  document.getElementById('metricUsers').textContent = usersCount ?? '—';
+  document.getElementById('metricTrips').textContent = tripsCount ?? '—';
+  document.getElementById('metricRequests').textContent = requestsCount ?? '—';
+  document.getElementById('metricCompleted').textContent = completedCount ?? '—';
+  document.getElementById('metricReports').textContent = reportsCount ?? '—';
+}
+loadMetrics();
+
+const REPORT_REASON_LABELS = {
+  comunicacao_suspeita: 'Comunicação suspeita',
+  produto_nao_permitido: 'Produto não permitido',
+  nao_compareceu: 'Não compareceu à entrega',
+  perfil_falso: 'Perfil falso',
+  outro: 'Outro'
+};
+
+async function loadReports() {
+  const tbody = document.getElementById('reportsBody');
+  const { data: reports, error } = await idealSupabase
+    .from('reports')
+    .select('*, reporter:reporter_id(first_name), reported:reported_user_id(first_name)')
+    .eq('report_status', 'pendente')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--red);">Erro ao carregar (${error.message}).</td></tr>`;
+    return;
+  }
+  if (!reports.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--ink-soft);">Nenhuma denúncia pendente.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = reports.map(r => `
+    <tr id="report-row-${r.id}">
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(r.reporter?.first_name)}</div><div><b>${r.reporter?.first_name||'—'}</b></div></td>
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(r.reported?.first_name)}</div><div><b>${r.reported?.first_name||'—'}</b></div></td>
+      <td>${REPORT_REASON_LABELS[r.reason]||r.reason||'—'}</td>
+      <td style="max-width:220px; white-space:normal;">${r.description||'—'}</td>
+      <td><span class="status-chip pending">Em análise</span></td>
+      <td class="row-actions">
+        <button class="btn btn-success btn-sm" onclick="resolveReport('${r.id}','resolvida')">Resolver</button>
+        <button class="btn btn-ghost btn-sm" onclick="resolveReport('${r.id}','arquivada')">Arquivar</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function resolveReport(id, status) {
+  const { error } = await idealSupabase.from('reports').update({ report_status: status }).eq('id', id);
+  if (error) { alert('Erro ao atualizar: ' + error.message); return; }
+  document.getElementById(`report-row-${id}`).remove();
+  loadMetrics();
+}
+loadReports();
+
+async function loadUsers() {
+  const tbody = document.getElementById('usersBody');
+  const { data: profiles, error } = await idealSupabase
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Erro ao carregar (${error.message}).</td></tr>`;
+    return;
+  }
+
+  let emailMap = {};
+  try {
+    const { data: sessionData } = await idealSupabase.auth.getSession();
+    const token = sessionData?.session?.access_token;
+    if (token) {
+      const res = await fetch('/api/list-users', { headers: { Authorization: `Bearer ${token}` } });
+      const json = await res.json();
+      if (res.ok) (json.users || []).forEach(u => { emailMap[u.id] = u.email; });
+    }
+  } catch (e) { /* segue sem e-mail se falhar */ }
+
+  if (!profiles.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--ink-soft);">Nenhum usuário cadastrado ainda.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = profiles.map(p => {
+    const statusChip = p.is_admin
+      ? '<span class="status-chip verified">Admin</span>'
+      : p.identity_verified
+        ? '<span class="status-chip verified">Verificado</span>'
+        : '<span class="status-chip pending">Não verificado</span>';
+    const action = p.is_admin
+      ? ''
+      : `<button class="btn btn-ghost btn-sm" onclick="promoteToAdmin('${p.id}')">Tornar admin</button>`;
+    return `
+      <tr>
+        <td class="cell-user"><div class="avatar-sm">${idealInitial(p.first_name)}</div><div><b>${p.first_name||'—'} ${p.last_name||''}</b><span>${emailMap[p.id]||'—'}</span></div></td>
+        <td>${p.average_rating ? p.average_rating.toFixed(1) + ' ★' : '—'}</td>
+        <td>${p.completed_trips_count || 0}</td>
+        <td>${statusChip}</td>
+        <td class="row-actions">${action}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function promoteToAdmin(id) {
+  if (!confirm('Tornar este usuário administrador da plataforma?')) return;
+  const { error } = await idealSupabase.from('profiles').update({ is_admin: true }).eq('id', id);
+  if (error) { alert('Erro: ' + error.message); return; }
+  loadUsers();
+}
+loadUsers();
 </script>
 </body>
 </html>
