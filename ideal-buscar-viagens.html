@@ -179,9 +179,8 @@ footer{padding:56px 0 32px; border-top:1px solid var(--line); margin-top:20px;}
 
 <div class="wrap layout">
   <!-- FILTERS -->
-  <aside class="filters">
+ <aside class="filters">
     <h3>Filtros <button id="clearFilters">Limpar tudo</button></h3>
-
     <div class="f-group">
       <label>Origem</label>
       <div class="f-row">
@@ -190,7 +189,6 @@ footer{padding:56px 0 32px; border-top:1px solid var(--line); margin-top:20px;}
       </div>
       <input type="text" id="origCidade" placeholder="Cidade de origem" style="margin-top:10px">
     </div>
-
     <div class="f-group">
       <label>Destino</label>
       <div class="f-row">
@@ -200,83 +198,74 @@ footer{padding:56px 0 32px; border-top:1px solid var(--line); margin-top:20px;}
       <input type="text" id="destCidade" placeholder="Cidade de destino" style="margin-top:10px">
     </div>
     <p style="font-size:12px; color:var(--ink-soft); margin-top:-8px; margin-bottom:20px;">Estados do Brasil carregados pela base oficial do IBGE.</p>
-
     <div class="f-divider"></div>
-
     <div class="f-group">
       <label>Data de embarque</label>
       <div class="f-row">
-        <input type="date">
-        <input type="date">
+        <input type="date" id="dateFrom">
+        <input type="date" id="dateTo">
       </div>
     </div>
-
     <div class="f-divider"></div>
-
     <div class="f-group">
       <label>Tipo de viagem</label>
-      <div class="chip-group">
-        <span class="chip selected">Regional</span>
-        <span class="chip selected">Nacional</span>
-        <span class="chip selected">Internacional</span>
+      <div class="chip-group" id="tripTypeChips">
+        <span class="chip" data-value="Regional">Regional</span>
+        <span class="chip" data-value="Nacional">Nacional</span>
+        <span class="chip" data-value="Internacional">Internacional</span>
       </div>
     </div>
-
     <div class="f-group">
       <label>Transporte</label>
-      <div class="chip-group">
-        <span class="chip selected">✈️ Avião</span>
-        <span class="chip">🚗 Carro</span>
-        <span class="chip">🚌 Ônibus</span>
-        <span class="chip">🚆 Trem</span>
-        <span class="chip">🚢 Navio</span>
-        <span class="chip">📦 Outro</span>
+      <div class="chip-group" id="transportChips">
+        <span class="chip" data-value="✈️ Avião">✈️ Avião</span>
+        <span class="chip" data-value="🚗 Carro">🚗 Carro</span>
+        <span class="chip" data-value="🚌 Ônibus">🚌 Ônibus</span>
+        <span class="chip" data-value="🚆 Trem">🚆 Trem</span>
+        <span class="chip" data-value="🚢 Navio">🚢 Navio</span>
+        <span class="chip" data-value="📦 Outro">📦 Outro</span>
       </div>
     </div>
-
     <div class="f-group">
       <label>Categoria do produto</label>
-      <select>
-        <option>Todas as categorias</option>
+      <select id="categoryFilter">
+        <option value="">Todas as categorias</option>
         <option>Eletrônicos</option>
         <option>Tênis</option>
         <option>Cosméticos</option>
         <option>Games</option>
+        <option>Roupas</option>
+        <option>Fotografia</option>
         <option>Documentos</option>
+        <option>Brinquedos</option>
       </select>
     </div>
-
     <div class="f-group">
       <label>Peso mínimo disponível</label>
-      <select>
-        <option>Qualquer peso</option>
-        <option>Acima de 3 kg</option>
-        <option>Acima de 5 kg</option>
-        <option>Acima de 10 kg</option>
-        <option>Acima de 20 kg</option>
+      <select id="weightFilter">
+        <option value="0">Qualquer peso</option>
+        <option value="3">Acima de 3 kg</option>
+        <option value="5">Acima de 5 kg</option>
+        <option value="10">Acima de 10 kg</option>
+        <option value="20">Acima de 20 kg</option>
       </select>
     </div>
-
     <div class="f-divider"></div>
-
     <div class="f-toggle">
       <span>Apenas viajantes verificados</span>
-      <div class="switch on"></div>
+      <div class="switch" id="verifiedToggle"></div>
     </div>
-
     <div class="f-group">
       <label>Avaliação mínima</label>
-      <div class="rating-row">
-        <div class="rating-chip">3★</div>
-        <div class="rating-chip selected">4★</div>
-        <div class="rating-chip">4.5★</div>
-        <div class="rating-chip">5★</div>
+      <div class="rating-row" id="ratingChips">
+        <div class="rating-chip selected" data-value="0">Qualquer</div>
+        <div class="rating-chip" data-value="3">3★</div>
+        <div class="rating-chip" data-value="4">4★</div>
+        <div class="rating-chip" data-value="4.5">4.5★</div>
       </div>
     </div>
-
-    <button class="btn btn-primary" style="width:100%; margin-top:6px;">Aplicar filtros</button>
+    <button class="btn btn-primary" style="width:100%; margin-top:6px;" id="applyFiltersBtn">Aplicar filtros</button>
   </aside>
-
   <!-- RESULTS -->
   <main>
     <div class="results-head">
@@ -345,7 +334,14 @@ document.querySelectorAll('.rating-chip').forEach(c=>c.addEventListener('click',
 document.querySelector('.switch').addEventListener('click', function(){ this.classList.toggle('on'); });
 document.getElementById('clearFilters').addEventListener('click', ()=>{
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
-  document.querySelectorAll('input').forEach(i=>i.value='');
+  document.querySelectorAll('input[type=text]').forEach(i=>i.value='');
+  document.getElementById('dateFrom').value='';
+  document.getElementById('dateTo').value='';
+  document.getElementById('categoryFilter').value='';
+  document.getElementById('weightFilter').value='0';
+  document.getElementById('verifiedToggle').classList.remove('on');
+  document.querySelectorAll('.rating-chip').forEach(c=>c.classList.remove('selected'));
+  document.querySelector('#ratingChips .rating-chip[data-value="0"]').classList.add('selected');
 });
 </script>
 <script src="assets/supabase-client.js"></script>
@@ -357,17 +353,65 @@ function tripTypeClass(type){
   return 'regional';
 }
 
+function getSelectedChipValues(containerId) {
+  return Array.from(document.querySelectorAll(`#${containerId} .chip.selected`)).map(c => c.dataset.value);
+}
+
+function getSelectedRating() {
+  const el = document.querySelector('#ratingChips .rating-chip.selected');
+  return el ? parseFloat(el.dataset.value) : 0;
+}
+
+function applyUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const origem = params.get('origem');
+  const destino = params.get('destino');
+  const categoria = params.get('categoria');
+  if (origem) document.getElementById('origCidade').value = origem;
+  if (destino) document.getElementById('destCidade').value = destino;
+  if (categoria) document.getElementById('categoryFilter').value = categoria;
+}
+
 async function renderResults() {
   const grid = document.getElementById('resultsGrid');
   const countEl = document.getElementById('resultsCount');
-  const trips = await idealFetchActiveTrips(50);
+  const allTrips = await idealFetchActiveTrips(200);
 
-  countEl.innerHTML = `<b>${trips.length}</b> viagem${trips.length===1?'':'ns'} encontrada${trips.length===1?'':'s'}`;
+  const origCidade = document.getElementById('origCidade').value.trim().toLowerCase();
+  const destCidade = document.getElementById('destCidade').value.trim().toLowerCase();
+  const origPais = document.getElementById('origPais').value;
+  const destPais = document.getElementById('destPais').value;
+  const dateFrom = document.getElementById('dateFrom').value;
+  const dateTo = document.getElementById('dateTo').value;
+  const selectedTypes = getSelectedChipValues('tripTypeChips');
+  const selectedTransports = getSelectedChipValues('transportChips');
+  const category = document.getElementById('categoryFilter').value;
+  const minWeight = parseFloat(document.getElementById('weightFilter').value) || 0;
+  const verifiedOnly = document.getElementById('verifiedToggle').classList.contains('on');
+  const minRating = getSelectedRating();
+
+  const trips = allTrips.filter(t => {
+    if (origCidade && !(t.origin_city||'').toLowerCase().includes(origCidade)) return false;
+    if (destCidade && !(t.destination_city||'').toLowerCase().includes(destCidade)) return false;
+    if (origPais && t.origin_country !== origPais) return false;
+    if (destPais && t.destination_country !== destPais) return false;
+    if (dateFrom && t.departure_date < dateFrom) return false;
+    if (dateTo && t.departure_date > dateTo) return false;
+    if (selectedTypes.length && !selectedTypes.includes(t.trip_type)) return false;
+    if (selectedTransports.length && !selectedTransports.includes(t.transport_type)) return false;
+    if (category && !(t.accepted_categories||[]).includes(category)) return false;
+    if (minWeight && (t.available_weight||0) < minWeight) return false;
+    if (verifiedOnly && !t.traveler?.identity_verified) return false;
+    if (minRating && (t.traveler?.average_rating||0) < minRating) return false;
+    return true;
+  });
+
+  countEl.innerHTML = `<b>${trips.length}</b> ${trips.length===1 ? 'viagem encontrada' : 'viagens encontradas'}`;
 
   if (!trips.length) {
     grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px 20px; background:var(--paper); border:1px dashed var(--line); border-radius:16px;">
-      <p style="color:var(--ink-soft); font-size:15px; margin-bottom:16px;">Nenhuma viagem publicada ainda. Assim que alguém anunciar uma viagem, ela aparece aqui.</p>
-      <a href="ideal-anunciar-viagem.html" class="btn btn-primary" style="display:inline-flex;">Anunciar a primeira viagem</a>
+      <p style="color:var(--ink-soft); font-size:15px; margin-bottom:16px;">Nenhuma viagem encontrada com esses filtros.</p>
+      <button class="btn btn-ghost" style="display:inline-flex;" onclick="document.getElementById('clearFilters').click(); renderResults();">Limpar filtros</button>
     </div>`;
     return;
   }
@@ -413,7 +457,12 @@ async function renderResults() {
   }).join('');
 }
 
+document.getElementById('applyFiltersBtn').addEventListener('click', renderResults);
+
+applyUrlParams();
 renderResults();
+idealRenderNavAuth();
+</script>
 idealRenderNavAuth();
 </script>
 </body>
