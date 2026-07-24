@@ -107,7 +107,7 @@ header.nav{
 .ticket{
   max-width:920px; margin:48px auto 0; background:var(--paper); border-radius:24px;
   box-shadow:var(--shadow-lg); border:1px solid var(--line); position:relative;
-  display:flex; align-items:stretch; overflow:visible;
+  display:flex; align-items:stretch; overflow:hidden;
 }
 .ticket-main{flex:1; padding:26px 8px 26px 30px; display:grid; grid-template-columns:1.2fr 1.2fr 1fr 1fr; gap:0;}
 .ticket-field{padding:0 18px; border-right:1px dashed var(--line); text-align:left;}
@@ -376,32 +376,34 @@ footer{padding:64px 0 32px;}
       <a href="ideal-anunciar-viagem.html" class="btn btn-dark">Anunciar minha viagem</a>
     </div>
 
-    <div class="ticket">
+   <div class="ticket">
       <div class="ticket-main">
         <div class="ticket-field">
-          <label>De onde?</label>
-          <input type="text" placeholder="Cidade ou país de origem">
+          <label>Origem do produto</label>
+          <input type="text" id="heroOrigin" placeholder="De onde ele vem?">
         </div>
         <div class="ticket-field">
-          <label>Para onde?</label>
-          <input type="text" placeholder="Cidade de destino">
+          <label>Destino da entrega</label>
+          <input type="text" id="heroDestination" placeholder="Sua cidade">
         </div>
         <div class="ticket-field">
-          <label>Data aproximada</label>
-          <input type="text" placeholder="Qualquer data">
+          <label>Data desejada</label>
+          <input type="text" id="heroDate" placeholder="Qualquer data">
         </div>
         <div class="ticket-field">
-          <label>Categoria</label>
-          <select>
-            <option>Todas</option>
+          <label>Tipo de produto</label>
+          <select id="heroCategory">
+            <option value="">Todos os tipos</option>
             <option>Eletrônicos</option>
             <option>Tênis</option>
             <option>Cosméticos</option>
+            <option>Games</option>
+            <option>Roupas</option>
           </select>
         </div>
       </div>
       <div class="ticket-stub">
-        <button class="btn btn-primary">Buscar viagens</button>
+        <button class="btn btn-primary" id="heroSearchBtn">Buscar oportunidades</button>
       </div>
     </div>
 
@@ -759,6 +761,17 @@ renderOrigins();
 renderRoutes();
 renderTrending();
 renderUpcomingTrips();
+
+document.getElementById('heroSearchBtn').addEventListener('click', () => {
+  const params = new URLSearchParams();
+  const origin = document.getElementById('heroOrigin').value.trim();
+  const destination = document.getElementById('heroDestination').value.trim();
+  const category = document.getElementById('heroCategory').value;
+  if (origin) params.set('origem', origin);
+  if (destination) params.set('destino', destination);
+  if (category) params.set('categoria', category);
+  window.location.href = 'ideal-buscar-viagens.html' + (params.toString() ? '?' + params.toString() : '');
+});
 </script>
 </body>
 </html>
