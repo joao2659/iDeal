@@ -119,9 +119,9 @@ header.nav{
 }
 .ticket-field input:focus, .ticket-field select:focus{outline:none;}
 .ticket-field input::placeholder{color:#B7BCCB; font-weight:500;}
-.ticket-field input, .ticket-field select{min-width:0;}
+.ticket-field input, .ticket-field select{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .ticket-stub{
-  width:150px; background:var(--navy); border-radius:0 24px 24px 0; color:#fff;
+  width:190px; background:var(--navy); border-radius:0 24px 24px 0; color:#fff;
   display:flex; align-items:center; justify-content:center; padding:12px;
   position:relative;
 }
@@ -129,7 +129,7 @@ header.nav{
   content:''; position:absolute; left:-11px; top:50%; transform:translateY(-50%);
   width:22px; height:22px; border-radius:50%; background:var(--bg); border:1px solid var(--line);
 }
-.ticket-stub .btn{width:100%; padding:13px 10px; font-size:14px;}
+.ticket-stub .btn{width:100%; padding:13px 8px; font-size:12.5px; white-space:nowrap;}
 .punch-row{position:absolute; left:0; top:0; bottom:0; width:0;}
 @media (max-width:860px){
   .ticket{flex-direction:column; border-radius:20px;}
