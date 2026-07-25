@@ -478,8 +478,7 @@ async function submitVerification() {
   loadVerificationStatus();
 }
 
-async function openRequestModal(requestId) {
-  const { data: r, error } = await idealSupabase
+const { data: r, error } = await idealSupabase
     .from('requests')
     .select('*, buyer:buyer_id(first_name, last_name)')
     .eq('id', requestId)
@@ -488,7 +487,37 @@ async function openRequestModal(requestId) {
 
   if (error || !r) { alert('Erro ao carregar solicitação.'); return; }
 
+  const timelineSteps = [
+    { key: 'aceita', label: 'Confirmada', icon: '✅' },
+    { key: 'em_transporte', label: 'Em transporte', icon: '🧳' },
+    { key: 'concluida', label: 'Entregue', icon: '📦' }
+  ];
+  const statusOrder = ['enviada', 'em_analise', 'aceita', 'em_transporte', 'concluida'];
+  const currentIndex = statusOrder.indexOf(r.request_status);
+  let timelineHtml = '';
+  if (r.request_status !== 'recusada' && r.request_status !== 'cancelada' && currentIndex >= statusOrder.indexOf('aceita')) {
+    timelineHtml = `
+      <div style="display:flex; justify-content:space-between; margin-bottom:20px; position:relative;">
+        <div style="position:absolute; top:16px; left:24px; right:24px; height:2px; background:var(--line); z-index:0;"></div>
+        ${timelineSteps.map(step => {
+          const stepIndex = statusOrder.indexOf(step.key);
+          const done = currentIndex >= stepIndex;
+          return `
+            <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:6px; flex:1;">
+              <div style="width:32px; height:32px; border-radius:50%; background:${done ? 'var(--coral)' : 'var(--bg)'}; border:2px solid ${done ? 'var(--coral)' : 'var(--line)'}; display:flex; align-items:center; justify-content:center; font-size:14px;">${step.icon}</div>
+              <span style="font-size:10.5px; font-weight:700; color:${done ? 'var(--navy)' : 'var(--ink-soft)'}; text-align:center;">${step.label}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
   document.getElementById('requestModalBody').innerHTML = `
+    ${timelineHtml}
+`;
+
+  document.getElementById('requestModalBody').innerHTML += `
     <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Comprador</span><span style="font-weight:600;">${r.buyer?.first_name||'—'} ${r.buyer?.last_name||''}</span></div>
     <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Produto</span><span style="font-weight:600;">${r.product_name||'—'}</span></div>
     <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Categoria</span><span style="font-weight:600;">${r.product_category||'—'}</span></div>
