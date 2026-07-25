@@ -310,7 +310,7 @@ async function loadTrip() {
   document.getElementById('statRating').textContent = t.traveler?.average_rating ? t.traveler.average_rating.toFixed(1) : '—';
   document.getElementById('statTrips').textContent = t.traveler?.completed_trips_count ?? 0;
   document.getElementById('statResponse').textContent = '—';
-
+  document.getElementById('travelerName').innerHTML += ' ' + idealTierBadgeHtml(t.traveler?.completed_trips_count);
   const badges = [];
   if (t.traveler?.identity_verified) badges.push('<span class="badge-pill"><span class="ic">✓</span> Identidade verificada</span>');
   if (t.traveler?.travel_verified) badges.push('<span class="badge-pill"><span class="ic">✓</span> Viagem comprovada</span>');
