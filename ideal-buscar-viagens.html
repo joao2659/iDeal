@@ -429,7 +429,8 @@ async function renderResults() {
             <div class="avatar">${idealInitial(name)}</div>
             <div>
               <div class="trip-name">${name} ${verif}</div>
-              <div class="trip-rating"><span class="star">★</span> ${rating} · ${tripsCount} viagens concluídas</div>
+             <div class="trip-rating"><span class="star">★</span> ${rating} · ${tripsCount} viagens concluídas</div>
+              <div style="margin-top:4px;">${idealTierBadgeHtml(tripsCount)}</div>
             </div>
           </div>
           <span class="badge-type ${tripTypeClass(t.trip_type)}">${t.trip_type || 'Regional'}</span>
