@@ -154,6 +154,62 @@ header.nav{
 .split-card.a .ic{background:#FFF0EB; color:var(--coral);}
 .split-card.b .ic{background:#E7F7F2; color:var(--mint);}
 
+/* ===== HERO v2 — imagem com moldura + card de busca vertical (estilo Airbnb) ===== */
+.hero-photo{
+  position:absolute; top:32px; right:24px; bottom:32px; left:38%; z-index:0;
+  border-radius:28px; overflow:hidden;
+  box-shadow:0 30px 70px -24px rgba(19,27,58,.35);
+}
+.hero-photo img{ width:100%; height:100%; object-fit:cover; object-position:55% center; }
+
+.hero-badge-float{
+  position:absolute; right:52px; bottom:110px; z-index:3; max-width:250px;
+  background:var(--paper); border-radius:16px; padding:14px 16px;
+  display:flex; align-items:center; gap:12px;
+  box-shadow:var(--shadow-lg);
+}
+.hero-badge-float .ic-round{
+  width:38px; height:38px; border-radius:50%; background:var(--bg); border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+}
+.hero-badge-float b{font-size:13.5px; color:var(--navy); display:block;}
+.hero-badge-float span{font-size:12px; color:var(--ink-soft); line-height:1.35;}
+
+.hero-content-v2{ position:relative; z-index:2; max-width:600px; text-align:left; }
+.hero-content-v2 .eyebrow-badge{margin-bottom:20px;}
+.hero-content-v2 p.sub{ margin:18px 0 0; max-width:440px; }
+
+.hero-search-card{
+  margin-top:28px; width:100%; max-width:460px;
+  background:var(--paper); border-radius:var(--radius); padding:26px;
+  box-shadow:var(--shadow-lg); border:1px solid var(--line);
+  position:relative; z-index:3;
+}
+.hero-search-card h3{font-size:20px; font-weight:700; margin-bottom:6px;}
+.hsc-sub{font-size:13.5px; color:var(--ink-soft); margin-bottom:18px; line-height:1.5;}
+.hsc-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.hsc-field{ border:1px solid var(--line); border-radius:14px; padding:10px 14px; background:var(--bg); margin-bottom:10px; }
+.hsc-field label{display:block; font-size:11px; font-weight:700; color:var(--navy-2); text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px;}
+.hsc-field input, .hsc-field select{ border:none; background:transparent; width:100%; font-weight:600; font-size:13.5px; color:var(--navy); padding:0; font-family:'Inter',sans-serif; }
+.hsc-field input:focus, .hsc-field select:focus{outline:none;}
+.hsc-field input::placeholder{color:#9AA0B4; font-weight:500;}
+.hsc-btn{ width:100%; margin-top:4px; padding:14px; border-radius:14px; font-size:14.5px; justify-content:center; background:linear-gradient(90deg, var(--coral), var(--coral-dark)); }
+
+.hero-content-v2 .hero-split{ justify-content:flex-start; margin-top:26px; margin-left:0; }
+
+.hero-more-link{
+  text-align:center; margin-top:8px; font-size:14px; color:var(--ink-soft); font-weight:600;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+}
+
+@media (max-width:900px){
+  .hero-photo{ position:static; width:100%; height:280px; margin:20px 0 0; border-radius:20px; }
+  .hero-badge-float{ display:none; }
+  .hero-content-v2{ max-width:100%; }
+  .hero-search-card{ max-width:100%; }
+  .hero-content-v2 .hero-split{ justify-content:center; }
+}
+
 /* ===== SECTION GENERIC ===== */
 section{padding:76px 0;}
 .section-head{margin-bottom:40px; max-width:640px;}
@@ -366,32 +422,41 @@ footer{padding:64px 0 32px;}
 
 <!-- HERO -->
 <section class="hero" id="inicio">
-  <div class="hero-bg"></div>
-  <div class="wrap hero-inner">
-    <span class="eyebrow-badge"><span class="pulse"></span> <span id="heroStatsText">Carregando…</span></span>
-    <h1>Compre de qualquer lugar<br>com quem já está <span class="hl">viajando</span>.</h1>
-    <p class="sub">Encontre viajantes com espaço disponível na bagagem ou aproveite sua próxima viagem para ganhar uma renda extra.</p>
-    <div class="hero-ctas">
-      <a href="ideal-buscar-viagens.html" class="btn btn-primary">Encontrar viajantes</a>
-      <a href="ideal-anunciar-viagem.html" class="btn btn-dark">Anunciar minha viagem</a>
-    </div>
+  <div class="hero-photo">
+    <img src="assets/hero-desktop.jpg" alt="Viajante entregando uma encomenda a uma compradora na rua, placa da loja iDeal ao fundo">
+  </div>
 
-   <div class="ticket">
-      <div class="ticket-main">
-        <div class="ticket-field">
-          <label>Origem do produto</label>
+  <div class="hero-badge-float">
+    <div class="ic-round">✈️</div>
+    <div><b>Transforme sua viagem</b><span>Espaço na mala pode ser a oportunidade de alguém.</span></div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero-content-v2">
+      <span class="eyebrow-badge"><span class="pulse"></span> <span id="heroStatsText">Carregando…</span></span>
+      <h1>Compre de qualquer lugar<br>com quem já está <span class="hl">viajando</span>.</h1>
+      <p class="sub">Encontre viajantes com espaço disponível na bagagem ou aproveite sua próxima viagem para ganhar uma renda extra.</p>
+
+      <div class="hero-search-card">
+        <h3>Encontre viajantes disponíveis</h3>
+        <div class="hsc-sub">Origem, destino e o que você precisa enviar.</div>
+
+        <div class="hsc-field">
+          <label for="heroOrigin">Origem do produto</label>
           <input type="text" id="heroOrigin" placeholder="De onde ele vem?">
         </div>
-        <div class="ticket-field">
-          <label>Destino da entrega</label>
-          <input type="text" id="heroDestination" placeholder="Sua cidade">
+        <div class="hsc-row">
+          <div class="hsc-field">
+            <label for="heroDestination">Destino da entrega</label>
+            <input type="text" id="heroDestination" placeholder="Sua cidade">
+          </div>
+          <div class="hsc-field">
+            <label for="heroDate">Data desejada</label>
+            <input type="text" id="heroDate" placeholder="Qualquer data">
+          </div>
         </div>
-        <div class="ticket-field">
-          <label>Data desejada</label>
-          <input type="text" id="heroDate" placeholder="Qualquer data">
-        </div>
-        <div class="ticket-field">
-          <label>Tipo de produto</label>
+        <div class="hsc-field">
+          <label for="heroCategory">Tipo de produto</label>
           <select id="heroCategory">
             <option value="">Todos os tipos</option>
             <option>Eletrônicos</option>
@@ -401,15 +466,13 @@ footer{padding:64px 0 32px;}
             <option>Roupas</option>
           </select>
         </div>
+        <button class="btn btn-primary hsc-btn" id="heroSearchBtn">🔍 Buscar oportunidades</button>
       </div>
-      <div class="ticket-stub">
-        <button class="btn btn-primary" id="heroSearchBtn">Buscar oportunidades</button>
-      </div>
-    </div>
 
-    <div class="hero-split">
-      <a href="ideal-buscar-viagens.html" class="split-card a"><span class="ic">🛍️</span> Preciso transportar ou comprar algo</a>
-      <a href="ideal-anunciar-viagem.html" class="split-card b"><span class="ic">🧳</span> Tenho espaço disponível</a>
+      <div class="hero-split">
+        <a href="ideal-buscar-viagens.html" class="split-card a"><span class="ic">🛍️</span> Preciso transportar ou comprar algo</a>
+        <a href="ideal-anunciar-viagem.html" class="split-card b"><span class="ic">🧳</span> Tenho espaço disponível</a>
+      </div>
     </div>
   </div>
 </section>
