@@ -338,6 +338,7 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <script src="assets/geo.js"></script>
 <script src="assets/supabase-client.js"></script>
 <script>
@@ -533,12 +534,16 @@ async function publishTrip() {
     return;
   }
 
-  current = total + 1;
+ current = total + 1;
   document.querySelector('.step-panel[data-panel="success"]').classList.add('active');
   panels.forEach(p => { if (p.dataset.panel !== 'success') p.classList.remove('active'); });
   document.getElementById('progressSteps').style.display = 'none';
   stepNav.style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (typeof confetti === 'function') {
+    confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 }, colors: ['#FF5A3C', '#F5A623', '#1FAE8C', '#131B3A'] });
+  }
 }
 
 btnNext.addEventListener('click', async ()=>{
