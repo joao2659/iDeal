@@ -229,9 +229,9 @@ async function loadProfile() {
   document.getElementById('heroMember').textContent = p.created_at ? `Na iDeal desde ${new Date(p.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}` : '';
   document.getElementById('messageBtn').href = 'ideal-mensagens.html';
 
-  document.getElementById('statRating').textContent = p.average_rating ? p.average_rating.toFixed(1) : '—';
+ document.getElementById('statRating').textContent = p.average_rating ? p.average_rating.toFixed(1) : '—';
   document.getElementById('statTrips').textContent = p.completed_trips_count || 0;
-
+  document.getElementById('heroName').innerHTML += ' ' + idealTierBadgeHtml(p.completed_trips_count);
   if (p.bio) {
     document.getElementById('bioCard').style.display = 'block';
     document.getElementById('bioText').textContent = p.bio;
