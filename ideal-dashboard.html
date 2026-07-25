@@ -478,7 +478,8 @@ async function submitVerification() {
   loadVerificationStatus();
 }
 
-const { data: r, error } = await idealSupabase
+async function openRequestModal(requestId) {
+  const { data: r, error } = await idealSupabase
     .from('requests')
     .select('*, buyer:buyer_id(first_name, last_name)')
     .eq('id', requestId)
