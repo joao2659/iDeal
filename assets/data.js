@@ -112,3 +112,18 @@ function idealFormatDateShort(isoDate) {
 function idealInitial(firstName) {
   return (firstName || "?").charAt(0).toUpperCase();
 }
+
+// Calcula o nível de confiança do viajante com base em viagens concluídas
+function idealGetTier(completedTrips) {
+  const trips = completedTrips || 0;
+  if (trips >= 30) return { name: "Diamante", icon: "💎", color: "#4FA8D8", bg: "#E9F4FA" };
+  if (trips >= 15) return { name: "Ouro", icon: "🥇", color: "#B27600", bg: "#FFF3DC" };
+  if (trips >= 5) return { name: "Prata", icon: "🥈", color: "#5B6478", bg: "#EDEFF3" };
+  return { name: "Bronze", icon: "🥉", color: "#A15C2E", bg: "#F5E9E0" };
+}
+
+// Retorna o HTML pronto de um selo de nível
+function idealTierBadgeHtml(completedTrips) {
+  const tier = idealGetTier(completedTrips);
+  return `<span style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:999px; background:${tier.bg}; color:${tier.color};">${tier.icon} ${tier.name}</span>`;
+}
