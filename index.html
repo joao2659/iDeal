@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<script src="assets/analytics.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>iDeal — Compre de qualquer lugar com quem já está viajando</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,7 +107,7 @@ header.nav{
 .ticket{
   max-width:920px; margin:48px auto 0; background:var(--paper); border-radius:24px;
   box-shadow:var(--shadow-lg); border:1px solid var(--line); position:relative;
-  display:flex; align-items:stretch; overflow:visible;
+  display:flex; align-items:stretch; overflow:hidden;
 }
 .ticket-main{flex:1; padding:26px 8px 26px 30px; display:grid; grid-template-columns:1.2fr 1.2fr 1fr 1fr; gap:0;}
 .ticket-field{padding:0 18px; border-right:1px dashed var(--line); text-align:left;}
@@ -118,8 +119,9 @@ header.nav{
 }
 .ticket-field input:focus, .ticket-field select:focus{outline:none;}
 .ticket-field input::placeholder{color:#B7BCCB; font-weight:500;}
+.ticket-field input, .ticket-field select{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .ticket-stub{
-  width:150px; background:var(--navy); border-radius:0 24px 24px 0; color:#fff;
+  width:190px; background:var(--navy); border-radius:0 24px 24px 0; color:#fff;
   display:flex; align-items:center; justify-content:center; padding:12px;
   position:relative;
 }
@@ -127,14 +129,18 @@ header.nav{
   content:''; position:absolute; left:-11px; top:50%; transform:translateY(-50%);
   width:22px; height:22px; border-radius:50%; background:var(--bg); border:1px solid var(--line);
 }
-.ticket-stub .btn{width:100%; padding:13px 10px; font-size:14px;}
+.ticket-stub .btn{width:100%; padding:13px 8px; font-size:12.5px; white-space:nowrap;}
 .punch-row{position:absolute; left:0; top:0; bottom:0; width:0;}
 @media (max-width:860px){
   .ticket{flex-direction:column; border-radius:20px;}
   .ticket-main{grid-template-columns:1fr 1fr; padding:22px 22px 6px; gap:16px 0;}
-  .ticket-field{border-right:none; border-bottom:1px dashed var(--line); padding:0 0 14px;}
+  .ticket-field{border-right:none; border-bottom:1px dashed var(--line); padding:0 0 14px; overflow:hidden;}
+  .ticket-field input, .ticket-field select{font-size:14px;}
   .ticket-stub{width:100%; border-radius:0 0 20px 20px; padding:18px 22px;}
   .ticket-stub::before{display:none;}
+}
+@media (max-width:480px){
+  .ticket-main{grid-template-columns:1fr;}
 }
 
 .hero-split{display:flex; gap:16px; justify-content:center; margin-top:28px; flex-wrap:wrap;}
@@ -147,6 +153,73 @@ header.nav{
 .split-card .ic{width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
 .split-card.a .ic{background:#FFF0EB; color:var(--coral);}
 .split-card.b .ic{background:#E7F7F2; color:var(--mint);}
+
+/* ===== HERO v2 — imagem com moldura + card de busca vertical (estilo Airbnb) ===== */
+.hero-photo{
+  position:absolute; top:56px; right:24px; left:38%; z-index:0;
+  aspect-ratio:4 / 3; max-height:520px;
+  border-radius:28px; overflow:hidden;
+  box-shadow:0 30px 70px -24px rgba(19,27,58,.35);
+}
+.hero-photo img{ width:100%; height:100%; object-fit:cover; object-position:55% center; }
+
+.hero-badge-float{
+  position:absolute; right:20px; bottom:20px; z-index:3; max-width:230px;
+  background:var(--paper); border-radius:16px; padding:14px 16px;
+  display:flex; align-items:center; gap:12px;
+  box-shadow:var(--shadow-lg);
+}
+.hero-badge-float .ic-round{
+  width:38px; height:38px; border-radius:50%; background:var(--bg); border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+}
+.hero-badge-float b{font-size:13.5px; color:var(--navy); display:block;}
+.hero-badge-float span{font-size:12px; color:var(--ink-soft); line-height:1.35;}
+
+.hero-content-v2{ position:relative; z-index:2; max-width:600px; text-align:left; }
+.hero-content-v2 h1{ font-size:clamp(26px, 3.2vw, 42px); line-height:1.15; }
+.hero-content-v2 .eyebrow-badge{margin-bottom:20px;}
+.hero-content-v2 p.sub{ margin:18px 0 0; max-width:440px; }
+
+.hero-search-card{
+  margin-top:28px; width:100%; max-width:460px;
+  background:rgba(255,255,255,0.7);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius:32px; padding:30px;
+  box-shadow:
+    0 60px 120px -30px rgba(19,27,58,.35),
+    0 25px 50px -20px rgba(19,27,58,.22),
+    0 2px 6px rgba(19,27,58,.06),
+    inset 0 1px 0 rgba(255,255,255,.7);
+  border:1px solid rgba(255,255,255,.6);
+  position:relative; z-index:3;
+}
+.hero-search-card h3{font-size:20px; font-weight:700; margin-bottom:6px;}
+.hsc-sub{font-size:13.5px; color:var(--ink-soft); margin-bottom:18px; line-height:1.5;}
+.hsc-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.hsc-field{ border:1px solid var(--line); border-radius:14px; padding:10px 14px; background:rgba(246,247,250,.75); margin-bottom:10px; }
+.hsc-field label{display:block; font-size:11px; font-weight:700; color:var(--navy-2); text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px;}
+.hsc-field input, .hsc-field select{ border:none; background:transparent; width:100%; font-weight:600; font-size:13.5px; color:var(--navy); padding:0; font-family:'Inter',sans-serif; }
+.hsc-field input:focus, .hsc-field select:focus{outline:none;}
+.hsc-field input::placeholder{color:#9AA0B4; font-weight:500;}
+.hsc-btn{ width:100%; margin-top:4px; padding:14px; border-radius:16px; font-size:14.5px; justify-content:center; background:linear-gradient(90deg, var(--coral), var(--coral-dark)); box-shadow:0 14px 30px -10px rgba(255,90,60,.5); }
+
+.hero-content-v2 .hero-split{ justify-content:flex-start; margin-top:26px; margin-left:0; }
+
+.hero-more-link{
+  text-align:center; margin-top:8px; font-size:14px; color:var(--ink-soft); font-weight:600;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+}
+
+@media (max-width:900px){
+  .hero-photo{ position:static; width:100%; aspect-ratio:4/3; max-height:none; margin:20px 0 0; border-radius:20px; }
+  .hero-badge-float{ display:none; }
+  .hero-content-v2{ max-width:100%; }
+  .hero-content-v2 h1{ font-size:clamp(24px, 6.5vw, 34px); }
+  .hero-search-card{ max-width:100%; }
+  .hero-content-v2 .hero-split{ justify-content:center; }
+}
 
 /* ===== SECTION GENERIC ===== */
 section{padding:76px 0;}
@@ -360,48 +433,87 @@ footer{padding:64px 0 32px;}
 
 <!-- HERO -->
 <section class="hero" id="inicio">
-  <div class="hero-bg"></div>
-  <div class="wrap hero-inner">
-    <span class="eyebrow-badge"><span class="pulse"></span> <span id="heroStatsText">Carregando…</span></span>
-    <h1>Compre de qualquer lugar<br>com quem já está <span class="hl">viajando</span>.</h1>
-    <p class="sub">Encontre viajantes com espaço disponível na bagagem ou aproveite sua próxima viagem para ganhar uma renda extra.</p>
-    <div class="hero-ctas">
-      <a href="ideal-buscar-viagens.html" class="btn btn-primary">Encontrar viajantes</a>
-      <a href="ideal-anunciar-viagem.html" class="btn btn-dark">Anunciar minha viagem</a>
+  <div class="hero-photo">
+    <img src="assets/hero-desktop.jpg" alt="Viajante entregando uma encomenda a uma compradora na rua, placa da loja iDeal ao fundo">
+    <div class="hero-badge-float">
+      <div class="ic-round">✈️</div>
+      <div><b>Transforme sua viagem</b><span>Espaço na mala pode ser a oportunidade de alguém.</span></div>
     </div>
+  </div>
 
-    <div class="ticket">
-      <div class="ticket-main">
-        <div class="ticket-field">
-          <label>De onde?</label>
-          <input type="text" placeholder="Cidade ou país de origem">
+  <div class="wrap">
+    <div class="hero-content-v2">
+      <h1>Compre de qualquer lugar<br>com quem já está<br><span class="hl">viajando</span>.</h1>
+      <p class="sub">Encontre viajantes com espaço disponível na bagagem ou aproveite sua próxima viagem para ganhar uma renda extra.</p>
+
+      <div class="hero-search-card">
+        <h3>Encontre viajantes disponíveis</h3>
+        <div class="hsc-sub">Origem, destino e o que você precisa enviar.</div>
+
+        <div class="hsc-field">
+          <label for="heroOrigin">Origem do produto</label>
+          <input type="text" id="heroOrigin" placeholder="De onde ele vem?">
         </div>
-        <div class="ticket-field">
-          <label>Para onde?</label>
-          <input type="text" placeholder="Cidade de destino">
+        <div class="hsc-row">
+          <div class="hsc-field">
+            <label for="heroDestination">Destino da entrega</label>
+            <input type="text" id="heroDestination" placeholder="Sua cidade">
+          </div>
+          <div class="hsc-field">
+            <label for="heroDate">Data desejada</label>
+            <input type="text" id="heroDate" placeholder="Qualquer data">
+          </div>
         </div>
-        <div class="ticket-field">
-          <label>Data aproximada</label>
-          <input type="text" placeholder="Qualquer data">
-        </div>
-        <div class="ticket-field">
-          <label>Categoria</label>
-          <select>
-            <option>Todas</option>
+        <div class="hsc-field">
+          <label for="heroCategory">Tipo de produto</label>
+          <select id="heroCategory">
+            <option value="">Todos os tipos</option>
             <option>Eletrônicos</option>
             <option>Tênis</option>
             <option>Cosméticos</option>
+            <option>Games</option>
+            <option>Roupas</option>
           </select>
         </div>
+        <button class="btn btn-primary hsc-btn" id="heroSearchBtn">🔍 Buscar oportunidades</button>
       </div>
-      <div class="ticket-stub">
-        <button class="btn btn-primary">Buscar viagens</button>
+
+      <div class="hero-split">
+        <a href="ideal-buscar-viagens.html" class="split-card a"><span class="ic">🛍️</span> Preciso transportar ou comprar algo</a>
+        <a href="ideal-anunciar-viagem.html" class="split-card b"><span class="ic">🧳</span> Tenho espaço disponível</a>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="hero-split">
-      <a href="ideal-buscar-viagens.html" class="split-card a"><span class="ic">🛍️</span> Preciso transportar ou comprar algo</a>
-      <a href="ideal-anunciar-viagem.html" class="split-card b"><span class="ic">🧳</span> Tenho espaço disponível</a>
+<!-- COMPARAÇÃO -->
+<section style="padding-top:20px;">
+  <div class="wrap">
+    <div class="section-head center reveal" style="margin-left:auto; margin-right:auto;">
+      <span class="kicker">A diferença é clara</span>
+      <h2>Por que escolher a iDeal</h2>
+    </div>
+    <div style="max-width:760px; margin:0 auto; background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow-lg); overflow:hidden;" class="reveal">
+      <div style="display:grid; grid-template-columns:1fr 1fr;">
+        <div style="padding:20px 24px; background:var(--bg); border-right:1px solid var(--line); text-align:center; font-weight:700; color:var(--ink-soft); font-size:14px;">Compra tradicional</div>
+        <div style="padding:20px 24px; background:var(--navy); text-align:center; font-weight:700; color:#fff; font-size:14px;">Com a iDeal</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; border-top:1px solid var(--line);">
+        <div style="padding:18px 24px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); font-size:14px; color:var(--ink-soft);">📦 Frete internacional caro</div>
+        <div style="padding:18px 24px; border-bottom:1px solid var(--line); font-size:14px; font-weight:600;">🧳 Entrega por quem já está viajando</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr;">
+        <div style="padding:18px 24px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); font-size:14px; color:var(--ink-soft);">⏳ Prazo de semanas, às vezes meses</div>
+        <div style="padding:18px 24px; border-bottom:1px solid var(--line); font-size:14px; font-weight:600;">⚡ Em poucos dias, conforme a viagem</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr;">
+        <div style="padding:18px 24px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); font-size:14px; color:var(--ink-soft);">💸 Taxas e intermediários</div>
+        <div style="padding:18px 24px; border-bottom:1px solid var(--line); font-size:14px; font-weight:600;">🤝 Negociação direta com o viajante</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr;">
+        <div style="padding:18px 24px; border-right:1px solid var(--line); font-size:14px; color:var(--ink-soft);">📮 Rastreamento limitado</div>
+        <div style="padding:18px 24px; font-size:14px; font-weight:600;">💬 Contato direto com quem está trazendo</div>
+      </div>
     </div>
   </div>
 </section>
@@ -547,28 +659,28 @@ footer{padding:64px 0 32px;}
         <a href="#" class="logo"><span class="dot"></span>iDeal</a>
         <p>Conectamos viajantes com espaço disponível a pessoas que querem comprar de qualquer lugar do mundo.</p>
       </div>
-      <div>
+     <div>
         <h5>Plataforma</h5>
         <ul>
-          <li><a href="#">Sobre a iDeal</a></li>
-          <li><a href="#">Como funciona</a></li>
-          <li><a href="#">Central de ajuda</a></li>
-          <li><a href="#">Contato</a></li>
+          <li><a href="ideal-sobre.html">Sobre a iDeal</a></li>
+          <li><a href="#como-funciona">Como funciona</a></li>
+          <li><a href="ideal-central-ajuda.html">Central de ajuda</a></li>
+          <li><a href="ideal-contato.html">Contato</a></li>
         </ul>
       </div>
       <div>
         <h5>Confiança</h5>
         <ul>
-          <li><a href="#">Segurança</a></li>
-          <li><a href="#">Produtos proibidos</a></li>
-          <li><a href="#">Sistema de denúncias</a></li>
+          <li><a href="ideal-homepage.html#como-funciona">Segurança</a></li>
+          <li><a href="ideal-produtos-proibidos.html">Produtos proibidos</a></li>
+          <li><a href="ideal-sistema-denuncias.html">Sistema de denúncias</a></li>
         </ul>
       </div>
       <div>
         <h5>Legal</h5>
         <ul>
-          <li><a href="#">Termos de uso</a></li>
-          <li><a href="#">Política de privacidade</a></li>
+          <li><a href="ideal-termos.html">Termos de uso</a></li>
+          <li><a href="ideal-privacidade.html">Política de privacidade</a></li>
         </ul>
       </div>
       <div>
@@ -752,6 +864,17 @@ renderOrigins();
 renderRoutes();
 renderTrending();
 renderUpcomingTrips();
+
+document.getElementById('heroSearchBtn').addEventListener('click', () => {
+  const params = new URLSearchParams();
+  const origin = document.getElementById('heroOrigin').value.trim();
+  const destination = document.getElementById('heroDestination').value.trim();
+  const category = document.getElementById('heroCategory').value;
+  if (origin) params.set('origem', origin);
+  if (destination) params.set('destino', destination);
+  if (category) params.set('categoria', category);
+  window.location.href = 'ideal-buscar-viagens.html' + (params.toString() ? '?' + params.toString() : '');
+});
 </script>
 </body>
 </html>
