@@ -694,10 +694,15 @@ loadDashboard().then(loadNotifications);
 
 async function loadMyOffers() {
   const grid = document.getElementById('myOffersGrid');
+  const user = currentUser || await idealGetCurrentUser();
+  if (!user) {
+    grid.innerHTML = `<p style="color:var(--ink-soft); font-size:14px;">Não foi possível carregar seus anúncios.</p>`;
+    return;
+  }
   const { data: offers } = await idealSupabase
     .from('traveler_offers')
     .select('*, trip:trip_id(origin_city, destination_city, departure_date)')
-    .eq('traveler_id', currentUser.id)
+    .eq('traveler_id', user.id)
     .order('created_at', { ascending: false });
 
   const list = offers || [];
