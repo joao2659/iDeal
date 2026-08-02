@@ -467,10 +467,6 @@ function validateStep(step) {
     }
   }
   if (step === 4) {
-    if (!document.querySelectorAll('#categoryChips .chip.selected').length) {
-      alert('Selecione ao menos uma categoria aceita.');
-      return false;
-    }
     if (!document.querySelector('#rewardTypeRow .reward-type.selected')) {
       alert('Selecione o tipo de recompensa.');
       return false;
