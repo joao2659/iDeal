@@ -355,7 +355,7 @@ const { data: myReviewsRaw } = await idealSupabase
     reqList.innerHTML = requests.map(r => `
       <div class="req-row">
         <div class="req-thumb">📦</div>
-        <div><div class="req-name">${r.product_name||'Produto'}</div><div class="req-sub">${r.delivery_city||''}</div></div>
+        <div><div class="req-name">${idealEscapeHtml(r.product_name)||'Produto'}</div><div class="req-sub">${idealEscapeHtml(r.delivery_city)||''}</div></div>
         <div class="req-sub">Recompensa: <b>R$ ${r.offered_reward||0}</b></div>
         <span class="req-status ${r.request_status}">${STATUS_LABELS[r.request_status]||r.request_status}</span>
         <a href="#" class="btn btn-ghost" style="padding:8px 16px; font-size:13px;" onclick="openRequestModal('${r.id}'); return false;">Ver</a>
