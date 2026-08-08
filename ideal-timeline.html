@@ -169,7 +169,7 @@ async function renderOffers() {
   const grid = document.getElementById('offersGrid');
   const { data: offers, error } = await idealSupabase
     .from('traveler_offers')
-    .select('*, traveler:traveler_id(first_name, last_name), trip:trip_id(origin_city, destination_city, departure_date)')
+    .select('*, trip:trip_id(origin_city, destination_city, departure_date)')
     .eq('offer_status', 'disponivel')
     .order('created_at', { ascending: false });
 
@@ -178,7 +178,14 @@ async function renderOffers() {
     return;
   }
 
-  const list = offers || [];
+  let list = offers || [];
+  if (list.length) {
+    const travelerIds = [...new Set(list.map(o => o.traveler_id))];
+    const { data: travelers } = await idealSupabase
+      .from('profiles_public').select('id, first_name, last_name').in('id', travelerIds);
+    const travelerMap = Object.fromEntries((travelers || []).map(t => [t.id, t]));
+    list = list.map(o => ({ ...o, traveler: travelerMap[o.traveler_id] || null }));
+  }
   if (!list.length) {
     grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px 20px; background:var(--paper); border:1px dashed var(--line); border-radius:16px;">
       <p style="color:var(--ink-soft); font-size:15px; margin-bottom:16px;">Nenhum anúncio disponível no momento.</p>
@@ -192,12 +199,12 @@ async function renderOffers() {
     const photoUrl = o.photo_url ? idealSupabase.storage.from('offer-photos').getPublicUrl(o.photo_url).data.publicUrl : null;
     return `
       <div class="offer-card">
-        <div class="offer-photo">${photoUrl ? `<img src="${photoUrl}" alt="${o.product_name}">` : '📦'}</div>
+        <div class="offer-photo">${photoUrl ? `<img src="${photoUrl}" alt="${idealEscapeHtml(o.product_name)}">` : '📦'}</div>
         <div class="offer-body">
-          <div class="offer-title">${o.product_name}</div>
-          <div class="offer-desc">${o.description || ''}</div>
+          <div class="offer-title">${idealEscapeHtml(o.product_name)}</div>
+          <div class="offer-desc">${idealEscapeHtml(o.description)||''}</div>
           <div class="offer-route">${o.trip ? (o.trip.origin_city||'')+' → '+(o.trip.destination_city||'') : ''} · Chega ${idealFormatDateShort(o.trip?.departure_date)}</div>
-          <div class="offer-traveler"><div class="avatar-sm">${idealInitial(name)}</div><span>${name} ${o.traveler?.last_name||''}</span></div>
+          <div class="offer-traveler"><div class="avatar-sm">${idealInitial(name)}</div><span>${idealEscapeHtml(name)} ${idealEscapeHtml(o.traveler?.last_name)||''}</span></div>
           <div class="offer-price"><span>PREÇO ESTIMADO</span><b>R$ ${o.price||0}</b></div>
           <button class="btn btn-primary" onclick='openInterestModal(${JSON.stringify(o).replace(/'/g,"&apos;")})'>Tenho interesse</button>
         </div>
