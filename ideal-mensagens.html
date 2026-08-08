@@ -208,9 +208,9 @@ async function loadConversations() {
   const { data: myProfile } = await idealSupabase.from('profiles').select('first_name').eq('id', currentUser.id).single();
   document.getElementById('navAvatar').textContent = idealInitial(myProfile?.first_name || '?');
 
-  const { data: requests } = await idealSupabase
+ const { data: requests } = await idealSupabase
     .from('requests')
-    .select('*, conversation:conversations(id), buyer:buyer_id(first_name), traveler:traveler_id(first_name), trip:trip_id(origin_city, destination_city, departure_date)')
+    .select('*, conversation:conversations(id), trip:trip_id(origin_city, destination_city, departure_date)')
     .or(`buyer_id.eq.${currentUser.id},traveler_id.eq.${currentUser.id}`)
     .order('created_at', { ascending: false });
 
@@ -221,6 +221,15 @@ async function loadConversations() {
     container.innerHTML = `<p style="color:var(--ink-soft); font-size:13.5px; padding:24px; text-align:center;">Nenhuma conversa ainda. Elas aparecem aqui quando você envia ou recebe uma solicitação.</p>`;
     return;
   }
+
+  const userIds = [...new Set(withConv.flatMap(r => [r.buyer_id, r.traveler_id]))];
+  const { data: profilesData } = await idealSupabase
+    .from('profiles_public').select('id, first_name').in('id', userIds);
+  const profileMap = Object.fromEntries((profilesData || []).map(p => [p.id, p]));
+  withConv.forEach(r => {
+    r.buyer = profileMap[r.buyer_id] || null;
+    r.traveler = profileMap[r.traveler_id] || null;
+  });
 
   container.innerHTML = withConv.map(r => {
     const isBuyer = r.buyer_id === currentUser.id;
@@ -289,6 +298,12 @@ async function loadMessages() {
   renderMessages(messages || []);
 }
 
+function idealEscapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
 function renderMessages(messages) {
   const area = document.getElementById('messagesArea');
   if (!messages.length) {
@@ -301,7 +316,7 @@ function renderMessages(messages) {
       <div class="msg-row ${mine ? 'mine' : ''}">
         <div class="msg-avatar">${mine ? idealInitial('Você') : '?'}</div>
         <div>
-          <div class="msg-bubble">${m.message_text}</div>
+          <div class="msg-bubble">${idealEscapeHtml(m.message_text)}</div>
           <span class="msg-time">${formatTime(m.created_at)}</span>
         </div>
       </div>
