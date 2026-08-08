@@ -4,13 +4,11 @@
    Requer que assets/supabase-client.js já tenha sido carregado antes.
    ========================================================================= */
 
-// Busca viagens ativas e aprovadas, com dados do viajante (join com profiles)
+// Busca viagens ativas e aprovadas, com dados do viajante (via profiles_public)
 async function idealFetchActiveTrips(limit = 24) {
   const { data, error } = await idealSupabase
     .from("trips")
-    .select(
-      "*, traveler:traveler_id ( first_name, last_name, average_rating, identity_verified, completed_trips_count )"
-    )
+    .select("*")
     .eq("approval_status", "aprovada")
     .eq("trip_status", "ativa")
     .order("departure_date", { ascending: true })
@@ -20,9 +18,21 @@ async function idealFetchActiveTrips(limit = 24) {
     console.error("Erro ao buscar viagens:", error);
     return [];
   }
-  return data || [];
-}
 
+  const trips = data || [];
+  if (!trips.length) return trips;
+
+  const travelerIds = [...new Set(trips.map((t) => t.traveler_id).filter(Boolean))];
+  const { data: travelers } = await idealSupabase
+    .from("profiles_public")
+    .select("id, first_name, last_name, average_rating, identity_verified, completed_trips_count")
+    .in("id", travelerIds);
+
+  const travelerMap = Object.fromEntries((travelers || []).map((tv) => [tv.id, tv]));
+  trips.forEach((t) => { t.traveler = travelerMap[t.traveler_id] || null; });
+
+  return trips;
+}
 // Agrupa viagens ativas por país de origem (para "De onde você quer comprar?")
 async function idealFetchOriginSummary() {
   const trips = await idealFetchActiveTrips(300);
@@ -91,7 +101,7 @@ async function idealFetchNationalRoutes() {
 // Estatísticas gerais da plataforma (pra badge do hero etc.)
 async function idealFetchPlatformStats() {
   const [{ count: travelerCount }, { count: tripCount }] = await Promise.all([
-    idealSupabase.from("profiles").select("*", { count: "exact", head: true }),
+    idealSupabase.from("profiles_public").select("*", { count: "exact", head: true }),
     idealSupabase
       .from("trips")
       .select("*", { count: "exact", head: true })
