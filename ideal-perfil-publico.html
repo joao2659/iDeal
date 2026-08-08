@@ -210,8 +210,8 @@ async function loadProfile() {
     return;
   }
 
-  const { data: p, error } = await idealSupabase
-    .from('profiles')
+const { data: p, error } = await idealSupabase
+    .from('profiles_public')
     .select('*')
     .eq('id', profileUserId)
     .single();
@@ -269,10 +269,19 @@ async function loadProfile() {
     `).join('');
   }
 
-  // Avaliações
-  const { data: reviews } = await idealSupabase
-    .from('reviews').select('*, author:author_id(first_name)')
+ // Avaliações
+  const { data: reviewsRaw } = await idealSupabase
+    .from('reviews').select('*')
     .eq('reviewed_user_id', profileUserId).order('created_at', { ascending: false }).limit(10);
+
+  let reviews = reviewsRaw || [];
+  if (reviews.length) {
+    const authorIds = [...new Set(reviews.map(r => r.author_id))];
+    const { data: authors } = await idealSupabase
+      .from('profiles_public').select('id, first_name').in('id', authorIds);
+    const authorMap = Object.fromEntries((authors || []).map(a => [a.id, a]));
+    reviews = reviews.map(r => ({ ...r, author: authorMap[r.author_id] || null }));
+  }
 
   document.getElementById('statReviews').textContent = reviews?.length || 0;
   document.getElementById('reviewsCount').textContent = `(${reviews?.length || 0})`;
