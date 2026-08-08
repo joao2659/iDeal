@@ -255,9 +255,9 @@ async function loadTripContext() {
     return;
   }
 
-  const { data: t, error } = await idealSupabase
+ const { data: t, error } = await idealSupabase
     .from('trips')
-    .select('*, traveler:traveler_id(first_name, last_name)')
+    .select('*')
     .eq('id', tripId)
     .single();
 
@@ -267,6 +267,10 @@ async function loadTripContext() {
     return;
   }
 
+  const { data: travelerProfile } = await idealSupabase
+    .from('profiles_public').select('first_name, last_name').eq('id', t.traveler_id).single();
+  t.traveler = travelerProfile || null;
+
   currentTrip = t;
   const name = t.traveler?.first_name || 'Viajante';
 
@@ -274,7 +278,7 @@ async function loadTripContext() {
     <div class="avatar-sm">${idealInitial(name)}</div>
     <div>
       <div class="route">${(t.origin_city||'').slice(0,3).toUpperCase()} → ${(t.destination_city||'').slice(0,3).toUpperCase()}</div>
-      <div class="meta">${name}</div>
+      <div class="meta">${idealEscapeHtml(name)}</div>
     </div>
     <div class="divider"></div>
     <div class="meta">Embarque ${idealFormatDateShort(t.departure_date)} · Espaço disponível: ${t.available_weight||0} kg</div>
