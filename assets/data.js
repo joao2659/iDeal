@@ -137,3 +137,9 @@ function idealTierBadgeHtml(completedTrips) {
   const tier = idealGetTier(completedTrips);
   return `<span style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:999px; background:${tier.bg}; color:${tier.color};">${tier.icon} ${tier.name}</span>`;
 }
+// Protege texto digitado por usuário antes de inserir na página (previne XSS)
+function idealEscapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
