@@ -22,11 +22,12 @@ const idealSupabase = window.supabase.createClient(
    ------------------------------------------------------------------------- */
 
 // Cria uma conta nova (login) + a linha correspondente em "profiles"
-async function idealSignUp({ email, password, firstName, lastName }) {
+async function idealSignUp({ email, password, firstName, lastName, captchaToken }) {
   try {
     const { data, error } = await idealSupabase.auth.signUp({
       email,
       password,
+      options: { captchaToken },
     });
     if (error) return { error };
 
