@@ -11,13 +11,10 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
-       // Cria uma conta nova (login) + a linha correspondente em "profiles"
-async function idealSignUp({ email, password, firstName, lastName }) {
-  try {
-    const { data, error } = await idealSupabase.auth.signUp({
-      email,
-      password,
-    });
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://servicodados.ibge.gov.br https://countriesnow.space https://www.google-analytics.com https://region1.google-analytics.com https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'none';"
+        }
       ]
     }
   ]
