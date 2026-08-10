@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
 :root{
   --bg:#F6F7FA; --paper:#FFFFFF; --navy:#131B3A; --coral:#FF5A3C; --coral-dark:#E8432A;
@@ -53,7 +54,8 @@ button:disabled{opacity:.6; cursor:not-allowed;}
       <div class="field"><label>Sobrenome</label><input type="text" id="lastName" required></div>
     </div>
     <div class="field"><label>E-mail</label><input type="email" id="email" required></div>
-    <div class="field"><label>Senha</label><input type="password" id="password" minlength="6" required></div>
+   <div class="field"><label>Senha</label><input type="password" id="password" minlength="6" required></div>
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAEKkPydyKUfi21ac" style="margin-bottom:14px;"></div>
     <button type="submit" id="submitBtn">Criar conta</button>
   </form>
 
@@ -72,12 +74,22 @@ form.addEventListener('submit', async (e) => {
   submitBtn.textContent = 'Criando conta...';
   msgBox.className = 'msg';
 
+  const captchaToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+  if (!captchaToken) {
+    msgBox.className = 'msg error';
+    msgBox.textContent = 'Confirme que você não é um robô antes de continuar.';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Criar conta';
+    return;
+  }
+
   try {
     const result = await idealSignUp({
       email: document.getElementById('email').value,
       password: document.getElementById('password').value,
       firstName: document.getElementById('firstName').value,
       lastName: document.getElementById('lastName').value,
+      captchaToken,
     });
 
     if (result.error) {
