@@ -4,7 +4,6 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // 1) Confirma que quem está chamando está logado de verdade
   const authHeader = req.headers['authorization'] || '';
   const token = authHeader.replace('Bearer ', '');
   if (!token) {
@@ -44,19 +43,16 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // 2) Confirma que quem está pagando é realmente o comprador dessa solicitação
     if (requestRow.buyer_id !== userData.id) {
       res.status(403).json({ error: 'Você não tem permissão para pagar esta solicitação' });
       return;
     }
 
-    // 3) Só permite pagar solicitações já aceitas pelo viajante
     if (requestRow.request_status !== 'aceita') {
       res.status(400).json({ error: 'Esta solicitação ainda não foi aceita pelo viajante' });
       return;
     }
 
-    // 4) Evita gerar cobrança duplicada se já existe um pagamento em andamento/concluído
     const existingRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/payments?request_id=eq.${request_id}&select=payment_status`, { headers: supaHeaders });
     const existingRows = await existingRes.json();
     if (existingRows.some(p => p.payment_status === 'liberado' || p.payment_status === 'pendente')) {
