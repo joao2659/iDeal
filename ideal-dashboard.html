@@ -581,9 +581,15 @@ async function payRequest(requestId) {
   btn.textContent = 'Gerando pagamento…';
 
   try {
+    const { data: sessionData } = await idealSupabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
+
     const res = await fetch('/api/create-payment', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
       body: JSON.stringify({ request_id: requestId })
     });
     const data = await res.json();
