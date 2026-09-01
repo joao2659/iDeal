@@ -1,0 +1,174 @@
+<!--
+  ============================================================
+  COMO USAR ESTE ARQUIVO
+  ============================================================
+  Este é um arquivo COMPLETO e novo. No GitHub, crie um arquivo
+  chamado exatamente:  ideal-redefinir-senha.html
+  (na mesma pasta onde estão os outros arquivos, tipo
+  ideal-login.html, ideal-homepage.html etc.)
+  e cole todo esse conteúdo dentro.
+
+  Antes de salvar, procure a linha marcada com "PREENCHER AQUI"
+  mais abaixo e coloque a URL e a chave (anon key) do seu
+  projeto Supabase — as mesmas que você já usa em
+  ideal-login.html. É só copiar de lá.
+  ============================================================
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Redefinir senha — iDeal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f7f7f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .card {
+    background: #fff;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    padding: 32px 28px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  }
+  h1 {
+    font-size: 22px;
+    color: #1a2b4a;
+    margin: 0 0 8px;
+  }
+  p.subtitulo {
+    color: #666;
+    font-size: 14px;
+    margin: 0 0 24px;
+    line-height: 1.4;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+  button {
+    width: 100%;
+    padding: 13px;
+    background: #FF6B4A;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  #mensagem {
+    font-size: 14px;
+    margin-bottom: 16px;
+    min-height: 18px;
+  }
+  a.voltar {
+    display: block;
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+    color: #1a2b4a;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Criar nova senha</h1>
+  <p class="subtitulo">Digite a nova senha da sua conta iDeal.</p>
+
+  <div id="areaFormulario">
+    <label for="novaSenha">Nova senha</label>
+    <input id="novaSenha" type="password" placeholder="Mínimo 6 caracteres" />
+
+    <label for="confirmarSenha">Confirmar nova senha</label>
+    <input id="confirmarSenha" type="password" placeholder="Digite novamente" />
+
+    <div id="mensagem"></div>
+
+    <button id="btnSalvar" onclick="salvarNovaSenha()">Salvar nova senha</button>
+  </div>
+
+  <a class="voltar" href="ideal-entrar.html">Voltar para o login</a>
+</div>
+
+<script>
+  // ================== PREENCHER AQUI ==================
+  // Troque pelos valores do SEU projeto Supabase (os mesmos
+  // que já estão em ideal-entrar.html)
+  const SUPABASE_URL = 'https://SEU-PROJETO.supabase.co';
+  const SUPABASE_ANON_KEY = 'SUA-CHAVE-ANON-AQUI';
+  // ======================================================
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function salvarNovaSenha() {
+    const novaSenha = document.getElementById('novaSenha').value;
+    const confirmarSenha = document.getElementById('confirmarSenha').value;
+    const mensagemEl = document.getElementById('mensagem');
+    const botao = document.getElementById('btnSalvar');
+
+    mensagemEl.textContent = '';
+
+    if (!novaSenha || novaSenha.length < 6) {
+      mensagemEl.style.color = '#d33';
+      mensagemEl.textContent = 'A senha precisa ter pelo menos 6 caracteres.';
+      return;
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      mensagemEl.style.color = '#d33';
+      mensagemEl.textContent = 'As senhas não coincidem.';
+      return;
+    }
+
+    botao.disabled = true;
+    botao.textContent = 'Salvando...';
+
+    const { error } = await supabase.auth.updateUser({ password: novaSenha });
+
+    botao.disabled = false;
+    botao.textContent = 'Salvar nova senha';
+
+    if (error) {
+      mensagemEl.style.color = '#d33';
+      mensagemEl.textContent = 'Não foi possível salvar. O link pode ter expirado — solicite um novo na tela de login.';
+      console.error(error);
+      return;
+    }
+
+    document.getElementById('areaFormulario').innerHTML =
+      '<p style="color:#2a8f4f; font-size:15px; line-height:1.5;">' +
+      'Senha alterada com sucesso! Você já pode fazer login com a senha nova.' +
+      '</p>';
+  }
+</script>
+
+</body>
+</html>
