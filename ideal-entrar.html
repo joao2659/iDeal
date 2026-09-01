@@ -49,10 +49,27 @@ button:disabled{opacity:.6; cursor:not-allowed;}
   <form id="loginForm">
     <div class="field"><label>E-mail</label><input type="email" id="email" required></div>
     <div class="field"><label>Senha</label><input type="password" id="password" required></div>
+
+    <div style="text-align:right; margin-bottom:8px;">
+      <a href="#" onclick="abrirModalEsqueciSenha(); return false;" style="font-size:13px;">Esqueceu a senha?</a>
+    </div>
+
     <button type="submit" id="submitBtn">Entrar</button>
   </form>
 
   <div class="footer-link">Ainda não tem conta? <a href="ideal-criar-conta.html">Criar conta</a></div>
+</div>
+
+<!-- Modal "Esqueceu a senha?" -->
+<div id="modalEsqueciSenha" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(19,27,58,0.5); z-index:9999; align-items:center; justify-content:center; padding:24px;">
+  <div class="card" style="max-width:380px;">
+    <h1 style="text-align:center; font-size:20px;">Recuperar senha</h1>
+    <p class="sub" style="text-align:center;">Digite o e-mail da sua conta. Vamos te enviar um link para criar uma senha nova.</p>
+    <div class="msg" id="msgBoxRecuperacao"></div>
+    <div class="field"><label>E-mail</label><input type="email" id="emailRecuperacao" required></div>
+    <button onclick="enviarEmailRecuperacao()" id="btnRecuperacao">Enviar link de recuperação</button>
+    <div class="footer-link"><a href="#" onclick="fecharModalEsqueciSenha(); return false;">Cancelar</a></div>
+  </div>
 </div>
 
 <script src="assets/supabase-client.js"></script>
@@ -92,6 +109,48 @@ form.addEventListener('submit', async (e) => {
     submitBtn.textContent = 'Entrar';
   }
 });
+
+function abrirModalEsqueciSenha() {
+  document.getElementById('modalEsqueciSenha').style.display = 'flex';
+  document.getElementById('msgBoxRecuperacao').className = 'msg';
+  document.getElementById('emailRecuperacao').value = '';
+}
+
+function fecharModalEsqueciSenha() {
+  document.getElementById('modalEsqueciSenha').style.display = 'none';
+}
+
+async function enviarEmailRecuperacao() {
+  const email = document.getElementById('emailRecuperacao').value.trim();
+  const msgEl = document.getElementById('msgBoxRecuperacao');
+  const btn = document.getElementById('btnRecuperacao');
+
+  if (!email) {
+    msgEl.className = 'msg error';
+    msgEl.textContent = 'Digite um e-mail válido.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://www.viajaideal.com.br/ideal-redefinir-senha.html'
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Enviar link de recuperação';
+
+  if (error) {
+    msgEl.className = 'msg error';
+    msgEl.textContent = 'Não foi possível enviar o e-mail. Tente novamente.';
+    console.error(error);
+    return;
+  }
+
+  msgEl.className = 'msg success';
+  msgEl.textContent = 'E-mail enviado! Confira sua caixa de entrada (e o spam).';
+}
 </script>
 </body>
 </html>
