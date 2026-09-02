@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
 :root{
   --bg:#F6F7FA; --paper:#FFFFFF; --navy:#131B3A; --coral:#FF5A3C; --coral-dark:#E8432A;
@@ -67,6 +68,7 @@ button:disabled{opacity:.6; cursor:not-allowed;}
     <p class="sub" style="text-align:center;">Digite o e-mail da sua conta. Vamos te enviar um link para criar uma senha nova.</p>
     <div class="msg" id="msgBoxRecuperacao"></div>
     <div class="field"><label>E-mail</label><input type="email" id="emailRecuperacao" required></div>
+    <div class="cf-turnstile" id="turnstileRecuperacao" data-sitekey="0x4AAAAAAEKkPydyKUfi21ac" style="margin-bottom:14px;"></div>
     <button onclick="enviarEmailRecuperacao()" id="btnRecuperacao">Enviar link de recuperação</button>
     <div class="footer-link"><a href="#" onclick="fecharModalEsqueciSenha(); return false;">Cancelar</a></div>
   </div>
@@ -124,6 +126,7 @@ async function enviarEmailRecuperacao() {
   const email = document.getElementById('emailRecuperacao').value.trim();
   const msgEl = document.getElementById('msgBoxRecuperacao');
   const btn = document.getElementById('btnRecuperacao');
+  const captchaToken = document.querySelector('#turnstileRecuperacao [name="cf-turnstile-response"]')?.value;
 
   if (!email) {
     msgEl.className = 'msg error';
@@ -131,15 +134,26 @@ async function enviarEmailRecuperacao() {
     return;
   }
 
+  if (!captchaToken) {
+    msgEl.className = 'msg error';
+    msgEl.textContent = 'Confirme que você não é um robô.';
+    return;
+  }
+
   btn.disabled = true;
   btn.textContent = 'Enviando...';
 
   const { error } = await idealSupabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://www.viajaideal.com.br/ideal-redefinir-senha.html'
+    redirectTo: 'https://www.viajaideal.com.br/ideal-redefinir-senha.html',
+    captchaToken
   });
 
   btn.disabled = false;
   btn.textContent = 'Enviar link de recuperação';
+
+  if (window.turnstile) {
+    window.turnstile.reset('#turnstileRecuperacao');
+  }
 
   if (error) {
     msgEl.className = 'msg error';
