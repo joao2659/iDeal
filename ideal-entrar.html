@@ -134,7 +134,7 @@ async function enviarEmailRecuperacao() {
   btn.disabled = true;
   btn.textContent = 'Enviando...';
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await idealSupabase.auth.resetPasswordForEmail(email, {
     redirectTo: 'https://www.viajaideal.com.br/ideal-redefinir-senha.html'
   });
 
