@@ -50,6 +50,7 @@ button:disabled{opacity:.6; cursor:not-allowed;}
   <form id="loginForm">
     <div class="field"><label>E-mail</label><input type="email" id="email" required></div>
     <div class="field"><label>Senha</label><input type="password" id="password" required></div>
+    <div class="cf-turnstile" id="turnstileLogin" data-sitekey="0x4AAAAAAEKkPydyKUfi21ac" style="margin-bottom:14px;"></div>
 
     <div style="text-align:right; margin-bottom:8px;">
       <a href="#" onclick="abrirModalEsqueciSenha(); return false;" style="font-size:13px;">Esqueceu a senha?</a>
@@ -87,9 +88,11 @@ form.addEventListener('submit', async (e) => {
   msgBox.className = 'msg';
 
   try {
+       const captchaToken = document.querySelector('#turnstileLogin [name="cf-turnstile-response"]')?.value;
     const { error } = await idealSignIn({
       email: document.getElementById('email').value,
       password: document.getElementById('password').value,
+      captchaToken,
     });
 
     if (error) {
