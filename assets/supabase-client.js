@@ -55,11 +55,12 @@ async function idealSignUp({ email, password, firstName, lastName, captchaToken 
 }
 
 // Login
-async function idealSignIn({ email, password }) {
+async function idealSignIn({ email, password, captchaToken }) {
   try {
     const { data, error } = await idealSupabase.auth.signInWithPassword({
       email,
       password,
+      options: { captchaToken },
     });
     return { data, error };
   } catch (err) {
