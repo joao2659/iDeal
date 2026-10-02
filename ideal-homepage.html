@@ -199,7 +199,17 @@ header.nav{
 .hero-search-card h3{font-size:20px; font-weight:700; margin-bottom:6px;}
 .hsc-sub{font-size:13.5px; color:var(--ink-soft); margin-bottom:18px; line-height:1.5;}
 .hsc-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-.hsc-field{ border:1px solid var(--line); border-radius:14px; padding:10px 14px; background:rgba(246,247,250,.75); margin-bottom:10px; }
+.hsc-field{ border:1px solid var(--line); border-radius:14px; padding:10px 14px; background:rgba(246,247,250,.75); margin-bottom:10px; position:relative; }
+.ideal-suggestions{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:50;
+  background:#fff; border:1px solid var(--line); border-radius:14px;
+  box-shadow:var(--shadow-lg); overflow:hidden; display:none;
+}
+.ideal-suggestions.show{display:block;}
+.ideal-suggestions div{
+  padding:10px 14px; font-size:13.5px; font-weight:600; color:var(--navy); cursor:pointer;
+}
+.ideal-suggestions div:hover{background:var(--bg);}
 .hsc-field label{display:block; font-size:11px; font-weight:700; color:var(--navy-2); text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px;}
 .hsc-field input, .hsc-field select{ border:none; background:transparent; width:100%; font-weight:600; font-size:13.5px; color:var(--navy); padding:0; font-family:'Inter',sans-serif; }
 .hsc-field input:focus, .hsc-field select:focus{outline:none;}
@@ -446,21 +456,23 @@ footer{padding:64px 0 32px;}
 
   <div class="wrap">
     <div class="hero-content-v2">
-      <h1>Compre de qualquer lugar<br>com quem já está<br><span class="hl">viajando</span>.</h1>
-      <p class="sub">Compre produtos de qualquer lugar do mundo usando o espaço na bagagem de quem já está viajando — ou transforme o espaço livre na sua mala em uma renda extra.</p>
+           <h1>Sem frete caro.<br>Sem taxa de<br><span class="hl">importação surpresa.</span></h1>
+      <p class="sub">Compre de qualquer lugar do mundo direto com quem já está viajando pra lá — ou transforme o espaço livre na sua mala em uma renda extra.</p>
 
       <div class="hero-search-card">
         <h3>Encontre viajantes disponíveis</h3>
         <div class="hsc-sub">Origem, destino e o que você precisa enviar.</div>
 
-        <div class="hsc-field">
+              <div class="hsc-field">
           <label for="heroOrigin">Origem do produto</label>
-          <input type="text" id="heroOrigin" placeholder="De onde ele vem?">
+          <input type="text" id="heroOrigin" placeholder="De onde ele vem?" autocomplete="off">
+          <div class="ideal-suggestions" id="heroOriginSuggestions"></div>
         </div>
         <div class="hsc-row">
           <div class="hsc-field">
             <label for="heroDestination">Destino da entrega</label>
-            <input type="text" id="heroDestination" placeholder="Sua cidade">
+            <input type="text" id="heroDestination" placeholder="Sua cidade" autocomplete="off">
+            <div class="ideal-suggestions" id="heroDestinationSuggestions"></div>
           </div>
           <div class="hsc-field">
             <label for="heroDate">Data desejada</label>
@@ -744,6 +756,62 @@ idealRenderNavAuth();
 
 const FLAGS = { "Brasil":"🇧🇷", "Estados Unidos":"🇺🇸", "Portugal":"🇵🇹", "Japão":"🇯🇵", "China":"🇨🇳", "França":"🇫🇷", "Itália":"🇮🇹", "Paraguai":"🇵🇾", "Argentina":"🇦🇷" };
 function flagFor(country){ return FLAGS[country] || "🌍"; }
+
+const IDEAL_CIDADES = [
+  "São Paulo, Brasil","Rio de Janeiro, Brasil","Belo Horizonte, Brasil","Brasília, Brasil","Salvador, Brasil",
+  "Fortaleza, Brasil","Curitiba, Brasil","Recife, Brasil","Porto Alegre, Brasil","Manaus, Brasil",
+  "Belém, Brasil","Goiânia, Brasil","Guarulhos, Brasil","Campinas, Brasil","São Luís, Brasil",
+  "Maceió, Brasil","Natal, Brasil","Teresina, Brasil","Campo Grande, Brasil","João Pessoa, Brasil",
+  "Florianópolis, Brasil","Vitória, Brasil","Aracaju, Brasil","Cuiabá, Brasil","Santos, Brasil",
+  "Ribeirão Preto, Brasil","Uberlândia, Brasil","Sorocaba, Brasil","Niterói, Brasil","Londrina, Brasil",
+  "Nova York, Estados Unidos","Miami, Estados Unidos","Los Angeles, Estados Unidos","Orlando, Estados Unidos",
+  "Chicago, Estados Unidos","Boston, Estados Unidos","Houston, Estados Unidos","Lisboa, Portugal",
+  "Porto, Portugal","Faro, Portugal","Tóquio, Japão","Osaka, Japão","Pequim, China","Xangai, China",
+  "Paris, França","Lyon, França","Roma, Itália","Milão, Itália","Assunção, Paraguai","Ciudad del Este, Paraguai",
+  "Buenos Aires, Argentina","Córdoba, Argentina","Londres, Reino Unido","Madri, Espanha","Barcelona, Espanha",
+  "Dubai, Emirados Árabes Unidos","Toronto, Canadá","Montreal, Canadá"
+];
+
+function idealConfigurarAutocomplete(inputId, listId) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  if (!input || !list) return;
+
+  input.addEventListener('input', () => {
+    const termo = input.value.trim().toLowerCase();
+    if (!termo) { list.classList.remove('show'); list.innerHTML = ''; return; }
+
+    const sugestoes = IDEAL_CIDADES
+      .filter(c => c.toLowerCase().includes(termo))
+      .slice(0, 6);
+
+    if (!sugestoes.length) { list.classList.remove('show'); list.innerHTML = ''; return; }
+
+    list.innerHTML = sugestoes.map(s => `<div>${s}</div>`).join('');
+    list.classList.add('show');
+  });
+
+  list.addEventListener('click', (e) => {
+    const item = e.target.closest('div');
+    if (!item) return;
+    input.value = item.textContent;
+    list.classList.remove('show');
+    list.innerHTML = '';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target !== input && !list.contains(e.target)) {
+      list.classList.remove('show');
+    }
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { list.classList.remove('show'); }
+  });
+}
+
+idealConfigurarAutocomplete('heroOrigin', 'heroOriginSuggestions');
+idealConfigurarAutocomplete('heroDestination', 'heroDestinationSuggestions');
 
 function emptyState(message, ctaText, ctaHref) {
   return `<div style="width:100%; text-align:center; padding:40px 20px; background:var(--paper); border:1px dashed var(--line); border-radius:16px;">
