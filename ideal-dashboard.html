@@ -2,21 +2,6 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-  async function conectarMercadoPago() {
-  const { data: { session } } = await idealSupabase.auth.getSession();
-  if (!session) return;
-
-  const res = await fetch('/api/mp-oauth-start', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${session.access_token}` }
-  });
-  const data = await res.json();
-  if (data.url) {
-    window.location.href = data.url;
-  } else {
-    alert('Não foi possível conectar com o Mercado Pago. Tente novamente.');
-  }
-}
 <script src="assets/analytics.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meu painel — iDeal</title>
@@ -824,6 +809,22 @@ async function deleteOffer(id) {
   const { error } = await idealSupabase.from('traveler_offers').delete().eq('id', id);
   if (error) { alert('Erro ao remover: ' + error.message); return; }
   loadMyOffers();
+}
+
+async function conectarMercadoPago() {
+  const { data: { session } } = await idealSupabase.auth.getSession();
+  if (!session) return;
+
+  const res = await fetch('/api/mp-oauth-start', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${session.access_token}` }
+  });
+  const data = await res.json();
+  if (data.url) {
+    window.location.href = data.url;
+  } else {
+    alert('Não foi possível conectar com o Mercado Pago. Tente novamente.');
+  }
 }
 
 loadMyOffers();
