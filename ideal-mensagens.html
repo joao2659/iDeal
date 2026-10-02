@@ -342,13 +342,19 @@ async function sendMessage() {
   const input = document.getElementById('messageInput');
   const text = input.value.trim();
   if (!text || !activeConversationId) return;
-  input.value = '';
 
-  await idealSupabase.from('messages').insert({
+  const { error } = await idealSupabase.from('messages').insert({
     conversation_id: activeConversationId,
     sender_id: currentUser.id,
     message_text: text,
   });
+
+  if (error) {
+    alert(error.message.includes('Por segurança') ? error.message : 'Não foi possível enviar a mensagem. Tente novamente.');
+    return;
+  }
+
+  input.value = '';
 
   if (activeOtherUserId) {
     await idealSupabase.from('notifications').insert({
