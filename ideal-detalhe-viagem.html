@@ -306,16 +306,15 @@ async function loadTrip() {
   document.getElementById('infoValuable').textContent = t.accepts_valuable ? 'Sim' : 'Não';
   document.getElementById('infoDocs').textContent = t.accepts_documents ? 'Sim' : 'Não';
   document.getElementById('infoCategories').innerHTML = (t.accepted_categories || [])
-    .map(c => `<span class="tagpill">${c}</span>`).join('') || '<span style="color:var(--ink-soft); font-size:13px;">Nenhuma categoria informada</span>';
-
+    .map(c => `<span class="tagpill">${idealEscapeHtml(c)}</span>`).join('') || '<span style="color:var(--ink-soft); font-size:13px;">Nenhuma categoria informada</span>';
   if (t.description) {
     document.getElementById('descriptionCard').style.display = 'block';
     document.getElementById('tripDescriptionText').textContent = t.description;
   }
 
-  const name = t.traveler?.first_name || 'Viajante';
+    const name = t.traveler?.first_name || 'Viajante';
   document.getElementById('travelerAvatar').textContent = idealInitial(name);
-  document.getElementById('travelerName').innerHTML = `${name} ${t.traveler?.last_name || ''} ${t.traveler?.identity_verified ? '<span class="verif">✓</span>' : ''}`;
+  document.getElementById('travelerName').innerHTML = `${idealEscapeHtml(name)} ${idealEscapeHtml(t.traveler?.last_name || '')} ${t.traveler?.identity_verified ? '<span class="verif">✓</span>' : ''}`;
   document.getElementById('travelerLoc').textContent = [t.traveler?.city, t.traveler?.country].filter(Boolean).join(', ');
   document.getElementById('statRating').textContent = t.traveler?.average_rating ? t.traveler.average_rating.toFixed(1) : '—';
   document.getElementById('statTrips').textContent = t.traveler?.completed_trips_count ?? 0;
@@ -347,13 +346,13 @@ async function loadTrip() {
   }
   document.getElementById('reviewsCount').textContent = `(${reviews?.length || 0})`;
   if (reviews && reviews.length) {
-    document.getElementById('reviewsList').innerHTML = reviews.map(rv => `
+        document.getElementById('reviewsList').innerHTML = reviews.map(rv => `
       <div class="review-item">
         <div class="review-top">
           <div class="avatar-sm">${idealInitial(rv.author?.first_name)}</div>
-          <div><div class="review-name">${rv.author?.first_name || 'Usuário'}</div><div class="review-stars">${'★'.repeat(Math.round(rv.overall_rating||0))}</div></div>
+          <div><div class="review-name">${idealEscapeHtml(rv.author?.first_name || 'Usuário')}</div><div class="review-stars">${'★'.repeat(Math.round(rv.overall_rating||0))}</div></div>
         </div>
-        <p class="review-text">${rv.written_comment || ''}</p>
+        <p class="review-text">${idealEscapeHtml(rv.written_comment || '')}</p>
       </div>
     `).join('');
   }
