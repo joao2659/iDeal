@@ -787,7 +787,7 @@ function idealConfigurarAutocomplete(inputId, listId) {
 
     if (!sugestoes.length) { list.classList.remove('show'); list.innerHTML = ''; return; }
 
-    list.innerHTML = sugestoes.map(s => `<div>${s}</div>`).join('');
+    list.innerHTML = sugestoes.map(s => `<div>${idealEscapeHtml(s)}</div>`).join('');
     list.classList.add('show');
   });
 
@@ -815,7 +815,7 @@ idealConfigurarAutocomplete('heroDestination', 'heroDestinationSuggestions');
 
 function emptyState(message, ctaText, ctaHref) {
   return `<div style="width:100%; text-align:center; padding:40px 20px; background:var(--paper); border:1px dashed var(--line); border-radius:16px;">
-    <p style="color:var(--ink-soft); font-size:14.5px; margin-bottom:16px;">${message}</p>
+    <p style="color:var(--ink-soft); font-size:14.5px; margin-bottom:16px;">${idealEscapeHtml(message)}</p>
     <a href="${ctaHref}" class="btn btn-primary" style="display:inline-flex;">${ctaText}</a>
   </div>`;
 }
@@ -825,7 +825,7 @@ async function renderHeroStats() {
   const el = document.getElementById('heroStatsText');
   if (!el) return;
   el.textContent = stats.tripCount > 0
-    ? `${stats.tripCount} viagem${stats.tripCount === 1 ? '' : 's'} ativa${stats.tripCount === 1 ? '' : 's'} agora`
+    ? `${stats.tripCount} viagem${idealEscapeHtml(stats.tripCount === 1 ? '' : 's')} ativa${idealEscapeHtml(stats.tripCount === 1 ? '' : 's')} agora`
     : `Seja o primeiro a anunciar uma viagem`;
 }
 
@@ -839,16 +839,16 @@ async function renderOrigins() {
   el.innerHTML = origins.map(o => `
     <div class="dest-card">
       <div class="dest-top">
-        <div class="dest-flag-row"><span class="dest-flag">${flagFor(o.country)}</span><h3>${o.country}</h3></div>
+        <div class="dest-flag-row"><span class="dest-flag">${idealEscapeHtml(flagFor(o.country))}</span><h3>${idealEscapeHtml(o.country)}</h3></div>
         <div class="dest-stats">
           <div class="dest-stat"><b>${o.travelerCount}</b><span>VIAJANTE${o.travelerCount===1?'':'S'}</span></div>
           <div class="dest-stat"><b>${o.tripCount}</b><span>VIAGEM${o.tripCount===1?'':'ENS'}</span></div>
         </div>
         ${o.nextArrival ? `<div class="dest-arrival">✓ Próxima chegada em ${idealFormatDateShort(o.nextArrival)}</div>` : ''}
-        ${o.destCities.length ? `<div class="dest-dest-list">Chegadas para <b>${o.destCities.join(', ')}</b></div>` : ''}
+        ${o.destCities.length ? `<div class="dest-dest-list">Chegadas para <b>${idealEscapeHtml(o.destCities.join(', '))}</b></div>` : ''}
       </div>
       <div class="tag-row">${o.categories.map(c=>`<span class="tag">${c}</span>`).join('')}</div>
-      <a href="ideal-buscar-viagens.html" class="btn btn-ghost">Ver viagens de ${o.country}</a>
+      <a href="ideal-buscar-viagens.html" class="btn btn-ghost">Ver viagens de ${idealEscapeHtml(o.country)}</a>
     </div>
   `).join('');
 }
@@ -862,7 +862,7 @@ async function renderRoutes() {
   }
   el.innerHTML = routes.map(r => `
     <div class="route-card">
-      <div class="route-path"><span class="route-city">${r.originCity}</span><span class="route-arrow"></span><span class="route-city">${r.destCity}</span></div>
+      <div class="route-path"><span class="route-city">${idealEscapeHtml(r.originCity)}</span><span class="route-arrow"></span><span class="route-city">${idealEscapeHtml(r.destCity)}</span></div>
       <div class="route-meta">
         <span>${r.transport || '—'}</span><span class="sep">·</span><span><b>${r.count}</b> dispon${r.count===1?'ível':'íveis'}</span><span class="sep">·</span><span>até <b>${r.maxWeight}kg</b></span>
       </div>
@@ -881,9 +881,9 @@ async function renderTrending() {
   }
   el.innerHTML = top.map(o => `
     <div class="trend-card">
-      <div class="trend-top"><span class="trend-flag">${flagFor(o.country)}</span><span class="trend-count">${o.travelerCount} viajante${o.travelerCount===1?'':'s'}</span></div>
+      <div class="trend-top"><span class="trend-flag">${idealEscapeHtml(flagFor(o.country))}</span><span class="trend-count">${o.travelerCount} viajante${idealEscapeHtml(o.travelerCount===1?'':'s')}</span></div>
       <div>
-        <div class="trend-title">${o.country}</div>
+        <div class="trend-title">${idealEscapeHtml(o.country)}</div>
         <div class="trend-cats">${o.categories.map(c=>`<span>${c}</span>`).join('')}</div>
       </div>
       <a href="ideal-buscar-viagens.html" class="trend-cta">Explorar destino →</a>
@@ -911,15 +911,15 @@ async function renderUpcomingTrips() {
         <div class="tag-head">
           <div class="avatar">${idealInitial(name)}</div>
           <div>
-            <div class="tag-name">${name} ${verif}</div>
+            <div class="tag-name">${idealEscapeHtml(name)} ${verif}</div>
             <div class="tag-rating"><span class="star">★</span> ${rating} · ${tripsCount} viagens</div>
           </div>
         </div>
-        <div class="tag-route"><span class="code">${(t.origin_city||'').slice(0,3).toUpperCase()}</span><span class="arr">✈</span><span class="code">${(t.destination_city||'').slice(0,3).toUpperCase()}</span></div>
+        <div class="tag-route"><span class="code">${idealEscapeHtml((t.origin_city||'').slice(0,3).toUpperCase())}</span><span class="arr">✈</span><span class="code">${idealEscapeHtml((t.destination_city||'').slice(0,3).toUpperCase())}</span></div>
         <div class="tag-dates"><span>Embarque ${idealFormatDateShort(t.departure_date)}</span><span>Chegada ${idealFormatDateShort(t.arrival_date)}</span></div>
         <div class="perforation"></div>
         <div class="tag-body">
-          <div class="tag-info-row"><span>Transporte</span><b>${t.transport_type || '—'}</b></div>
+          <div class="tag-info-row"><span>Transporte</span><b>${idealEscapeHtml(t.transport_type || '—')}</b></div>
           <div class="tag-info-row"><span>Espaço disponível</span><b>${t.available_weight || 0} kg</b></div>
           <div class="tag-cats">${(t.accepted_categories||[]).map(c=>`<span class="tag">${c}</span>`).join('')}</div>
           <div class="tag-reward"><span>RECOMPENSA</span><b>${reward}</b></div>

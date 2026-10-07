@@ -18,7 +18,9 @@ function verifySignature(xSignature, xRequestId, dataId) {
     .update(manifest)
     .digest('hex');
 
-  return computedHash === hash;
+  const a = Buffer.from(computedHash);
+  const b = Buffer.from(hash);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
 module.exports = async (req, res) => {
@@ -60,6 +62,10 @@ module.exports = async (req, res) => {
       return;
     }
     const requestId = mpData.external_reference;
+    if (!/^[0-9a-f-]{36}$/i.test(String(requestId || ''))) {
+      res.status(200).send('referência inválida');
+      return;
+    }
     const status = mpData.status;
     const statusMap = {
       approved: 'liberado',

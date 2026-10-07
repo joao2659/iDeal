@@ -34,6 +34,7 @@ module.exports = async (req, res) => {
     const users = (listData.users || []).map(u => ({ id: u.id, email: u.email }));
     res.status(200).json({ users });
   } catch (err) {
-    res.status(500).json({ error: 'Erro inesperado: ' + err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erro inesperado. Tente novamente.' });
   }
 };

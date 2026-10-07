@@ -365,7 +365,7 @@ function setupRouteFields(prefix) {
       try {
         const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estadoEl.value}/municipios`);
         const cidades = await res.json();
-        datalistEl.innerHTML = cidades.map(c => `<option value="${c.nome}">`).join('');
+        datalistEl.innerHTML = cidades.map(c => `<option value="${idealEscapeHtml(c.nome)}">`).join('');
       } catch (e) { /* segue sem sugestões se a API falhar */ }
     } else {
       await idealPopulateCountryStateCities(datalistEl, paisEl.value, estadoEl.value);
