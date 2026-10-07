@@ -278,7 +278,7 @@ async function loadTripContext() {
   document.getElementById('tripContext').innerHTML = `
     <div class="avatar-sm">${idealInitial(name)}</div>
     <div>
-      <div class="route">${(t.origin_city||'').slice(0,3).toUpperCase()} → ${(t.destination_city||'').slice(0,3).toUpperCase()}</div>
+      <div class="route">${idealEscapeHtml((t.origin_city||'').slice(0,3).toUpperCase())} → ${idealEscapeHtml((t.destination_city||'').slice(0,3).toUpperCase())}</div>
       <div class="meta">${idealEscapeHtml(name)}</div>
     </div>
     <div class="divider"></div>

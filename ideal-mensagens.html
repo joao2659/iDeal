@@ -237,17 +237,17 @@ async function loadConversations() {
     const otherName = isBuyer ? (r.traveler?.first_name || 'Viajante') : (r.buyer?.first_name || 'Comprador');
     const otherId = isBuyer ? r.traveler_id : r.buyer_id;
     const conv = r.conversation[0];
-    const route = r.trip ? `${(r.trip.origin_city||'').slice(0,3).toUpperCase()} → ${(r.trip.destination_city||'').slice(0,3).toUpperCase()}` : '';
+    const route = r.trip ? `${idealEscapeHtml((r.trip.origin_city||'').slice(0,3).toUpperCase())} → ${idealEscapeHtml((r.trip.destination_city||'').slice(0,3).toUpperCase())}` : '';
     return `
-      <div class="conv-item" data-conv-id="${conv.id}" data-other-id="${otherId}" data-other-name="${otherName}"
+      <div class="conv-item" data-conv-id="${conv.id}" data-other-id="${otherId}" data-other-name="${idealEscapeHtml(otherName)}"
            data-request-id="${r.id}"
-           data-route="${route}" data-departure="${r.trip?.departure_date||''}" data-product="${r.product_name||''}"
-           data-reward="${r.offered_reward||''}" data-delivery="${r.delivery_city||''}" data-status="${r.request_status||''}"
+           data-route="${idealEscapeHtml(route)}" data-departure="${idealEscapeHtml(r.trip?.departure_date||'')}" data-product="${idealEscapeHtml(r.product_name||'')}"
+           data-reward="${r.offered_reward||''}" data-delivery="${idealEscapeHtml(r.delivery_city||'')}" data-status="${r.request_status||''}"
            onclick="openChat(this)">
         <div class="avatar-sm">${idealInitial(otherName)}</div>
         <div class="conv-body">
-          <div class="conv-top-row"><span class="conv-name">${otherName}</span><span class="conv-time">${timeAgo(r.created_at)}</span></div>
-          <div class="conv-context">${route} · ${r.product_name || ''}</div>
+          <div class="conv-top-row"><span class="conv-name">${idealEscapeHtml(otherName)}</span><span class="conv-time">${timeAgo(r.created_at)}</span></div>
+          <div class="conv-context">${idealEscapeHtml(route)} · ${idealEscapeHtml(r.product_name || '')}</div>
           <div class="conv-preview">Toque para ver a conversa</div>
         </div>
       </div>

@@ -246,7 +246,7 @@ async function loadPendingTrips() {
     .order('created_at', { ascending: true });
 
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Sem permissão de administrador ou erro ao carregar (${error.message}).</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Sem permissão de administrador ou erro ao carregar (${idealEscapeHtml(error.message)}).</td></tr>`;
     return;
   }
 
@@ -257,8 +257,8 @@ async function loadPendingTrips() {
 
   tbody.innerHTML = trips.map(t => `
     <tr id="trip-row-${t.id}">
-      <td class="cell-user"><div class="avatar-sm">${idealInitial(t.traveler?.first_name)}</div><div><b>${t.traveler?.first_name||'—'} ${t.traveler?.last_name||''}</b></div></td>
-      <td class="route-mono">${(t.origin_city||'').slice(0,3).toUpperCase()} → ${(t.destination_city||'').slice(0,3).toUpperCase()}</td>
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(t.traveler?.first_name)}</div><div><b>${idealEscapeHtml(t.traveler?.first_name||'—')} ${idealEscapeHtml(t.traveler?.last_name||'')}</b></div></td>
+      <td class="route-mono">${idealEscapeHtml((t.origin_city||'').slice(0,3).toUpperCase())} → ${idealEscapeHtml((t.destination_city||'').slice(0,3).toUpperCase())}</td>
       <td>${idealFormatDateShort(t.departure_date)}</td>
       <td><span class="status-chip pending">Pendente</span></td>
       <td class="row-actions">
@@ -326,7 +326,7 @@ async function loadVerifications() {
     .order('verification_submitted_at', { ascending: true });
 
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Erro ao carregar (${error.message}).</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Erro ao carregar (${idealEscapeHtml(error.message)}).</td></tr>`;
     return;
   }
 
@@ -337,12 +337,12 @@ async function loadVerifications() {
 
   tbody.innerHTML = users.map(u => `
     <tr id="verif-row-${u.id}">
-      <td class="cell-user"><div class="avatar-sm">${idealInitial(u.first_name)}</div><div><b>${u.first_name||'—'} ${u.last_name||''}</b></div></td>
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(u.first_name)}</div><div><b>${idealEscapeHtml(u.first_name||'—')} ${idealEscapeHtml(u.last_name||'')}</b></div></td>
       <td>Identidade</td>
       <td>${u.verification_submitted_at ? new Date(u.verification_submitted_at).toLocaleDateString('pt-BR') : '—'}</td>
       <td>
-        <a href="#" onclick="verDocumento('${u.document_photo_url}'); return false;" style="color:var(--coral); font-weight:600; display:block;">Ver documento</a>
-        <a href="#" onclick="verDocumento('${u.selfie_photo_url}'); return false;" style="color:var(--coral); font-weight:600; display:block;">Ver selfie</a>
+        <a href="#" data-path="${idealEscapeHtml(u.document_photo_url)}" onclick="verDocumento(this.dataset.path); return false;" style="color:var(--coral); font-weight:600; display:block;">Ver documento</a>
+        <a href="#" data-path="${idealEscapeHtml(u.selfie_photo_url)}" onclick="verDocumento(this.dataset.path); return false;" style="color:var(--coral); font-weight:600; display:block;">Ver selfie</a>
       </td>
       <td class="row-actions">
         <button class="btn btn-success btn-sm" onclick="approveVerification('${u.id}')">Verificar</button>
@@ -398,7 +398,7 @@ async function loadDisputes() {
     .order('created_at', { ascending: true });
 
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Erro ao carregar (${error.message}).</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Erro ao carregar (${idealEscapeHtml(error.message)}).</td></tr>`;
     return;
   }
 
@@ -411,10 +411,10 @@ async function loadDisputes() {
 
   tbody.innerHTML = disputes.map(d => `
     <tr id="dispute-row-${d.id}">
-      <td class="cell-user"><div class="avatar-sm">${idealInitial(d.opener?.first_name)}</div><div><b>${d.opener?.first_name||'—'}</b></div></td>
-      <td class="cell-user"><div class="avatar-sm">${idealInitial(d.target?.first_name)}</div><div><b>${d.target?.first_name||'—'}</b></div></td>
-      <td>${REASON_LABELS[d.reason]||d.reason||'—'}</td>
-      <td style="max-width:220px; white-space:normal;">${d.description||'—'}</td>
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(d.opener?.first_name)}</div><div><b>${idealEscapeHtml(d.opener?.first_name||'—')}</b></div></td>
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(d.target?.first_name)}</div><div><b>${idealEscapeHtml(d.target?.first_name||'—')}</b></div></td>
+      <td>${idealEscapeHtml(REASON_LABELS[d.reason]||d.reason||'—')}</td>
+      <td style="max-width:220px; white-space:normal;">${idealEscapeHtml(d.description||'—')}</td>
       <td class="row-actions">
         <button class="btn btn-success btn-sm" onclick="resolveDispute('${d.id}','resolvida_comprador')">A favor comprador</button>
         <button class="btn btn-success btn-sm" onclick="resolveDispute('${d.id}','resolvida_viajante')">A favor viajante</button>
@@ -470,7 +470,7 @@ async function loadReports() {
     .order('created_at', { ascending: true });
 
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--red);">Erro ao carregar (${error.message}).</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--red);">Erro ao carregar (${idealEscapeHtml(error.message)}).</td></tr>`;
     return;
   }
   if (!reports.length) {
@@ -479,10 +479,10 @@ async function loadReports() {
   }
   tbody.innerHTML = reports.map(r => `
     <tr id="report-row-${r.id}">
-      <td class="cell-user"><div class="avatar-sm">${idealInitial(r.reporter?.first_name)}</div><div><b>${r.reporter?.first_name||'—'}</b></div></td>
-      <td class="cell-user"><div class="avatar-sm">${idealInitial(r.reported?.first_name)}</div><div><b>${r.reported?.first_name||'—'}</b></div></td>
-      <td>${REPORT_REASON_LABELS[r.reason]||r.reason||'—'}</td>
-      <td style="max-width:220px; white-space:normal;">${r.description||'—'}</td>
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(r.reporter?.first_name)}</div><div><b>${idealEscapeHtml(r.reporter?.first_name||'—')}</b></div></td>
+      <td class="cell-user"><div class="avatar-sm">${idealInitial(r.reported?.first_name)}</div><div><b>${idealEscapeHtml(r.reported?.first_name||'—')}</b></div></td>
+      <td>${idealEscapeHtml(REPORT_REASON_LABELS[r.reason]||r.reason||'—')}</td>
+      <td style="max-width:220px; white-space:normal;">${idealEscapeHtml(r.description||'—')}</td>
       <td><span class="status-chip pending">Em análise</span></td>
       <td class="row-actions">
         <button class="btn btn-success btn-sm" onclick="resolveReport('${r.id}','resolvida')">Resolver</button>
@@ -509,7 +509,7 @@ async function loadUsers() {
     .limit(50);
 
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Erro ao carregar (${error.message}).</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red);">Erro ao carregar (${idealEscapeHtml(error.message)}).</td></tr>`;
     return;
   }
 
@@ -540,7 +540,7 @@ async function loadUsers() {
       : `<button class="btn btn-ghost btn-sm" onclick="promoteToAdmin('${p.id}')">Tornar admin</button>`;
     return `
       <tr>
-        <td class="cell-user"><div class="avatar-sm">${idealInitial(p.first_name)}</div><div><b>${p.first_name||'—'} ${p.last_name||''}</b><span>${emailMap[p.id]||'—'}</span></div></td>
+        <td class="cell-user"><div class="avatar-sm">${idealInitial(p.first_name)}</div><div><b>${idealEscapeHtml(p.first_name||'—')} ${idealEscapeHtml(p.last_name||'')}</b><span>${idealEscapeHtml(emailMap[p.id]||'—')}</span></div></td>
         <td>${p.average_rating ? p.average_rating.toFixed(1) + ' ★' : '—'}</td>
         <td>${p.completed_trips_count || 0}</td>
         <td>${statusChip}</td>

@@ -225,7 +225,7 @@ const { data: p, error } = await idealSupabase
   const name = p.first_name || 'Usuário';
   document.title = `${name} — iDeal`;
   document.getElementById('heroAvatar').textContent = idealInitial(name);
-  document.getElementById('heroName').innerHTML = `${name} ${p.last_name || ''} ${p.identity_verified ? '<span class="verif">✓</span>' : ''}`;
+  document.getElementById('heroName').innerHTML = `${idealEscapeHtml(name)} ${idealEscapeHtml(p.last_name || '')} ${p.identity_verified ? '<span class="verif">✓</span>' : ''}`;
   document.getElementById('heroLoc').textContent = '📍 ' + [p.city, p.country].filter(Boolean).join(', ');
   document.getElementById('heroMember').textContent = p.created_at ? `Na iDeal desde ${new Date(p.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}` : '';
   document.getElementById('messageBtn').href = 'ideal-mensagens.html';
@@ -244,7 +244,7 @@ const { data: p, error } = await idealSupabase
   document.getElementById('verifBadges').innerHTML = badges.join('') || '<span style="color:var(--ink-soft); font-size:13px;">Ainda sem verificações.</span>';
 
   document.getElementById('infoList').innerHTML = `
-    <div class="info-row"><span>Localização</span><span>${[p.city, p.country].filter(Boolean).join(', ') || '—'}</span></div>
+    <div class="info-row"><span>Localização</span><span>${idealEscapeHtml([p.city, p.country].filter(Boolean).join(', ') || '—')}</span></div>
     <div class="info-row"><span>Membro desde</span><span>${p.created_at ? new Date(p.created_at).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) : '—'}</span></div>
   `;
 
@@ -264,7 +264,7 @@ const { data: p, error } = await idealSupabase
     document.getElementById('tripsCard').style.display = 'block';
     document.getElementById('tripsList').innerHTML = trips.map(t => `
       <div class="trip-mini">
-        <div><div class="trip-mini-route">${(t.origin_city||'').slice(0,3).toUpperCase()} → ${(t.destination_city||'').slice(0,3).toUpperCase()}</div><div class="trip-mini-date">Embarque ${idealFormatDateShort(t.departure_date)} · ${t.transport_type||''} · ${t.available_weight||0} kg disponíveis</div></div>
+        <div><div class="trip-mini-route">${idealEscapeHtml((t.origin_city||'').slice(0,3).toUpperCase())} → ${idealEscapeHtml((t.destination_city||'').slice(0,3).toUpperCase())}</div><div class="trip-mini-date">Embarque ${idealFormatDateShort(t.departure_date)} · ${idealEscapeHtml(t.transport_type||'')} · ${t.available_weight||0} kg disponíveis</div></div>
         <a href="ideal-detalhe-viagem.html?id=${t.id}" class="btn btn-ghost">Ver viagem</a>
       </div>
     `).join('');
@@ -291,10 +291,10 @@ const { data: p, error } = await idealSupabase
       <div class="review-item">
         <div class="review-top">
           <div class="avatar-sm">${idealInitial(rv.author?.first_name)}</div>
-          <div><div class="review-name">${rv.author?.first_name || 'Usuário'}</div><div class="review-stars">${'★'.repeat(Math.round(rv.overall_rating||0))}</div></div>
+          <div><div class="review-name">${idealEscapeHtml(rv.author?.first_name || 'Usuário')}</div><div class="review-stars">${'★'.repeat(Math.round(rv.overall_rating||0))}</div></div>
           <span class="review-date">${idealFormatDateShort(rv.created_at)}</span>
         </div>
-        <p class="review-text">${rv.written_comment || ''}</p>
+        <p class="review-text">${idealEscapeHtml(rv.written_comment || '')}</p>
       </div>
     `).join('');
   }

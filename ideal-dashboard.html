@@ -285,7 +285,7 @@ async function loadDashboard() {
 
   document.getElementById('sideUserBlock').innerHTML = `
     <div class="avatar-lg">${idealInitial(firstName)}</div>
-    <div><b>${firstName} ${profile?.last_name || ''}</b><span>${profile?.identity_verified ? '✓ Verificado' : 'Perfil em análise'}</span></div>
+    <div><b>${idealEscapeHtml(firstName)} ${idealEscapeHtml(profile?.last_name || '')}</b><span>${profile?.identity_verified ? '✓ Verificado' : 'Perfil em análise'}</span></div>
   `;
   document.getElementById('topAvatar').textContent = idealInitial(firstName);
   document.getElementById('greetingTitle').textContent = `Olá, ${firstName} 👋`;
@@ -341,8 +341,8 @@ const { data: myReviewsRaw } = await idealSupabase
     const statusClass = { ativa: 'active', pendente: 'pending', concluida: 'done' };
     tripsGrid.innerHTML = trips.map(t => `
       <div class="trip-mini">
-        <div class="trip-mini-top"><span class="trip-mini-route">${(t.origin_city||'').slice(0,3).toUpperCase()} → ${(t.destination_city||'').slice(0,3).toUpperCase()}</span><span class="status-chip ${statusClass[t.trip_status]||'pending'}">${t.trip_status||'pendente'}</span></div>
-        <div class="trip-mini-date">Embarque ${idealFormatDateShort(t.departure_date)} · ${t.transport_type||'—'}</div>
+        <div class="trip-mini-top"><span class="trip-mini-route">${idealEscapeHtml((t.origin_city||'').slice(0,3).toUpperCase())} → ${idealEscapeHtml((t.destination_city||'').slice(0,3).toUpperCase())}</span><span class="status-chip ${statusClass[t.trip_status]||'pending'}">${t.trip_status||'pendente'}</span></div>
+        <div class="trip-mini-date">Embarque ${idealFormatDateShort(t.departure_date)} · ${idealEscapeHtml(t.transport_type||'—')}</div>
         <div class="trip-mini-foot"><span><b>${t.available_weight||0} kg</b> disponível</span></div>
       </div>
     `).join('');
@@ -372,7 +372,7 @@ const { data: myReviewsRaw } = await idealSupabase
     myReqList.innerHTML = myRequests.map(r => `
       <div class="req-row">
         <div class="req-thumb">📦</div>
-        <div><div class="req-name">${r.product_name||'Produto'}</div><div class="req-sub">${r.trip ? (r.trip.origin_city||'')+' → '+(r.trip.destination_city||'') : ''}</div></div>
+        <div><div class="req-name">${idealEscapeHtml(r.product_name||'Produto')}</div><div class="req-sub">${idealEscapeHtml(r.trip ? (r.trip.origin_city||'')+' → '+(r.trip.destination_city||'') : '')}</div></div>
         <div class="req-sub">Oferecido: <b>R$ ${r.offered_reward||0}</b></div>
         <span class="req-status ${r.request_status}">${STATUS_LABELS[r.request_status]||r.request_status}</span>
         <a href="#" class="btn btn-ghost" style="padding:8px 16px; font-size:13px;" onclick="openRequestModal('${r.id}'); return false;">Ver</a>
@@ -387,9 +387,9 @@ const { data: myReviewsRaw } = await idealSupabase
   } else {
     savedGrid.innerHTML = savedTrips.map(s => `
       <div class="trip-mini">
-        <div class="trip-mini-top"><span class="trip-mini-route">${(s.trip?.origin_city||'').slice(0,3).toUpperCase()} → ${(s.trip?.destination_city||'').slice(0,3).toUpperCase()}</span></div>
+        <div class="trip-mini-top"><span class="trip-mini-route">${idealEscapeHtml((s.trip?.origin_city||'').slice(0,3).toUpperCase())} → ${idealEscapeHtml((s.trip?.destination_city||'').slice(0,3).toUpperCase())}</span></div>
         <div class="trip-mini-date">Embarque ${idealFormatDateShort(s.trip?.departure_date)}</div>
-        <div class="trip-mini-foot"><a href="ideal-detalhe-viagem.html?id=${s.trip_id}" class="btn btn-ghost" style="padding:6px 14px; font-size:12px;">Ver viagem</a></div>
+        <div class="trip-mini-foot"><a href="ideal-detalhe-viagem.html?id=${idealEscapeHtml(s.trip_id)}" class="btn btn-ghost" style="padding:6px 14px; font-size:12px;">Ver viagem</a></div>
       </div>
     `).join('');
   }
@@ -401,8 +401,8 @@ const { data: myReviewsRaw } = await idealSupabase
   } else {
     reviewsGrid.innerHTML = reviews.map(rv => `
       <div class="review-mini">
-        <div class="review-mini-top"><div class="avatar-sm">${idealInitial(rv.author?.first_name)}</div><div><div class="review-mini-name">${rv.author?.first_name||'Usuário'}</div><div class="review-mini-stars">${'★'.repeat(Math.round(rv.overall_rating||0))}</div></div></div>
-        <p class="review-mini-text">${rv.written_comment||''}</p>
+        <div class="review-mini-top"><div class="avatar-sm">${idealInitial(rv.author?.first_name)}</div><div><div class="review-mini-name">${idealEscapeHtml(rv.author?.first_name||'Usuário')}</div><div class="review-mini-stars">${'★'.repeat(Math.round(rv.overall_rating||0))}</div></div></div>
+        <p class="review-mini-text">${idealEscapeHtml(rv.written_comment||'')}</p>
       </div>
     `).join('');
   }
@@ -532,14 +532,14 @@ const { data: r, error } = await idealSupabase
 `;
 
   document.getElementById('requestModalBody').innerHTML += `
-    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Comprador</span><span style="font-weight:600;">${r.buyer?.first_name||'—'} ${r.buyer?.last_name||''}</span></div>
-    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Produto</span><span style="font-weight:600;">${r.product_name||'—'}</span></div>
-    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Categoria</span><span style="font-weight:600;">${r.product_category||'—'}</span></div>
-    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Link do produto</span><span style="font-weight:600;">${r.product_url ? `<a href="${r.product_url}" target="_blank" style="color:var(--coral);">Abrir</a>` : '—'}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Comprador</span><span style="font-weight:600;">${idealEscapeHtml(r.buyer?.first_name||'—')} ${idealEscapeHtml(r.buyer?.last_name||'')}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Produto</span><span style="font-weight:600;">${idealEscapeHtml(r.product_name||'—')}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Categoria</span><span style="font-weight:600;">${idealEscapeHtml(r.product_category||'—')}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Link do produto</span><span style="font-weight:600;">${r.product_url ? `<a href="${idealEscapeHtml(idealSafeUrl(r.product_url))}" target="_blank" rel="noopener noreferrer" style="color:var(--coral);">Abrir</a>` : '—'}</span></div>
     <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Preço do produto</span><span style="font-weight:600;">R$ ${r.product_price||0}</span></div>
     <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Recompensa oferecida</span><span style="font-weight:600;">R$ ${r.offered_reward||0}</span></div>
-    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Cidade de entrega</span><span style="font-weight:600;">${r.delivery_city||'—'}</span></div>
-    <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;"><span style="color:var(--ink-soft);">Mensagem</span><span style="font-weight:600; text-align:right; max-width:60%;">${r.message||'—'}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--bg); font-size:14px;"><span style="color:var(--ink-soft);">Cidade de entrega</span><span style="font-weight:600;">${idealEscapeHtml(r.delivery_city||'—')}</span></div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:14px;"><span style="color:var(--ink-soft);">Mensagem</span><span style="font-weight:600; text-align:right; max-width:60%;">${idealEscapeHtml(r.message||'—')}</span></div>
   `;
 
  const actions = document.getElementById('requestModalActions');
@@ -676,8 +676,8 @@ async function loadNotifications() {
   }
 
   notifList.innerHTML = list.map(n => `
-    <a href="${n.link || '#'}" style="display:block; padding:12px 14px; border-radius:10px; ${n.is_read ? '' : 'background:#FFF0EB;'} margin-bottom:4px;" onclick="markNotifRead('${n.id}')">
-      <div style="font-size:13px; color:var(--ink); font-weight:${n.is_read ? '500' : '700'};">${n.message}</div>
+    <a href="${idealSafeLink(n.link)}" style="display:block; padding:12px 14px; border-radius:10px; ${n.is_read ? '' : 'background:#FFF0EB;'} margin-bottom:4px;" onclick="markNotifRead('${n.id}')">
+      <div style="font-size:13px; color:var(--ink); font-weight:${n.is_read ? '500' : '700'};">${idealEscapeHtml(n.message)}</div>
       <div style="font-size:11px; color:var(--ink-soft); margin-top:3px;">${timeAgoShort(n.created_at)}</div>
     </a>
   `).join('');
@@ -735,8 +735,8 @@ async function loadMyOffers() {
 
   grid.innerHTML = list.map(o => `
     <div class="trip-mini">
-      <div class="trip-mini-top"><span class="trip-mini-route" style="font-size:13.5px;">${o.product_name}</span><span class="status-chip ${statusClass[o.offer_status]||'pending'}">${statusLabel[o.offer_status]||o.offer_status}</span></div>
-      <div class="trip-mini-date">${o.trip ? (o.trip.origin_city||'')+' → '+(o.trip.destination_city||'') : ''} · R$ ${o.price||0}</div>
+      <div class="trip-mini-top"><span class="trip-mini-route" style="font-size:13.5px;">${idealEscapeHtml(o.product_name)}</span><span class="status-chip ${statusClass[o.offer_status]||'pending'}">${statusLabel[o.offer_status]||o.offer_status}</span></div>
+      <div class="trip-mini-date">${idealEscapeHtml(o.trip ? (o.trip.origin_city||'')+' → '+(o.trip.destination_city||'') : '')} · R$ ${o.price||0}</div>
       <div class="trip-mini-foot">
         <span></span>
         <a href="#" style="color:var(--coral-dark); font-weight:600;" onclick="deleteOffer('${o.id}'); return false;">Remover</a>
@@ -752,7 +752,7 @@ async function openOfferModal() {
   if (!trips || !trips.length) {
     select.innerHTML = `<option value="">Nenhuma viagem ativa</option>`;
   } else {
-    select.innerHTML = trips.map(t => `<option value="${t.id}">${t.origin_city} → ${t.destination_city} (${idealFormatDateShort(t.departure_date)})</option>`).join('');
+    select.innerHTML = trips.map(t => `<option value="${t.id}">${idealEscapeHtml(t.origin_city)} → ${idealEscapeHtml(t.destination_city)} (${idealFormatDateShort(t.departure_date)})</option>`).join('');
   }
 
   document.getElementById('offerModal').style.display = 'flex';
@@ -778,7 +778,7 @@ async function submitOffer() {
 
   let photoPath = null;
   if (photoFile) {
-    photoPath = `${currentUser.id}/${Date.now()}-${photoFile.name}`;
+    photoPath = `${currentUser.id}/${Date.now()}-${photoFile.name.replace(/[^A-Za-z0-9._-]/g, '_')}`;
     const { error: uploadErr } = await idealSupabase.storage.from('offer-photos').upload(photoPath, photoFile);
     if (uploadErr) { msg.textContent = 'Erro ao enviar foto: ' + uploadErr.message; msg.style.color = 'var(--coral-dark)'; return; }
   }

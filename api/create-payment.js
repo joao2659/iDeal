@@ -14,8 +14,8 @@ module.exports = async (req, res) => {
   let body = '';
   for await (const chunk of req) body += chunk;
   const { request_id } = JSON.parse(body || '{}');
-  if (!request_id) {
-    res.status(400).json({ error: 'request_id ausente' });
+  if (!request_id || !/^[0-9a-f-]{36}$/i.test(String(request_id))) {
+    res.status(400).json({ error: 'request_id inválido' });
     return;
   }
 
@@ -98,7 +98,8 @@ module.exports = async (req, res) => {
     });
     const prefData = await prefRes.json();
     if (!prefRes.ok) {
-      res.status(400).json({ error: 'Erro ao criar cobrança: ' + JSON.stringify(prefData) });
+      console.error('Mercado Pago:', prefData);
+      res.status(400).json({ error: 'Não foi possível criar a cobrança. Tente novamente.' });
       return;
     }
 
@@ -120,6 +121,7 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ checkout_url: prefData.init_point });
   } catch (err) {
-    res.status(500).json({ error: 'Erro inesperado: ' + err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erro inesperado. Tente novamente.' });
   }
 };

@@ -429,23 +429,23 @@ async function renderResults() {
           <div class="trip-user">
             <div class="avatar">${idealInitial(name)}</div>
             <div>
-              <div class="trip-name">${name} ${verif}</div>
+              <div class="trip-name">${idealEscapeHtml(name)} ${verif}</div>
              <div class="trip-rating"><span class="star">★</span> ${rating} · ${tripsCount} viagens concluídas</div>
               <div style="margin-top:4px;">${idealTierBadgeHtml(tripsCount)}</div>
             </div>
           </div>
-          <span class="badge-type ${tripTypeClass(t.trip_type)}">${t.trip_type || 'Regional'}</span>
+          <span class="badge-type ${idealEscapeHtml(tripTypeClass(t.trip_type))}">${idealEscapeHtml(t.trip_type || 'Regional')}</span>
         </div>
         <div class="trip-route">
-          <span class="route-code">${(t.origin_city||'').slice(0,3).toUpperCase()}</span>
+          <span class="route-code">${idealEscapeHtml((t.origin_city||'').slice(0,3).toUpperCase())}</span>
           <span class="route-line"><span>✈</span></span>
-          <span class="route-code">${(t.destination_city||'').slice(0,3).toUpperCase()}</span>
+          <span class="route-code">${idealEscapeHtml((t.destination_city||'').slice(0,3).toUpperCase())}</span>
         </div>
         <div class="trip-dates"><span>Embarque ${idealFormatDateShort(t.departure_date)}</span><span>Chegada ${idealFormatDateShort(t.arrival_date)}</span></div>
         <div class="perforation"></div>
         <div class="trip-body">
           <div class="trip-meta-grid">
-            <div><b>${t.transport_type || '—'}</b>Transporte</div>
+            <div><b>${idealEscapeHtml(t.transport_type || '—')}</b>Transporte</div>
             <div><b>${t.available_weight || 0} kg</b>Espaço disponível</div>
           </div>
           <div class="tag-cats">${(t.accepted_categories||[]).map(c=>`<span class="tagpill">${c}</span>`).join('')}</div>

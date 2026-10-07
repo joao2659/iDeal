@@ -120,7 +120,7 @@ function idealFormatDateShort(isoDate) {
 
 // Gera as iniciais/avatar padrão a partir do primeiro nome
 function idealInitial(firstName) {
-  return (firstName || "?").charAt(0).toUpperCase();
+  return idealEscapeHtml((firstName || "?").charAt(0).toUpperCase());
 }
 
 // Calcula o nível de confiança do viajante com base em viagens concluídas
@@ -138,8 +138,29 @@ function idealTierBadgeHtml(completedTrips) {
   return `<span style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:999px; background:${tier.bg}; color:${tier.color};">${tier.icon} ${tier.name}</span>`;
 }
 // Protege texto digitado por usuário antes de inserir na página (previne XSS)
+// Transforma qualquer texto em texto "inofensivo" antes de colocar na página
+// (impede que alguém esconda código em nomes, descrições, mensagens etc.)
 function idealEscapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str || "";
-  return div.innerHTML;
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// Links de notificação: só páginas do próprio site (ex.: "ideal-dashboard.html")
+function idealSafeLink(link) {
+  return /^ideal-[a-z0-9-]+\.html([?#][A-Za-z0-9=&_#.-]*)?$/.test(link || "") ? link : "#";
+}
+
+// Links externos (ex.: link do produto): só http:// ou https://
+function idealSafeUrl(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:" ? u.href : "#";
+  } catch (e) {
+    return "#";
+  }
 }

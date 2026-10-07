@@ -25,7 +25,9 @@ module.exports = async (req, res) => {
     if (!payloadB64 || !signature) throw new Error('state inválido');
 
     const expectedSig = crypto.createHmac('sha256', process.env.MP_OAUTH_STATE_SECRET).update(payloadB64).digest('hex');
-    if (expectedSig !== signature) throw new Error('assinatura inválida');
+    const sigA = Buffer.from(expectedSig);
+    const sigB = Buffer.from(signature);
+    if (sigA.length !== sigB.length || !crypto.timingSafeEqual(sigA, sigB)) throw new Error('assinatura inválida');
 
     const payload = JSON.parse(base64urlDecode(payloadB64));
     const { uid, cv, ts } = payload;

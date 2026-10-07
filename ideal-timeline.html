@@ -195,6 +195,7 @@ async function renderOffers() {
     return;
   }
 
+  window.idealOffersById = Object.fromEntries(list.map(o => [o.id, o]));
   grid.innerHTML = list.map(o => {
     const name = o.traveler?.first_name || 'Viajante';
     const photoUrl = o.photo_url ? idealSupabase.storage.from('offer-photos').getPublicUrl(o.photo_url).data.publicUrl : null;
@@ -204,10 +205,10 @@ async function renderOffers() {
         <div class="offer-body">
           <div class="offer-title">${idealEscapeHtml(o.product_name)}</div>
           <div class="offer-desc">${idealEscapeHtml(o.description)||''}</div>
-          <div class="offer-route">${o.trip ? (o.trip.origin_city||'')+' → '+(o.trip.destination_city||'') : ''} · Chega ${idealFormatDateShort(o.trip?.departure_date)}</div>
-          <div class="offer-traveler"><div class="avatar-sm">${idealInitial(name)}</div><span>${idealEscapeHtml(name)} ${idealEscapeHtml(o.traveler?.last_name)||''}</span></div>
+          <div class="offer-route">${idealEscapeHtml(o.trip ? (o.trip.origin_city||'')+' → '+(o.trip.destination_city||'') : '')} · Chega ${idealFormatDateShort(o.trip?.departure_date)}</div>
+          <div class="offer-traveler"><div class="avatar-sm">${idealInitial(name)}</div><span>${idealEscapeHtml(name)} ${idealEscapeHtml(o.traveler?.last_name||'')}</span></div>
           <div class="offer-price"><span>PREÇO ESTIMADO</span><b>R$ ${o.price||0}</b></div>
-          <button class="btn btn-primary" onclick='openInterestModal(${JSON.stringify(o).replace(/'/g,"&apos;")})'>Tenho interesse</button>
+          <button class="btn btn-primary" data-offer-id="${idealEscapeHtml(o.id)}" onclick="openInterestModal(window.idealOffersById[this.dataset.offerId])">Tenho interesse</button>
         </div>
       </div>
     `;
