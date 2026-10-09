@@ -53,6 +53,10 @@ header.nav{background:var(--paper); border-bottom:1px solid var(--line);}
 .conv-context{font-size:11.5px; color:var(--coral-dark); font-weight:600; margin:3px 0; font-family:'IBM Plex Mono',monospace;}
 .conv-preview{font-size:13px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .unread-dot{width:9px; height:9px; border-radius:50%; background:var(--coral); flex-shrink:0; margin-top:4px;}
+.unread-count{min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:var(--coral); color:#fff; font-size:11px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; margin-left:8px;}
+.conv-item.unread .conv-preview{color:var(--ink); font-weight:600;}
+.conv-item.unread .conv-time{color:var(--coral-dark); font-weight:700;}
+.req-details-link{font-size:12.5px; font-weight:700; color:var(--coral-dark); white-space:nowrap; margin-left:6px;}
 
 /* CHAT PANE */
 .chat-pane{display:flex; flex-direction:column; background:var(--bg);}
@@ -79,7 +83,7 @@ header.nav{background:var(--paper); border-bottom:1px solid var(--line);}
 .msg-row{display:flex; gap:10px; max-width:70%;}
 .msg-row.mine{align-self:flex-end; flex-direction:row-reverse;}
 .msg-avatar{width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--coral)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:11px; font-family:'Space Grotesk',sans-serif; flex-shrink:0;}
-.msg-bubble{background:var(--paper); border-radius:16px 16px 16px 4px; padding:12px 16px; font-size:14px; line-height:1.5; box-shadow:var(--shadow);}
+.msg-bubble{background:var(--paper); border-radius:16px 16px 16px 4px; padding:12px 16px; font-size:14px; line-height:1.5; box-shadow:var(--shadow); white-space:pre-wrap; overflow-wrap:anywhere;}
 .msg-row.mine .msg-bubble{background:var(--navy); color:#fff; border-radius:16px 16px 4px 16px;}
 .msg-time{font-size:10.5px; color:var(--ink-soft); margin-top:4px; display:block;}
 .msg-row.mine .msg-time{text-align:right;}
@@ -141,6 +145,7 @@ header.nav{background:var(--paper); border-bottom:1px solid var(--line);}
         <div class="thumb">📦</div>
         <div class="info"><b id="reqProductName">—</b><span id="reqMeta"></span></div>
         <span class="request-status" id="reqStatus"></span>
+        <a href="#" class="req-details-link" id="reqDetailsLink">Ver detalhes ›</a>
       </div>
 
       <div class="messages" id="messagesArea"></div>
@@ -184,8 +189,17 @@ header.nav{background:var(--paper); border-bottom:1px solid var(--line);}
 let currentUser = null;
 let activeConversationId = null;
 let activeOtherUserId = null;
+let activeOtherName = '';
 let activeRequestId = null;
 let messagesChannel = null;
+let lastRenderedKey = '';
+let autoOpenDone = false;
+
+const STATUS_LABELS = {
+  enviada: 'Enviada', em_analise: 'Em análise', aceita: 'Aceita',
+  contraproposta: 'Contraproposta', recusada: 'Recusada',
+  em_transporte: 'Em transporte', concluida: 'Concluída', cancelada: 'Cancelada'
+};
 
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -200,7 +214,7 @@ function formatTime(dateStr) {
   return new Date(dateStr).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
-async function loadConversations() {
+async function initMessages() {
   currentUser = await idealGetCurrentUser();
   if (!currentUser) {
     window.location.href = 'ideal-entrar.html';
@@ -209,6 +223,19 @@ async function loadConversations() {
   const { data: myProfile } = await idealSupabase.from('profiles').select('first_name').eq('id', currentUser.id).single();
   document.getElementById('navAvatar').textContent = idealInitial(myProfile?.first_name || '?');
 
+  await loadConversations();
+
+  // Atualiza a lista (bolinhas) e o chat aberto a cada 20 segundos
+  setInterval(async () => {
+    await loadConversations();
+    if (activeConversationId) {
+      await loadMessages();
+      markActiveConversationRead();
+    }
+  }, 20000);
+}
+
+async function loadConversations() {
  const { data: requests } = await idealSupabase
     .from('requests')
     .select('*, conversation:conversations(id), trip:trip_id(origin_city, destination_city, departure_date)')
@@ -224,35 +251,64 @@ async function loadConversations() {
   }
 
   const userIds = [...new Set(withConv.flatMap(r => [r.buyer_id, r.traveler_id]))];
-  const { data: profilesData } = await idealSupabase
-    .from('profiles_public').select('id, first_name').in('id', userIds);
+  const convIds = withConv.map(r => r.conversation[0].id);
+
+  const [{ data: profilesData }, { data: lastMsgs }, unreadCounts] = await Promise.all([
+    idealSupabase.from('profiles_public').select('id, first_name').in('id', userIds),
+    idealSupabase.from('messages').select('conversation_id, sender_id, message_text, created_at')
+      .in('conversation_id', convIds).order('created_at', { ascending: false }).limit(500),
+    idealGetUnreadCounts()
+  ]);
+
   const profileMap = Object.fromEntries((profilesData || []).map(p => [p.id, p]));
+  const lastMap = {};
+  (lastMsgs || []).forEach(m => { if (!lastMap[m.conversation_id]) lastMap[m.conversation_id] = m; });
+
   withConv.forEach(r => {
     r.buyer = profileMap[r.buyer_id] || null;
     r.traveler = profileMap[r.traveler_id] || null;
+    r.last = lastMap[r.conversation[0].id] || null;
+    r.lastAt = r.last ? r.last.created_at : r.created_at;
+    // a conversa aberta agora já está sendo lida
+    const convId = r.conversation[0].id;
+    r.unread = convId === activeConversationId ? 0 : (unreadCounts[convId] || 0);
   });
+  withConv.sort((a, b) => new Date(b.lastAt) - new Date(a.lastAt));
 
   container.innerHTML = withConv.map(r => {
     const isBuyer = r.buyer_id === currentUser.id;
     const otherName = isBuyer ? (r.traveler?.first_name || 'Viajante') : (r.buyer?.first_name || 'Comprador');
     const otherId = isBuyer ? r.traveler_id : r.buyer_id;
     const conv = r.conversation[0];
-    const route = r.trip ? `${idealEscapeHtml((r.trip.origin_city||'').slice(0,3).toUpperCase())} → ${idealEscapeHtml((r.trip.destination_city||'').slice(0,3).toUpperCase())}` : '';
+    const route = r.trip ? `${(r.trip.origin_city||'').slice(0,3).toUpperCase()} → ${(r.trip.destination_city||'').slice(0,3).toUpperCase()}` : '';
+    const preview = r.last
+      ? (r.last.sender_id === currentUser.id ? 'Você: ' : '') + r.last.message_text
+      : 'Toque para ver a conversa';
     return `
-      <div class="conv-item" data-conv-id="${conv.id}" data-other-id="${otherId}" data-other-name="${idealEscapeHtml(otherName)}"
-           data-request-id="${r.id}"
+      <div class="conv-item ${r.unread ? 'unread' : ''} ${conv.id === activeConversationId ? 'active' : ''}" data-conv-id="${idealEscapeHtml(conv.id)}" data-other-id="${idealEscapeHtml(otherId)}" data-other-name="${idealEscapeHtml(otherName)}"
+           data-request-id="${idealEscapeHtml(r.id)}"
            data-route="${idealEscapeHtml(route)}" data-departure="${idealEscapeHtml(r.trip?.departure_date||'')}" data-product="${idealEscapeHtml(r.product_name||'')}"
-           data-reward="${r.offered_reward||''}" data-delivery="${idealEscapeHtml(r.delivery_city||'')}" data-status="${r.request_status||''}"
+           data-reward="${idealEscapeHtml(r.offered_reward||'')}" data-delivery="${idealEscapeHtml(r.delivery_city||'')}" data-status="${idealEscapeHtml(r.request_status||'')}"
            onclick="openChat(this)">
         <div class="avatar-sm">${idealInitial(otherName)}</div>
         <div class="conv-body">
-          <div class="conv-top-row"><span class="conv-name">${idealEscapeHtml(otherName)}</span><span class="conv-time">${timeAgo(r.created_at)}</span></div>
+          <div class="conv-top-row"><span class="conv-name">${idealEscapeHtml(otherName)}</span><span class="conv-time">${timeAgo(r.lastAt)}${r.unread ? `<span class="unread-count" title="Mensagens não lidas">${r.unread > 9 ? '9+' : r.unread}</span>` : ''}</span></div>
           <div class="conv-context">${idealEscapeHtml(route)} · ${idealEscapeHtml(r.product_name || '')}</div>
-          <div class="conv-preview">Toque para ver a conversa</div>
+          <div class="conv-preview">${idealEscapeHtml(preview)}</div>
         </div>
       </div>
     `;
   }).join('');
+
+  // Link direto para uma conversa: ideal-mensagens.html?conversa=<id da solicitação>
+  if (!autoOpenDone) {
+    autoOpenDone = true;
+    const wanted = new URLSearchParams(window.location.search).get('conversa');
+    if (wanted) {
+      const el = [...document.querySelectorAll('.conv-item')].find(c => c.dataset.requestId === wanted);
+      if (el) openChat(el);
+    }
+  }
 }
 
 async function openChat(el){
@@ -261,7 +317,9 @@ async function openChat(el){
 
  activeConversationId = el.dataset.convId;
   activeOtherUserId = el.dataset.otherId;
+  activeOtherName = el.dataset.otherName;
   activeRequestId = el.dataset.requestId;
+  lastRenderedKey = '';
 
   document.getElementById('chatEmptyState').style.display = 'none';
   document.getElementById('chatActiveArea').style.display = 'flex';
@@ -274,11 +332,13 @@ async function openChat(el){
     document.getElementById('requestBanner').style.display = 'flex';
     document.getElementById('reqProductName').textContent = el.dataset.product;
     document.getElementById('reqMeta').textContent = `Recompensa: R$ ${el.dataset.reward||0} · Entrega em ${el.dataset.delivery||'—'}`;
-    document.getElementById('reqStatus').textContent = el.dataset.status;
+    document.getElementById('reqStatus').textContent = STATUS_LABELS[el.dataset.status] || el.dataset.status;
+    document.getElementById('reqDetailsLink').href = 'ideal-dashboard.html?solicitacao=' + encodeURIComponent(activeRequestId);
   }
 
   await loadMessages();
   subscribeToMessages();
+  markActiveConversationRead();
 
   if(window.innerWidth <= 860){
     document.getElementById('convList').classList.add('hidden-mobile');
@@ -296,13 +356,25 @@ async function loadMessages() {
     .eq('conversation_id', activeConversationId)
     .order('created_at', { ascending: true });
 
-  renderMessages(messages || []);
+  const list = messages || [];
+  const key = activeConversationId + ':' + list.length + ':' + (list.length ? list[list.length - 1].id : '');
+  if (key === lastRenderedKey) return;
+  lastRenderedKey = key;
+  renderMessages(list);
 }
 
-function idealEscapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str || '';
-  return div.innerHTML;
+// Marca como lidas as mensagens recebidas na conversa aberta e apaga a bolinha
+async function markActiveConversationRead() {
+  if (!activeConversationId) return;
+  try {
+    await idealSupabase.rpc('ideal_mark_conversation_read', { conv: activeConversationId });
+  } catch (e) { /* sem problema: tenta de novo na próxima atualização */ }
+  const item = [...document.querySelectorAll('.conv-item')].find(c => c.dataset.convId === activeConversationId);
+  if (item) {
+    item.classList.remove('unread');
+    const badge = item.querySelector('.unread-count');
+    if (badge) badge.remove();
+  }
 }
 
 function renderMessages(messages) {
@@ -315,7 +387,7 @@ function renderMessages(messages) {
     const mine = m.sender_id === currentUser.id;
     return `
       <div class="msg-row ${mine ? 'mine' : ''}">
-        <div class="msg-avatar">${mine ? idealInitial('Você') : '?'}</div>
+        <div class="msg-avatar">${mine ? idealInitial('Você') : idealInitial(activeOtherName)}</div>
         <div>
           <div class="msg-bubble">${idealEscapeHtml(m.message_text)}</div>
           <span class="msg-time">${formatTime(m.created_at)}</span>
@@ -331,7 +403,7 @@ function subscribeToMessages() {
   messagesChannel = idealSupabase
     .channel(`messages-${activeConversationId}`)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${activeConversationId}` },
-      () => loadMessages())
+      async () => { await loadMessages(); markActiveConversationRead(); })
     .subscribe();
 }
 
@@ -361,7 +433,7 @@ async function sendMessage() {
       user_id: activeOtherUserId,
       type: 'mensagem',
       message: 'Você recebeu uma nova mensagem.',
-      link: 'ideal-mensagens.html'
+      link: 'ideal-mensagens.html?conversa=' + activeRequestId
     });
   }
 
@@ -407,7 +479,7 @@ async function submitDispute() {
   setTimeout(closeDisputeModal, 1800);
 }
 
-loadConversations();
+initMessages();
 </script>
 </body>
 </html>

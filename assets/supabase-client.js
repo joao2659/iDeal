@@ -102,6 +102,26 @@ async function idealGetCurrentUser() {
 }
 
 /* -------------------------------------------------------------------------
+   Mensagens não lidas
+   Retorna { idDaConversa: quantidade } com as mensagens recebidas e ainda
+   não lidas pelo usuário logado. Se algo falhar, retorna {} (sem bolinha).
+   ------------------------------------------------------------------------- */
+async function idealGetUnreadCounts() {
+  try {
+    const { data, error } = await idealSupabase.rpc("ideal_unread_counts");
+    if (error || !data) return {};
+    return Object.fromEntries(data.map((r) => [r.conversation_id, Number(r.unread) || 0]));
+  } catch (err) {
+    return {};
+  }
+}
+
+async function idealGetUnreadMessagesTotal() {
+  const counts = await idealGetUnreadCounts();
+  return Object.values(counts).reduce((a, b) => a + b, 0);
+}
+
+/* -------------------------------------------------------------------------
    Atualiza automaticamente o cabeçalho (nav) da página conforme o login:
    - Se NÃO estiver logado: mostra os botões "Entrar" / "Criar conta"
    - Se estiver logado: mostra o avatar (iniciais do nome) linkando pro
@@ -126,6 +146,7 @@ async function idealRenderNavAuth() {
   const initial = (profile?.first_name || user.email || "?").charAt(0).toUpperCase();
 
   container.innerHTML = `
+    <a href="ideal-mensagens.html" title="Mensagens" aria-label="Mensagens" style="position:relative; width:36px; height:36px; border-radius:50%; border:1.5px solid var(--line, #E3E6EE); background:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; text-decoration:none; flex-shrink:0;">💬<span id="idealNavMsgDot" style="display:none; position:absolute; top:4px; right:5px; width:9px; height:9px; border-radius:50%; background:var(--coral, #FF5A3C); border:2px solid #fff;"></span></a>
     <a href="ideal-dashboard.html" style="display:flex; align-items:center; gap:8px; font-weight:600; font-size:14px; color:var(--navy);">
       <span style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--coral));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-family:'Space Grotesk',sans-serif;">${initial}</span>
     </a>
@@ -133,4 +154,8 @@ async function idealRenderNavAuth() {
   `;
 
   document.getElementById("idealLogoutBtn").addEventListener("click", idealSignOut);
+
+  const total = await idealGetUnreadMessagesTotal();
+  const dot = document.getElementById("idealNavMsgDot");
+  if (dot && total > 0) dot.style.display = "block";
 }
