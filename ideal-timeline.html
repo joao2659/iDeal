@@ -261,12 +261,7 @@ async function submitInterest() {
 
   if (error) { msg.textContent = 'Erro ao enviar: ' + error.message; msg.style.color = 'var(--coral-dark)'; return; }
 
-  await idealSupabase.from('notifications').insert({
-    user_id: selectedOffer.traveler_id,
-    type: 'novo_interesse',
-    message: `Alguém tem interesse no seu anúncio "${selectedOffer.product_name}"!`,
-    link: 'ideal-dashboard.html'
-  });
+  // O aviso ao viajante e a conversa são criados automaticamente pelo banco.
 
   msg.textContent = 'Interesse enviado! O viajante vai te responder em breve.';
   msg.style.color = 'var(--mint)';

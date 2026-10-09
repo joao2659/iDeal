@@ -337,14 +337,11 @@ submitBtn.addEventListener('click', async ()=>{
     return;
   }
 
-  // Cria a conversa vinculada à viagem + solicitação
-  await idealSupabase.from('conversations').insert({
-    trip_id: currentTrip.id,
-    request_id: newRequest.id,
-  });
+  // A conversa, a sua mensagem no chat e o aviso ao viajante são criados
+  // automaticamente pelo banco quando a solicitação é salva.
 
   document.getElementById('successText').textContent =
-    `O viajante vai analisar seu pedido de transporte de "${productName}". Você recebe uma notificação assim que ele responder.`;
+    `O viajante já recebeu seu pedido de "${productName}" e sua mensagem está no chat de vocês. Você recebe uma notificação assim que ele responder.`;
   document.getElementById('formWrap').classList.add('gone');
   document.getElementById('successView').classList.add('active');
   window.scrollTo({top:0, behavior:'smooth'});

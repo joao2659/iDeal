@@ -29,7 +29,9 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .logo .dot{width:10px; height:10px; border-radius:50%; background:var(--coral); display:inline-block;}
 .nav-right{display:flex; align-items:center; gap:16px;}
 .icon-btn{width:40px; height:40px; border-radius:50%; background:var(--paper); border:1.5px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:15px; position:relative;}
-.icon-btn .dot-badge{position:absolute; top:6px; right:7px; width:7px; height:7px; border-radius:50%; background:var(--coral);}
+.icon-btn .dot-badge{position:absolute; top:5px; right:6px; width:9px; height:9px; border-radius:50%; background:var(--coral); border:2px solid var(--paper);}
+.summary-card[data-goto]{cursor:pointer; transition:transform .15s ease;}
+.summary-card[data-goto]:hover{transform:translateY(-2px);}
 .avatar-nav{width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--coral)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px; font-family:'Space Grotesk',sans-serif;}
 
 .app-shell{max-width:1320px; margin:0 auto; display:grid; grid-template-columns:250px 1fr; gap:0; min-height:calc(100vh - 68px);}
@@ -37,7 +39,6 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 
 /* SIDEBAR */
 .side{padding:28px 20px; border-right:1px solid var(--line);}
-@media (max-width:900px){.side{display:none;}}
 .side-user{display:flex; align-items:center; gap:12px; margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--line);}
 .side-user .avatar-lg{width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--coral)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-family:'Space Grotesk',sans-serif; flex-shrink:0;}
 .side-user b{font-size:14.5px; display:block;}
@@ -49,6 +50,16 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .side-link .count{margin-left:auto; font-size:11.5px; background:var(--coral); color:#fff; padding:2px 7px; border-radius:999px; font-weight:700;}
 .side-link.active .count{background:rgba(255,255,255,0.2);}
 .side-divider{height:1px; background:var(--line); margin:16px 0;}
+/* celular: menu vira uma barra de atalhos rolável */
+@media (max-width:900px){
+  .app-shell{grid-template-columns:minmax(0,1fr);}
+  .side{padding:12px 16px; border-right:none; border-bottom:1px solid var(--line); min-width:0;}
+  .side-user{display:none;}
+  .side-nav{flex-direction:row; overflow-x:auto; gap:6px; scrollbar-width:none; -webkit-overflow-scrolling:touch;}
+  .side-nav::-webkit-scrollbar{display:none;}
+  .side-link.active{background:var(--navy);}
+  .side-link{white-space:nowrap; flex-shrink:0; padding:8px 13px; font-size:13px; border:1px solid var(--line); background:var(--paper);}
+}
 
 /* MAIN */
 .main{padding:32px 28px 60px;}
@@ -124,7 +135,7 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
   <div class="nav-inner">
     <a href="ideal-homepage.html" class="logo"><span class="dot"></span>iDeal</a>
     <div class="nav-right">
-     <a href="ideal-mensagens.html" class="icon-btn" style="text-decoration:none;">💬</a>
+     <a href="ideal-mensagens.html" class="icon-btn" style="text-decoration:none;" title="Mensagens" aria-label="Mensagens">💬<span class="dot-badge" id="msgBadge" style="display:none;"></span></a>
       <div style="position:relative;">
         <button class="icon-btn" id="notifBtn" onclick="toggleNotifDropdown()">🔔<span class="dot-badge" id="notifBadge" style="display:none;"></span></button>
         <div id="notifDropdown" style="display:none; position:absolute; top:48px; right:0; width:320px; max-height:400px; overflow-y:auto; background:var(--paper); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow-lg); z-index:150;">
@@ -149,7 +160,7 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
       <a href="#solicitacoesRecebidasSection" class="side-link">📥 Solicitações recebidas</a>
       <a href="#viagensSalvasSection" class="side-link">🤍 Viagens salvas</a>
       <a href="#meusAnunciosSection" class="side-link">🏷️ Meus anúncios</a>
-      <a href="ideal-mensagens.html" class="side-link">💬 Mensagens</a>
+      <a href="ideal-mensagens.html" class="side-link">💬 Mensagens<span class="count" id="sideMsgCount" style="display:none;"></span></a>
       <a href="#avaliacoesSection" class="side-link">⭐ Avaliações</a>
     </nav>
   </aside>
@@ -323,11 +334,11 @@ const { data: myReviewsRaw } = await idealSupabase
   const acceptedReqs = requests.filter(r => r.request_status === 'aceita').length;
   const completedReqs = requests.filter(r => r.request_status === 'concluida').length;
   document.getElementById('summaryGrid').innerHTML = `
-    <div class="summary-card"><div class="ic">🧳</div><b>${activeTrips}</b><span>Viagens ativas</span></div>
-    <div class="summary-card"><div class="ic">📥</div><b>${pendingReqs}</b><span>Solicitações pendentes</span></div>
-    <div class="summary-card"><div class="ic">✅</div><b>${acceptedReqs}</b><span>Solicitações aceitas</span></div>
-    <div class="summary-card"><div class="ic">📦</div><b>${completedReqs}</b><span>Entregas concluídas</span></div>
-    <div class="summary-card"><div class="ic">⭐</div><b>${profile?.average_rating ? profile.average_rating.toFixed(1) : '—'}</b><span>Avaliação média</span></div>
+    <div class="summary-card" data-goto="minhasViagensSection"><div class="ic">🧳</div><b>${activeTrips}</b><span>Viagens ativas</span></div>
+    <div class="summary-card" data-goto="solicitacoesRecebidasSection"><div class="ic">📥</div><b>${pendingReqs}</b><span>Solicitações pendentes</span></div>
+    <div class="summary-card" data-goto="solicitacoesRecebidasSection"><div class="ic">✅</div><b>${acceptedReqs}</b><span>Solicitações aceitas</span></div>
+    <div class="summary-card" data-goto="solicitacoesRecebidasSection"><div class="ic">📦</div><b>${completedReqs}</b><span>Entregas concluídas</span></div>
+    <div class="summary-card" data-goto="avaliacoesSection"><div class="ic">⭐</div><b>${profile?.average_rating ? profile.average_rating.toFixed(1) : '—'}</b><span>Avaliação média</span></div>
   `;
 
   // Minhas viagens
@@ -544,6 +555,10 @@ const { data: r, error } = await idealSupabase
 
  const actions = document.getElementById('requestModalActions');
   const isTraveler = r.traveler_id === currentUserId;
+
+  document.getElementById('requestModalBody').innerHTML += `
+    <a href="ideal-mensagens.html?conversa=${idealEscapeHtml(r.id)}" class="btn btn-ghost" style="width:100%; justify-content:center; margin-top:16px;">💬 Abrir conversa com ${isTraveler ? 'o comprador' : 'o viajante'}</a>
+  `;
   if (isTraveler && (r.request_status === 'enviada' || r.request_status === 'em_analise')) {
     actions.innerHTML = `
       <button class="btn btn-ghost" style="flex:1;" onclick="respondToRequest('${r.id}', 'recusada')">Recusar</button>
@@ -630,7 +645,7 @@ async function respondToRequest(requestId, newStatus) {
       message: newStatus === 'aceita'
         ? `Sua solicitação de "${reqRow.product_name}" foi aceita!`
         : `Sua solicitação de "${reqRow.product_name}" foi recusada.`,
-      link: 'ideal-dashboard.html'
+      link: 'ideal-dashboard.html?solicitacao=' + requestId
     });
   }
 
@@ -709,7 +724,40 @@ document.addEventListener('click', (e) => {
   }
 });
 
-loadDashboard().then(loadNotifications);
+loadDashboard().then(loadNotifications).then(() => {
+  openRequestFromUrl();
+  loadUnreadMessagesBadge();
+  setInterval(() => { loadUnreadMessagesBadge(); loadNotifications(); }, 30000);
+});
+
+// Cards do resumo levam até a seção correspondente
+document.getElementById('summaryGrid').addEventListener('click', (e) => {
+  const card = e.target.closest('[data-goto]');
+  if (!card) return;
+  history.replaceState(null, '', '#' + card.dataset.goto);
+  scrollToHashSection();
+});
+
+// Link direto para uma solicitação: ideal-dashboard.html?solicitacao=<id>
+function openRequestFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('solicitacao');
+  if (!id || !/^[0-9a-f-]{36}$/i.test(id)) return;
+  history.replaceState(null, '', window.location.pathname + window.location.hash);
+  openRequestModal(id);
+}
+
+// Bolinha laranja no 💬 quando há mensagens não lidas
+async function loadUnreadMessagesBadge() {
+  const total = await idealGetUnreadMessagesTotal();
+  const dot = document.getElementById('msgBadge');
+  if (dot) dot.style.display = total > 0 ? 'block' : 'none';
+  const count = document.getElementById('sideMsgCount');
+  if (count) {
+    count.textContent = total > 9 ? '9+' : String(total);
+    count.style.display = total > 0 ? '' : 'none';
+  }
+}
 
 async function loadMyOffers() {
   const grid = document.getElementById('myOffersGrid');
