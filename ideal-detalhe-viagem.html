@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script src="assets/analytics.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rio de Janeiro → São Paulo com Mariana — iDeal</title>
+<title>Detalhes da viagem — iDeal</title>
   <link rel="canonical" href="https://www.viajaideal.com.br/ideal-detalhe-viagem.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -48,6 +48,7 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .trip-header h1{font-size:clamp(24px,3.4vw,34px);}
 .trip-header .sub{color:var(--ink-soft); margin-top:6px; font-size:15px;}
 .header-actions{display:flex; gap:10px;}
+@media (max-width:860px){.nav-links{display:none;} .header-actions{gap:8px;}}
 
 /* LAYOUT */
 .layout{display:grid; grid-template-columns:1fr 380px; gap:32px; padding-bottom:80px; align-items:start;}
@@ -141,7 +142,7 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 
 <div class="wrap">
   <div class="breadcrumb">
-    <a href="ideal-homepage.html">Início</a> / <a href="ideal-buscar-viagens.html">Encontrar viagens</a> / <span style="color:var(--navy); font-weight:600;">Rio de Janeiro → São Paulo</span>
+    <a href="ideal-homepage.html">Início</a> / <a href="ideal-buscar-viagens.html">Encontrar viagens</a> / <span id="crumbRoute" style="color:var(--navy); font-weight:600;">Detalhes da viagem</span>
   </div>
 
   <div class="trip-header" id="tripHeader">
@@ -291,6 +292,7 @@ async function loadTrip() {
   document.title = `${t.origin_city} → ${t.destination_city} — iDeal`;
   document.getElementById('tripBadgeType').textContent = t.trip_type || 'Regional';
   document.getElementById('tripTitle').textContent = `${t.origin_city} → ${t.destination_city}`;
+  document.getElementById('crumbRoute').textContent = `${t.origin_city} → ${t.destination_city}`;
   document.getElementById('tripSub').textContent = `${t.transport_type || ''}`;
 
   document.getElementById('originCode').textContent = (t.origin_city||'').slice(0,3).toUpperCase();

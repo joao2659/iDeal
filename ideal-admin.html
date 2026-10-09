@@ -23,8 +23,8 @@ a{color:inherit; text-decoration:none;}
 button,select,input{font-family:inherit; cursor:pointer; border:none;}
 :focus-visible{outline:2px solid var(--coral); outline-offset:2px;}
 
-.app-shell{display:grid; grid-template-columns:240px 1fr; min-height:100vh;}
-@media (max-width:900px){.app-shell{grid-template-columns:1fr;}}
+.app-shell{display:grid; grid-template-columns:240px minmax(0,1fr); min-height:100vh;}
+@media (max-width:900px){.app-shell{grid-template-columns:minmax(0,1fr);}}
 
 /* SIDEBAR */
 .side{background:var(--navy); color:#fff; padding:24px 16px; display:flex; flex-direction:column;}

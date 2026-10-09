@@ -121,6 +121,7 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .perforation{margin:18px 0; border-top:1px dashed var(--line); position:relative;}
 .perforation::before, .perforation::after{content:''; position:absolute; top:-8px; width:16px; height:16px; border-radius:50%; background:var(--bg); border:1px solid var(--line);}
 .perforation::before{left:-9px;} .perforation::after{right:-9px;}
+@media (max-width:640px){.results-grid{overflow-x:clip; padding:0 1px;}}
 
 .trip-body{padding:0 22px 22px; display:flex; flex-direction:column; flex:1;}
 .trip-meta-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; font-size:13px; color:var(--ink-soft); margin-bottom:14px;}

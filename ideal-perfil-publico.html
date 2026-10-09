@@ -50,6 +50,7 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .stats-card{background:var(--paper); border-radius:var(--radius); box-shadow:var(--shadow-lg); border:1px solid var(--line); display:flex;}
 .stat-col{flex:1; text-align:center; padding:24px 12px; border-right:1px solid var(--line);}
 .stat-col:last-child{border-right:none;}
+@media (max-width:640px){.stats-card{flex-wrap:wrap;} .stat-col{flex:1 1 50%; padding:18px 8px; border-bottom:1px solid var(--line);} .stat-col:nth-child(2n){border-right:none;} .stat-col:nth-last-child(-n+2){border-bottom:none;} .stat-col b{font-size:22px;}}
 .stat-col b{font-family:'Space Grotesk',sans-serif; font-size:26px; display:block; color:var(--navy);}
 .stat-col span{font-size:12px; color:var(--ink-soft); font-weight:600;}
 
@@ -258,6 +259,7 @@ const { data: p, error } = await idealSupabase
   const { data: trips } = await idealSupabase
     .from('trips').select('*')
     .eq('traveler_id', profileUserId).eq('trip_status', 'ativa')
+    .eq('approval_status', 'aprovada').gte('departure_date', idealTodayIso())
     .order('departure_date', { ascending: true }).limit(5);
 
   if (trips && trips.length) {

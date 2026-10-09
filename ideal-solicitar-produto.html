@@ -47,8 +47,8 @@ header.nav{position:sticky; top:0; z-index:100; background:rgba(246,247,250,0.9)
 .trip-context .avatar-sm{width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--coral)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:13px; font-family:'Space Grotesk',sans-serif;}
 .trip-context .divider{width:1px; height:28px; background:var(--line);}
 
-.layout{display:grid; grid-template-columns:1fr 340px; gap:28px; padding:28px 0 80px; align-items:start;}
-@media (max-width:900px){.layout{grid-template-columns:1fr;}}
+.layout{display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:28px; padding:28px 0 80px; align-items:start;}
+@media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr);}}
 
 .form-card{background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:32px;}
 .form-card h2{font-size:20px; margin-bottom:4px;}
