@@ -4,6 +4,14 @@
    Requer que assets/supabase-client.js já tenha sido carregado antes.
    ========================================================================= */
 
+// Data de hoje no fuso do usuário, no formato AAAA-MM-DD
+// (viagens que já partiram não aparecem mais para compradores)
+function idealTodayIso() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 // Busca viagens ativas e aprovadas, com dados do viajante (via profiles_public)
 async function idealFetchActiveTrips(limit = 24) {
   const { data, error } = await idealSupabase
@@ -11,6 +19,7 @@ async function idealFetchActiveTrips(limit = 24) {
     .select("*")
     .eq("approval_status", "aprovada")
     .eq("trip_status", "ativa")
+    .gte("departure_date", idealTodayIso())
     .order("departure_date", { ascending: true })
     .limit(limit);
 
@@ -106,7 +115,8 @@ async function idealFetchPlatformStats() {
       .from("trips")
       .select("*", { count: "exact", head: true })
       .eq("approval_status", "aprovada")
-      .eq("trip_status", "ativa"),
+      .eq("trip_status", "ativa")
+      .gte("departure_date", idealTodayIso()),
   ]);
   return { travelerCount: travelerCount || 0, tripCount: tripCount || 0 };
 }
