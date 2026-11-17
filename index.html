@@ -163,6 +163,16 @@ header.nav{
   box-shadow:0 30px 70px -24px rgba(19,27,58,.35);
 }
 .hero-photo img{ width:100%; height:100%; object-fit:cover; object-position:55% center; }
+.hero-photo.hero-video{ aspect-ratio:16 / 9; background:#F1EDE8; }
+.hero-photo video{ width:100%; height:100%; object-fit:cover; display:block; }
+.hero-sound-btn{
+  position:absolute; right:14px; bottom:14px; z-index:3;
+  border:none; cursor:pointer; border-radius:999px; padding:8px 14px;
+  font:600 12.5px 'Inter',sans-serif; color:var(--navy);
+  background:rgba(255,255,255,.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  box-shadow:0 6px 18px -8px rgba(19,27,58,.35);
+}
+.hero-sound-btn:hover{ background:#fff; }
 
 .hero-badge-float{
   position:absolute; right:20px; bottom:20px; z-index:3; max-width:230px;
@@ -226,6 +236,7 @@ header.nav{
 @media (max-width:1100px){
   .hero{ padding:20px 0 32px; }
   .hero-photo{ position:static; width:100%; aspect-ratio:4/3; max-height:none; margin:0; border-radius:20px; }
+  .hero-photo.hero-video{ position:relative; top:auto; left:auto; right:auto; aspect-ratio:16/9; }
   .hero-badge-float{ display:none; }
   .hero-content-v2{ max-width:100%; }
   .hero-content-v2 h1{ font-size:clamp(24px, 6.5vw, 34px); margin-top:26px; }
@@ -446,12 +457,11 @@ footer{padding:64px 0 32px;}
 
 <!-- HERO -->
 <section class="hero" id="inicio">
-  <div class="hero-photo">
-    <img src="assets/hero-desktop.jpg" alt="Viajante entregando uma encomenda a uma compradora na rua, placa da loja iDeal ao fundo">
-    <div class="hero-badge-float">
-      <div class="ic-round">✈️</div>
-      <div><b>Transforme sua viagem</b><span>Espaço na mala pode ser a oportunidade de alguém.</span></div>
-    </div>
+  <div class="hero-photo hero-video">
+    <video id="heroVideo" src="assets/como-usar.mp4" poster="assets/como-usar-poster.jpg"
+           autoplay muted loop playsinline preload="metadata"
+           aria-label="Vídeo: como usar o iDeal, passo a passo"></video>
+    <button type="button" class="hero-sound-btn" id="heroSoundBtn" aria-label="Ativar som do vídeo">🔇 Ativar som</button>
   </div>
 
   <div class="wrap">
@@ -946,6 +956,20 @@ document.getElementById('heroSearchBtn').addEventListener('click', () => {
   if (category) params.set('categoria', category);
   window.location.href = 'ideal-buscar-viagens.html' + (params.toString() ? '?' + params.toString() : '');
 });
+</script>
+<script>
+// Vídeo "Como usar" no hero: botão de som
+(function(){
+  var v = document.getElementById('heroVideo');
+  var b = document.getElementById('heroSoundBtn');
+  if (!v || !b) return;
+  b.addEventListener('click', function(){
+    v.muted = !v.muted;
+    if (!v.muted) { v.currentTime = 0; v.play(); }
+    b.textContent = v.muted ? '🔇 Ativar som' : '🔊 Som ligado';
+    b.setAttribute('aria-label', v.muted ? 'Ativar som do vídeo' : 'Desativar som do vídeo');
+  });
+})();
 </script>
 </body>
 </html>
